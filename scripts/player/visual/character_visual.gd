@@ -4,6 +4,7 @@ extends Node2D
 ##
 ##   play(nom, durée)     jouer une animation (durée imposée si > 0)
 ##   set_facing(sens)     regarder à gauche (-1) ou à droite (+1)
+##   set_energy(niveau)   niveau d'énergie de 0 à 1 (lueur du bracelet, J3)
 ##   current              nom de l'animation en cours
 ##   anim_event(nom)      signal émis à des instants précis (pas, prise…)
 ##
@@ -26,6 +27,12 @@ func play(_animation: StringName, _duration: float = -1.0) -> void:
 
 
 func set_facing(_direction: int) -> void:
+	pass
+
+
+## Niveau d'énergie, de 0 (vide) à 1 (plein) : un personnage peut l'afficher
+## sur lui (bracelet d'Élias). Facultatif : ne fait rien par défaut.
+func set_energy(_ratio: float) -> void:
 	pass
 
 

@@ -21,6 +21,9 @@ var move: int = 0
 var up: bool = false
 var down: bool = false
 var run: bool = false
+## Détente maintenue (tir chargé) et bouclier maintenu (J3).
+var fire: bool = false
+var shield: bool = false
 
 ## Horloge interne (secondes) et date du dernier appui de chaque commande.
 var _clock: float = 0.0
@@ -28,7 +31,7 @@ var _pressed_at: Dictionary = {}   # action -> date
 var _consumed: Dictionary = {}     # action -> date de l'appui déjà utilisé
 
 ## Commandes « à impulsion » suivies par le tampon.
-const BUFFERED: Array[StringName] = [&"jump", &"roll", &"move_up", &"move_down", &"interact"]
+const BUFFERED: Array[StringName] = [&"jump", &"roll", &"move_up", &"move_down", &"interact", &"fire", &"shield"]
 
 
 ## Lit clavier et manette (appelé par le joueur à chaque pas de physique).
@@ -41,6 +44,8 @@ func update(delta: float) -> void:
 	up = Input.is_action_pressed(&"move_up")
 	down = Input.is_action_pressed(&"move_down")
 	run = Input.is_action_pressed(&"run")
+	fire = Input.is_action_pressed(&"fire")
+	shield = Input.is_action_pressed(&"shield")
 	for action in BUFFERED:
 		if Input.is_action_just_pressed(action):
 			_pressed_at[action] = _clock
@@ -74,3 +79,5 @@ func clear() -> void:
 	up = false
 	down = false
 	run = false
+	fire = false
+	shield = false

@@ -59,13 +59,20 @@ func test_time_in_state_counts_and_resets() -> void:
 func test_every_player_state_has_a_script_and_animation() -> void:
 	var elias: Node = load("res://scenes/player/elias.tscn").instantiate()
 	var states: Node = elias.get_node("StateMachine")
-	assert_eq(states.get_child_count(), 16, "16 états")
+	assert_eq(states.get_child_count(), 20, "16 états de déplacement + 4 de combat")
 	for child in states.get_children():
 		assert_true(child is PlayerState, "%s hérite de PlayerState" % child.name)
 	elias.free()
-	# Toutes les animations demandées par les états existent dans les tables.
-	for anim_name: String in ["idle", "walk", "run", "skid", "turn", "crouch", "crouch_walk", "jump_windup", "jump",
-			"leap", "fall", "land", "land_heavy", "roll", "slide", "hang", "climb", "descend", "death"]:
+	# Toutes les animations demandées par les états (visual.play(&"…")) existent
+	# dans les tables : on les relève directement dans le code des états.
+	var regex := RegEx.create_from_string("visual\\.play\\(&\"([a-z_]+)\"")
+	var requested: Array[String] = []
+	for file in DirAccess.get_files_at("res://scripts/player/states"):
+		if file.ends_with(".gd"):
+			for m in regex.search_all(FileAccess.get_file_as_string("res://scripts/player/states".path_join(file))):
+				requested.append(m.get_string(1))
+	assert_true(requested.size() >= 20, "animations trouvées : %s" % [requested])
+	for anim_name in requested:
 		assert_true(EliasPoses.ANIMATIONS.has(anim_name), "animation %s" % anim_name)
 
 

@@ -1,6 +1,8 @@
 class_name EliasPoses
 extends RefCounted
 ## Tables de poses et d'animations d'Élias (silhouette polygonale provisoire).
+## Les Sentinelles (J3) partagent ce squelette et ces animations : leurs gestes
+## sont humains, et c'est voulu (PLAN §4.3, indices du twist).
 ##
 ## Une POSE est un dictionnaire « articulation → valeur ». Les angles sont en
 ## degrés, avec une convention unique : POSITIF = VERS L'AVANT (dans le sens du
@@ -98,6 +100,18 @@ const POSES: Dictionary = {
 		"arm_f": 30, "fore_f": 20, "arm_b": -20, "fore_b": 10, "thigh_f": 12, "shin_f": -15,
 		"thigh_b": -5, "shin_b": -5, "coat": 10},
 	"squeeze": {"rig_sx": 0.12},
+	# Combat (J3). Bras avant à 90° : tendu à l'horizontale, pistolet au bout.
+	"aim": {"torso": 0, "head": -2, "hips_y": 1, "arm_f": 90, "fore_f": 0, "arm_b": 40, "fore_b": 70,
+		"thigh_f": 14, "shin_f": -6, "thigh_b": -12, "shin_b": -4, "coat": 2},
+	"recoil": {"torso": -5, "head": -6, "hips_y": 1, "arm_f": 104, "fore_f": 8, "arm_b": 34, "fore_b": 70,
+		"thigh_f": 14, "shin_f": -6, "thigh_b": -12, "shin_b": -4, "coat": 6},
+	"charge": {"torso": 5, "head": 0, "hips_y": 4, "arm_f": 88, "fore_f": 0, "arm_b": 72, "fore_b": 25,
+		"thigh_f": 20, "shin_f": -18, "thigh_b": -16, "shin_b": -12, "coat": -2},
+	"guard": {"torso": -6, "head": -8, "hips_y": 5, "arm_f": 75, "fore_f": 40, "arm_b": 55, "fore_b": 60,
+		"thigh_f": 22, "shin_f": -16, "thigh_b": -20, "shin_b": -12, "coat": 8},
+	# À genou (tir bas des Sentinelles) : jambes de l'accroupi, buste droit.
+	"kneel_aim": {"hips_y": 24, "thigh_f": 75, "shin_f": -125, "thigh_b": 60, "shin_b": -120,
+		"torso": 8, "head": -4, "arm_f": 82, "fore_f": 0, "arm_b": 40, "fore_b": 70, "coat": -40},
 }
 
 ## Animations : longueur (s), boucle, poses clés [instant, pose, retouches éventuelles],
@@ -133,6 +147,13 @@ const ANIMATIONS: Dictionary = {
 	"climb": {"length": 0.6, "keys": [[0.0, "hang"], [0.25, "pull"], [0.4, "mantle"], [0.6, "stand"]],
 		"events": [[0.35, "climb_knee"]]},
 	"descend": {"length": 0.5, "keys": [[0.0, "stand"], [0.18, "sit_edge"], [0.35, "pull"], [0.5, "hang"]]},
+	# Combat (J3). « shoot » dure fire_cooldown (réglage de l'arme).
+	"aim": {"length": 1.6, "loop": true, "keys": [[0.0, "aim"], [0.8, "aim", false, {"torso": 2, "hips_y": 2}], [1.6, "aim"]]},
+	"shoot": {"length": 0.28, "keys": [[0.0, "aim"], [0.05, "recoil"], [0.28, "aim"]]},
+	"charge": {"length": 0.3, "loop": true, "keys": [[0.0, "charge"], [0.15, "charge", false, {"arm_f": 86, "hips_y": 5}], [0.3, "charge"]]},
+	"shield": {"length": 0.15, "keys": [[0.0, "aim"], [0.15, "guard"]]},
+	"kneel_aim": {"length": 0.2, "keys": [[0.0, "crouch"], [0.2, "kneel_aim"]]},
+	"kneel_shoot": {"length": 0.28, "keys": [[0.0, "kneel_aim"], [0.05, "kneel_aim", false, {"arm_f": 96, "torso": 2}], [0.28, "kneel_aim"]]},
 	"death": {"length": 0.8, "keys": [[0.0, "land_heavy"], [0.25, "collapse"], [0.7, "lying"], [0.8, "lying"]],
 		"events": [[0.62, "body_fall"]]},
 }

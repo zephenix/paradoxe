@@ -107,6 +107,10 @@ func update_charge(delta: float) -> void:
 	if not is_charging:
 		return
 	charge += delta
+	# L'arme retient l'énergie pendant la charge : la jauge ne se recharge pas
+	# (sinon maintenir la détente serait une recharge gratuite).
+	if energy:
+		energy.idle_time = 0.0
 	if is_charged() and not _charge_ready_sent:
 		_charge_ready_sent = true
 		AudioManager.play_stream_2d(CombatSounds.CHARGE_READY, muzzle_position(), AudioBuses.SFX, -10.0)

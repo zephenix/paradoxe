@@ -43,6 +43,23 @@ func handle_ground_actions() -> bool:
 	return false
 
 
+## Réactions de combat communes aux états au sol (arrêt, marche, course,
+## accroupi) : un appui sur « tir » ou « bouclier » fait dégainer (état Aim),
+## qui exécutera ensuite le tir ou lèvera le bouclier. Renvoie vrai si une
+## transition a eu lieu.
+func handle_combat_actions() -> bool:
+	var p: Player = player
+	if not p.is_on_floor() or not p.can_stand():
+		return false
+	if p.wants(&"shield") or p.input.shield:
+		machine.transition_to(&"Aim", {"then": &"shield"})
+		return true
+	if p.wants(&"fire"):
+		machine.transition_to(&"Aim", {"then": &"fire"})
+		return true
+	return false
+
+
 ## Garde-bord : en marchant, Élias s'arrête devant un vide dangereux (plus
 ## profond qu'une chute sans conséquence). Désactivé en mode classique.
 func edge_guard_stops() -> bool:
