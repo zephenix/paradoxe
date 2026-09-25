@@ -29,13 +29,13 @@ var _shield_pending: bool = false
 var _shield_delay: float = 0.0
 
 
-func enter(previous: StringName, _data: Dictionary) -> void:
+func enter(previous: StringName, data: Dictionary) -> void:
 	var s: Sentinel = sentinel
 	_judged.clear()
 	_shield_pending = false
 	_phase = Phase.REACT
 	_timer = s.config.reaction_time
-	if previous != &"Chase":
+	if previous != &"Chase" and not data.get("resumed", false):
 		s.say(&"alert")
 		s.weapon.play_draw_sound()
 	s.visual.play(&"aim")

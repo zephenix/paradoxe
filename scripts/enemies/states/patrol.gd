@@ -9,15 +9,19 @@ extends SentinelState
 var _pause: float = 0.0
 
 
-func enter(_previous: StringName, _data: Dictionary) -> void:
+func enter(_previous: StringName, data: Dictionary) -> void:
 	var s: Sentinel = sentinel
-	_pause = 0.0
+	_pause = data.get("pause", 0.0)
 	# Hors de son trajet (après une recherche) : elle se tourne vers son poste.
 	if s.global_position.x < _left() - 4.0:
 		s.facing = 1
 	elif s.global_position.x > _right() + 4.0:
 		s.facing = -1
 	s.visual.play(&"idle")
+
+
+func snapshot() -> Dictionary:
+	return {"pause": _pause}
 
 
 func physics_update(delta: float) -> void:

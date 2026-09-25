@@ -5,6 +5,7 @@ extends Node2D
 ##   play(nom, durée)     jouer une animation (durée imposée si > 0)
 ##   set_facing(sens)     regarder à gauche (-1) ou à droite (+1)
 ##   set_energy(niveau)   niveau d'énergie de 0 à 1 (lueur du bracelet, J3)
+##   capture_pose() / restore_pose(pose)   photo de la pose (rembobinage, J4)
 ##   current              nom de l'animation en cours
 ##   anim_event(nom)      signal émis à des instants précis (pas, prise…)
 ##
@@ -33,6 +34,16 @@ func set_facing(_direction: int) -> void:
 ## Niveau d'énergie, de 0 (vide) à 1 (plein) : un personnage peut l'afficher
 ## sur lui (bracelet d'Élias). Facultatif : ne fait rien par défaut.
 func set_energy(_ratio: float) -> void:
+	pass
+
+
+## Pose actuelle (animation et instant), pour le rembobinage (J4).
+func capture_pose() -> Dictionary:
+	return {}
+
+
+## Replace le dessin dans une pose capturée, même jeu en pause.
+func restore_pose(_pose: Dictionary) -> void:
 	pass
 
 

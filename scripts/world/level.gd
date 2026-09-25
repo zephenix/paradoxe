@@ -2,13 +2,15 @@ class_name Level
 extends Node2D
 ## Script d'un niveau : relie Élias, la caméra et les salles, et gère la mort.
 ##
-## Mort et réapparition (J3) : après un court délai (on voit Élias tomber), un
-## fondu au noir ; pendant le noir, les tirs en vol sont effacés et Élias
-## réapparaît au DERNIER CHECKPOINT atteint (ou à son point de départ s'il n'en
-## a touché aucun), jauge d'énergie pleine. Sa réapparition prévient les
-## ennemis (Events.player_respawned), qui reprennent leur poste. Le tout prend
-## moins de 2 secondes (PLAN §5.7 ; réglages dans resources/world/respawn.tres).
-## J4 ajoutera le choix « rembobiner » avant ce retour au checkpoint.
+## Mort (J4) : la séquence (ralenti, temps figé, choix « remonter le temps » ou
+## « checkpoint ») est confiée à un DeathController, enfant de ce nœud.
+##   - Élias a remonté le temps : le jeu reprend, rien d'autre à faire ;
+##   - retour au checkpoint : fondu au noir ; pendant le noir, les tirs en vol
+##     sont effacés et Élias réapparaît au DERNIER CHECKPOINT atteint (ou à son
+##     point de départ), jauge pleine et rembobinages rendus. Sa réapparition
+##     prévient les ennemis (Events.player_respawned), qui reprennent leur poste.
+## Sans rembobinage possible (mode classique…), le retour au checkpoint suit un
+## court délai et prend moins de 2 secondes (PLAN §5.7 ; resources/world/respawn.tres).
 ##
 ## « Pause » ramène à l'écran titre (le menu pause arrive en J9).
 
@@ -20,6 +22,9 @@ extends Node2D
 
 @onready var player: Player = $Elias
 @onready var camera: CameraDirector = $CameraDirector
+
+## Séquence de mort et rembobinage.
+var death: DeathController
 
 ## Point de départ d'Élias (réapparition tant qu'aucun checkpoint n'est atteint).
 var _start_position: Vector2
@@ -35,6 +40,18 @@ func _ready() -> void:
 	player.died.connect(_on_player_died)
 	player.kill_y = _lowest_room_bottom() + respawn.kill_margin
 	camera.snap_to_target()
+	death = DeathController.new()
+	death.name = "DeathController"
+	add_child(death)
+	# Pendant le défilement arrière, le jeu est en pause : la caméra ne suit plus
+	# d'elle-même, on la recadre à chaque image.
+	death.scrubbed.connect(camera.snap_to_target)
+	RewindManager.start_recording()
+
+
+func _exit_tree() -> void:
+	RewindManager.recording = false
+	RewindManager.clear()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -51,7 +68,16 @@ func respawn_point() -> Array:
 
 
 func _on_player_died(_cause: StringName) -> void:
-	await get_tree().create_timer(respawn.delay).timeout
+	RewindManager.stop_recording()
+	if RewindManager.can_rewind():
+		var result: StringName = await death.play()
+		if not is_inside_tree():
+			return
+		if result == &"rewound":
+			camera.snap_to_target()
+			return
+	else:
+		await get_tree().create_timer(respawn.delay).timeout
 	# Si le joueur a quitté le niveau entre-temps (Échap), on n'insiste pas.
 	if SceneTransition.is_changing_scene or not is_inside_tree():
 		return
@@ -61,7 +87,9 @@ func _on_player_died(_cause: StringName) -> void:
 	clear_projectiles()
 	var point: Array = respawn_point()
 	player.respawn(point[0], point[1])
+	GameState.reset_rewinds()
 	camera.snap_to_target()
+	RewindManager.start_recording()
 	await SceneTransition.fade_in(respawn.fade_in)
 
 

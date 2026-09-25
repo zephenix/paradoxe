@@ -11,8 +11,13 @@ func enter(_previous: StringName, data: Dictionary) -> void:
 	var s: Sentinel = sentinel
 	_clue = data.get("clue", s.global_position)
 	s.face_toward(_clue)
-	s.say(&"curious")
+	if not data.get("resumed", false):  # pas de nouveau cri en reprenant après un rembobinage
+		s.say(&"curious")
 	s.visual.play(&"idle")
+
+
+func snapshot() -> Dictionary:
+	return {"clue": _clue}
 
 
 func physics_update(delta: float) -> void:

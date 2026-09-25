@@ -29,6 +29,10 @@ func is_committed() -> bool:
 	return true
 
 
+func snapshot() -> Dictionary:
+	return {"airborne": _airborne}
+
+
 func physics_update(delta: float) -> void:
 	var p: Player = player
 	if not _airborne:

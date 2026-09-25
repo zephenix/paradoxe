@@ -82,6 +82,23 @@ func set_energy(ratio: float) -> void:
 		_bracelet.color = BRACELET_EMPTY.lerp(BRACELET_FULL, clampf(ratio, 0.0, 1.0))
 
 
+func capture_pose() -> Dictionary:
+	if _player == null or current == &"":
+		return {}
+	return {"anim": current, "time": _player.current_animation_position, "speed": _player.speed_scale}
+
+
+func restore_pose(pose: Dictionary) -> void:
+	if _player == null or pose.is_empty():
+		return
+	current = pose["anim"]
+	_player.play(current)
+	_player.seek(pose["time"], true)  # true : met la pose à jour tout de suite
+	_player.speed_scale = pose["speed"]
+	if _gun:
+		_gun.visible = current in WEAPON_ANIMATIONS
+
+
 ## Place l'animation à un instant donné (outil de planche de poses).
 func seek_fraction(animation: StringName, fraction: float) -> void:
 	current = animation

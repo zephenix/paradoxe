@@ -40,11 +40,26 @@ func before_each() -> void:
 	level.add_child(camera)
 	add_node(level)
 	player.input.from_devices = false
+	level.death.input_from_devices = false
 	await wait_physics(3)
 
 
 func after_each() -> void:
 	GameState.new_game()
+
+
+## Fait mourir Élias puis, si le choix « rembobiner / checkpoint » apparaît,
+## choisit le checkpoint ; attend la fin de la réapparition.
+func die_and_respawn(cause: StringName = &"shot") -> void:
+	if not player.is_dead:
+		player.kill(cause)
+	for i in 120:
+		if level.death.phase == &"choice" or not player.is_dead:
+			break
+		await wait_physics(1)
+	if level.death.phase == &"choice":
+		level.death.request_checkpoint()
+	await wait_physics_seconds(level.respawn.total_time() + 0.1)
 
 
 func walk_onto_checkpoint() -> void:
@@ -105,8 +120,7 @@ func test_death_without_checkpoint_respawns_at_start() -> void:
 	player.input.move = 1
 	await wait_physics(20)
 	player.input.move = 0
-	player.kill(&"shot")
-	await wait_physics_seconds(level.respawn.total_time() + 0.2)
+	await die_and_respawn()
 	assert_false(player.is_dead)
 	assert_almost_eq(player.global_position.x, 100.0, 1.0, "point de départ")
 
@@ -117,9 +131,8 @@ func test_death_respawns_at_checkpoint_quickly_with_full_energy() -> void:
 	await wait_physics(30)
 	player.input.move = 0
 	player.energy.try_spend(5.0)
-	player.kill(&"shot")
-	assert_true(level.respawn.total_time() < 2.0, "retour en jeu en moins de 2 s (PLAN §5.7)")
-	await wait_physics_seconds(level.respawn.total_time() + 0.1)
+	assert_true(level.respawn.fade_out + level.respawn.fade_in < 2.0, "retour en jeu en moins de 2 s après le choix (PLAN §5.7)")
+	await die_and_respawn()
 	assert_false(player.is_dead, "réapparu")
 	assert_almost_eq(player.global_position.x, checkpoint.global_position.x, 1.0, "au checkpoint")
 	assert_eq(player.facing, -1, "tourné comme le checkpoint le demande")
@@ -131,8 +144,7 @@ func test_respawn_clears_projectiles_in_flight() -> void:
 	shot.setup(null, Projectile.TEAM_ENEMY, -1, 10.0, false, WeaponConfig.new())
 	level.add_child(shot)
 	shot.global_position = Vector2(1000, 300)
-	player.kill(&"fall")
-	await wait_physics_seconds(level.respawn.total_time() + 0.1)
+	await die_and_respawn(&"fall")
 	assert_false(is_instance_valid(shot), "tir effacé à la réapparition")
 
 
@@ -144,7 +156,6 @@ func test_respawn_puts_sentinels_back_on_duty() -> void:
 	level.add_child(sentinel)
 	await wait_physics(2)
 	sentinel.die()
-	player.kill(&"shot")
-	await wait_physics_seconds(level.respawn.total_time() + 0.1)
+	await die_and_respawn()
 	assert_false(sentinel.is_dead, "la Sentinelle tuée depuis le checkpoint revient")
 	assert_almost_eq(sentinel.global_position.x, 1100.0, 1.0)

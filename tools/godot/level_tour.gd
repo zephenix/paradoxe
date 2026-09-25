@@ -87,6 +87,27 @@ func _tour() -> void:
 	_player.input.down = true
 	await _frames(50)
 	await _shot("tour_10_cover")
+	_player.input.down = false
+	# 6) Mort et rembobinage (J4), dans la salle B : Élias court, meurt, remonte le temps.
+	var death: Node = _level.get("death")
+	death.input_from_devices = false
+	await _teleport(Vector2(1280 + 1.5 * 48, 11 * 48))
+	_player.input.move = 1
+	_player.input.run = true
+	await _frames(70)
+	_player.kill(&"shot")
+	_player.input.move = 0
+	_player.input.run = false
+	while death.phase != &"choice":
+		await _frames(1)
+	await _frames(5)
+	await _shot("tour_11_choice")
+	death.rewind_held = true
+	await _frames(40)
+	await _shot("tour_12_rewind")
+	death.rewind_held = false
+	await _frames(20)
+	await _shot("tour_13_resumed")
 	quit()
 
 
