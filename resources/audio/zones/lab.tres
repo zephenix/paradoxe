@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AcousticZone" format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/acoustic_zone.gd" id="1_zone"]
+
+[resource]
+script = ExtResource("1_zone")
+id = &"lab"
+title = "Laboratoire"
+layers = Array[StringName]([&"amb_lab_loop", &"amb_electric_loop"])
+layer_volumes_db = Array[float]([0.0, -6.0])
+swell_depth_db = 2.0
+swell_period = 16.0
+events = Array[StringName]([&"amb_buzz", &"amb_drip"])
+event_interval_min = 5.0
+event_interval_max = 12.0
+event_distance_min = 250.0
+event_distance_max = 900.0
+event_volume_db = -4.0
+reverb_wet = 0.18
+reverb_room_size = 0.35
+reverb_damping = 0.3
+lowpass_hz = 20500.0

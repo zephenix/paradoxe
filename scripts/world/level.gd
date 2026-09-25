@@ -12,6 +12,9 @@ extends Node2D
 ## Sans rembobinage possible (mode classique…), le retour au checkpoint suit un
 ## court délai et prend moins de 2 secondes (PLAN §5.7 ; resources/world/respawn.tres).
 ##
+## Son (J5) : en changeant de salle, l'ambiance passe à la zone acoustique de la
+## salle (Room.acoustic_zone) ; en quittant le niveau, elle s'éteint.
+##
 ## « Pause » ramène à l'écran titre (le menu pause arrive en J9).
 
 ## Réglages de la réapparition (délai, fondus, vide sans fond).
@@ -37,6 +40,9 @@ func _ready() -> void:
 	_start_position = player.global_position
 	_start_facing = player.facing
 	camera.target = player
+	# Chaque salle a sa zone acoustique (J5) : en y entrant, l'ambiance et
+	# l'acoustique passent en fondu à celles de la zone.
+	camera.room_changed.connect(_on_room_changed)
 	player.died.connect(_on_player_died)
 	player.kill_y = _lowest_room_bottom() + respawn.kill_margin
 	camera.snap_to_target()
@@ -52,6 +58,11 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	RewindManager.recording = false
 	RewindManager.clear()
+	AudioManager.set_zone(&"", 1.0)
+
+
+func _on_room_changed(room: Room) -> void:
+	AudioManager.set_zone(room.acoustic_zone)
 
 
 func _unhandled_input(event: InputEvent) -> void:

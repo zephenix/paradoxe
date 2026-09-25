@@ -54,6 +54,8 @@ var _pool_2d: Array[AudioStreamPlayer2D] = []
 var _loops: Dictionary = {}  # identifiant -> AudioStreamPlayer
 var _muffle_tween: Tween
 var _gain_tween: Tween
+## Ambiance de la zone acoustique courante (J5) : voir set_zone().
+var ambience: AmbiencePlayer
 
 
 func _ready() -> void:
@@ -62,6 +64,9 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	for i in POOL_SIZE:
 		_pool.append(_make_player())
+	ambience = AmbiencePlayer.new()
+	ambience.name = "Ambience"
+	add_child(ambience)
 	_apply_muffle()
 	_apply_drama_gain()
 
@@ -248,7 +253,7 @@ func restore_from_silence(fade_back: float = 1.5) -> void:
 ## Règle la réverbération de la salle (bus Monde).
 ## wet : quantité d'écho (0 = sec) ; room_size : taille perçue (0 à 1) ;
 ## damping : amortissement des aigus (0 = métal brillant, 1 = pièce feutrée).
-## J5 remplacera cet appel par des préréglages par zone (set_zone).
+## Les zones acoustiques (set_zone) la règlent d'elles-mêmes.
 func set_reverb(wet: float, room_size: float = 0.6, damping: float = 0.5) -> void:
 	var reverb: AudioEffectReverb = _effect(AudioBuses.WORLD, AudioBuses.WORLD_FX_REVERB) as AudioEffectReverb
 	if reverb == null:
@@ -257,6 +262,35 @@ func set_reverb(wet: float, room_size: float = 0.6, damping: float = 0.5) -> voi
 	reverb.room_size = clampf(room_size, 0.0, 1.0)
 	reverb.damping = clampf(damping, 0.0, 1.0)
 	AudioServer.set_bus_effect_enabled(AudioBuses.index(AudioBuses.WORLD), AudioBuses.WORLD_FX_REVERB, wet > 0.0)
+
+
+## Filtre passe-bas des sons du monde (bus Monde), en Hz : 20500 = aucun filtre.
+func set_world_lowpass(cutoff_hz: float) -> void:
+	var lowpass: AudioEffectLowPassFilter = _effect(AudioBuses.WORLD, AudioBuses.WORLD_FX_LOWPASS) as AudioEffectLowPassFilter
+	if lowpass == null:
+		return
+	lowpass.cutoff_hz = clampf(cutoff_hz, 50.0, AudioBuses.LOWPASS_OPEN_HZ)
+	AudioServer.set_bus_effect_enabled(AudioBuses.index(AudioBuses.WORLD), AudioBuses.WORLD_FX_LOWPASS,
+			cutoff_hz < AudioBuses.LOWPASS_OPEN_HZ - 1.0)
+
+
+func world_lowpass_hz() -> float:
+	var lowpass: AudioEffectLowPassFilter = _effect(AudioBuses.WORLD, AudioBuses.WORLD_FX_LOWPASS) as AudioEffectLowPassFilter
+	return lowpass.cutoff_hz if lowpass else AudioBuses.LOWPASS_OPEN_HZ
+
+
+func world_reverb() -> AudioEffectReverb:
+	return _effect(AudioBuses.WORLD, AudioBuses.WORLD_FX_REVERB) as AudioEffectReverb
+
+
+# --------------------------------------------------------------------------
+# Zones acoustiques (J5)
+# --------------------------------------------------------------------------
+
+## Passe en fondu à l'ambiance et à l'acoustique de la zone « id »
+## (resources/audio/zones/<id>.tres). &"" = silence (on quitte le niveau).
+func set_zone(id: StringName, fade: float = 2.5) -> void:
+	ambience.set_zone(id, fade)
 
 
 # --------------------------------------------------------------------------

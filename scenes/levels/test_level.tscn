@@ -60,6 +60,7 @@ script = ExtResource("2_room")
 room_size = Vector2(1280, 720)
 camera_zoom = 1.0
 title = "A - Les bases"
+acoustic_zone = &"lab"
 
 [node name="Spawn" type="Marker2D" parent="RoomA"]
 position = Vector2(144, 624)
@@ -113,6 +114,7 @@ script = ExtResource("2_room")
 room_size = Vector2(1280, 720)
 camera_zoom = 1.0
 title = "B - Sauts"
+acoustic_zone = &"lab"
 
 [node name="Checkpoint" parent="RoomB" instance=ExtResource("7_checkpoint")]
 position = Vector2(96, 528)
@@ -169,6 +171,7 @@ script = ExtResource("2_room")
 room_size = Vector2(1280, 720)
 camera_zoom = 1.0
 title = "C - Rebords et chutes"
+acoustic_zone = &"ruins"
 
 [node name="Checkpoint" parent="RoomC" instance=ExtResource("7_checkpoint")]
 position = Vector2(96, 528)
@@ -180,6 +183,7 @@ position = Vector2(48, 528)
 position = Vector2(0, 528)
 script = ExtResource("3_block")
 size_blocks = Vector2(9, 4)
+surface = &"plant"
 
 [node name="Block1" type="StaticBody2D" parent="RoomC"]
 position = Vector2(432, 384)
@@ -226,6 +230,7 @@ script = ExtResource("2_room")
 room_size = Vector2(1280, 720)
 camera_zoom = 1.0
 title = "D - Le puits"
+acoustic_zone = &"shaft"
 transition = 1
 
 [node name="Spawn" type="Marker2D" parent="RoomD"]
@@ -235,6 +240,7 @@ position = Vector2(48, 624)
 position = Vector2(0, 624)
 script = ExtResource("3_block")
 size_blocks = Vector2(27, 2)
+surface = &"metal"
 
 [node name="Block1" type="StaticBody2D" parent="RoomD"]
 position = Vector2(912, 0)
@@ -262,6 +268,7 @@ script = ExtResource("2_room")
 room_size = Vector2(2560, 960)
 camera_zoom = 0.75
 title = "E - Grand hall"
+acoustic_zone = &"hall"
 
 [node name="Checkpoint" parent="RoomE" instance=ExtResource("7_checkpoint")]
 position = Vector2(120, 768)
@@ -321,6 +328,7 @@ script = ExtResource("2_room")
 room_size = Vector2(1920, 720)
 camera_zoom = 1.0
 title = "F - Combat"
+acoustic_zone = &"ruins"
 
 [node name="Checkpoint" parent="RoomF" instance=ExtResource("7_checkpoint")]
 position = Vector2(96, 672)
