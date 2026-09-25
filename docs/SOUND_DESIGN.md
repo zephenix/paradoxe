@@ -265,10 +265,10 @@ Une zone (`resources/audio/zones/<id>.tres`, classe `AcousticZone`) contient :
 
 | Zone | Salles de test | Couches | Évènements | Acoustique |
 |---|---|---|---|---|
-| `lab` (Laboratoire) | A, B | `amb_lab_loop` (ventilation), `amb_electric_loop` (grésillement, -6 dB) | `amb_buzz`, `amb_drip` | petite pièce claire, écho 18 % |
-| `ruins` (Ruines) | C, F | `amb_wind_loop` (vent), `amb_city_loop` (ville lointaine, -3 dB) | `amb_debris`, `amb_creak`, `amb_cry` | plein air, écho 8 % |
-| `shaft` (Puits) | D | `amb_shaft_loop` (grondement), `amb_wind_loop` (-10 dB) | `amb_drip`, `amb_creak`, `amb_debris` | grande cavité sombre, écho 42 %, filtre 9 kHz |
-| `hall` (Grand hall) | E | `amb_hall_loop` (présence, machinerie), `amb_electric_loop` (-12 dB) | `amb_creak`, `amb_cry`, `amb_buzz` | immense, écho 50 % |
+| `lab` (Laboratoire) | A, B | `amb_lab_loop` (ventilation), `amb_electric_loop` (grésillement, -6 dB) | `amb_buzz`, `amb_drip` | petite pièce, écho 7 % |
+| `ruins` (Ruines) | C, F | `amb_wind_loop` (vent), `amb_city_loop` (ville lointaine, -3 dB) | `amb_debris`, `amb_creak`, `amb_cry` | plein air, écho 4 % |
+| `shaft` (Puits) | D | `amb_shaft_loop` (grondement), `amb_wind_loop` (-10 dB) | `amb_drip`, `amb_creak`, `amb_debris` | grande cavité sombre, écho 20 %, filtre 9 kHz |
+| `hall` (Grand hall) | E | `amb_hall_loop` (présence, machinerie), `amb_electric_loop` (-12 dB) | `amb_creak`, `amb_cry`, `amb_buzz` | immense, écho 24 % |
 
 | Son (`ambience/`) | Rôle |
 |---|---|
@@ -317,6 +317,42 @@ Une zone (`resources/audio/zones/<id>.tres`, classe `AcousticZone`) contient :
 ---
 
 ## 7. Écouter et régler
+
+### Mesurer l'équilibre (v0.5.1)
+
+```bash
+python3 tools/audio/measure_levels.py          # vérifie les familles de sons
+python3 tools/audio/measure_levels.py --all    # et affiche les autres sons
+```
+
+L'outil mesure le **niveau effectif** de chaque son (niveau du fichier + volume de la
+bibliothèque) et le compare à la cible de sa **famille** : tous les pas au même niveau,
+tous les tirs, toutes les voix de Sentinelles… (table `FAMILIES` en tête du script). Il
+signale aussi une crête au-dessus de 0 dB. La CI le lance à chaque Pull Request : un son
+ajouté ou réglé trop fort ou trop faible fait échouer la vérification.
+
+| Famille | Cible (dB) | Tolérance |
+|---|---|---|
+| Tirs | -21 | ± 1,5 |
+| Voix des Sentinelles | -21 | ± 1,5 |
+| Réceptions et chutes | -21,5 | ± 1,5 |
+| Pas (course) | -22 | ± 2 |
+| Impacts | -24 | ± 1,5 |
+| Gestes (saut, roulade, prise…) | -27,5 | ± 2 |
+| Bouclier levé / baissé | -28 | ± 2 |
+| Signaux de l'arme | -31,5 | ± 2 |
+| Couches d'ambiance | -32 | ± 2,5 |
+| Évènements d'ambiance | -32,5 | ± 2 |
+| Petits gestes (demi-tour, accroupi, dégainer, rengainer) | -35 | ± 2,5 |
+| Interface | -20 | ± 1,5 |
+
+Un niveau égal n'est pas une sonie parfaitement égale (l'oreille entend mieux les
+médiums) : c'est un premier réglage objectif, que l'oreille affine au banc d'écoute.
+
+L'**écho** des zones est plafonné à 30 % par un test (`test_ambience.gd`) : les ambiances
+contiennent déjà leur propre espace, et la réverbération du bus Monde s'y ajoute.
+
+### Au banc d'écoute
 
 - **Banc d'écoute** (J5) : bouton « Banc d'écoute » de l'écran titre. Il fonctionne aussi
   sur le Web.

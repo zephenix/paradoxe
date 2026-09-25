@@ -66,6 +66,9 @@ jobs:
           python -m pip install --quiet -r tools/audio/requirements.txt
           python tools/audio/generate_sounds.py --out "$RUNNER_TEMP/sounds"
 
+      - name: Mixage équilibré (niveaux des familles de sons)
+        run: python tools/audio/measure_levels.py
+
   # ---------------------------------------------------------------------------
   web:
     name: Export Web

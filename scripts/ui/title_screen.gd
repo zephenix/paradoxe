@@ -171,8 +171,8 @@ func _on_hum_toggled(enabled: bool) -> void:
 
 
 func _on_reverb_toggled(enabled: bool) -> void:
-	# Préréglage « grand hall » : beaucoup d'écho, grande pièce, aigus brillants.
-	AudioManager.set_reverb(0.45 if enabled else 0.0, 0.9, 0.25)
+	# Préréglage « grand hall » (mêmes valeurs que resources/audio/zones/hall.tres).
+	AudioManager.set_reverb(0.24 if enabled else 0.0, 0.8, 0.55)
 
 
 func _on_muffle_toggled(enabled: bool) -> void:
