@@ -289,6 +289,11 @@
   "description": "Tir qui frappe le décor : choc et grésillement (provisoire J3).",
   "loop": false
  },
+ "lamp_break": {
+  "category": "sfx",
+  "description": "Lampe brisée par un tir : verre qui éclate, grésillement qui meurt (J6).",
+  "loop": false
+ },
  "portal_hum_loop": {
   "category": "ambience",
   "description": "Bourdonnement du portail (boucle de 8 s) : drone grave, battements, crépitements.",
@@ -327,6 +332,31 @@
  "shield_up": {
   "category": "combat",
   "description": "Le bouclier s'allume : montée brève (provisoire J3).",
+  "loop": false
+ },
+ "stone_impact_01": {
+  "category": "foley",
+  "description": "Pierre qui retombe et rebondit, variante 1 (diversion, J6).",
+  "loop": false
+ },
+ "stone_impact_02": {
+  "category": "foley",
+  "description": "Pierre qui retombe et rebondit, variante 2 (diversion, J6).",
+  "loop": false
+ },
+ "stone_impact_03": {
+  "category": "foley",
+  "description": "Pierre qui retombe et rebondit, variante 3 (diversion, J6).",
+  "loop": false
+ },
+ "stone_pickup": {
+  "category": "foley",
+  "description": "Ramasser des pierres : cailloux qui s'entrechoquent (J6).",
+  "loop": false
+ },
+ "stone_throw": {
+  "category": "foley",
+  "description": "Pierre lancée : bras qui fouette l'air (J6).",
   "loop": false
  },
  "test_impact": {

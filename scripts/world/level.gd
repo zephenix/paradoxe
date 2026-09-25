@@ -17,6 +17,9 @@ extends Node2D
 ##
 ## « Pause » ramène à l'écran titre (le menu pause arrive en J9).
 
+## Durée du fondu de la lumière ambiante en changeant de salle (secondes).
+const AMBIENT_FADE: float = 0.8
+
 ## Réglages de la réapparition (délai, fondus, vide sans fond).
 @export var respawn: RespawnConfig = preload("res://resources/world/respawn.tres")
 ## Commencer une nouvelle partie en chargeant ce niveau (oublie les checkpoints
@@ -28,6 +31,10 @@ extends Node2D
 
 ## Séquence de mort et rembobinage.
 var death: DeathController
+## Teinte de la lumière ambiante (J6) : une pour le monde, une pour le ciel.
+var ambient_tint: CanvasModulate
+var _sky_tint: CanvasModulate
+var _tint_tween: Tween
 
 ## Point de départ d'Élias (réapparition tant qu'aucun checkpoint n'est atteint).
 var _start_position: Vector2
@@ -43,9 +50,12 @@ func _ready() -> void:
 	# Chaque salle a sa zone acoustique (J5) : en y entrant, l'ambiance et
 	# l'acoustique passent en fondu à celles de la zone.
 	camera.room_changed.connect(_on_room_changed)
+	_create_tints()
 	player.died.connect(_on_player_died)
 	player.kill_y = _lowest_room_bottom() + respawn.kill_margin
 	camera.snap_to_target()
+	if camera.current_room:
+		set_ambient(camera.current_room.ambient_light)  # tout de suite, sans fondu
 	death = DeathController.new()
 	death.name = "DeathController"
 	add_child(death)
@@ -63,6 +73,39 @@ func _exit_tree() -> void:
 
 func _on_room_changed(room: Room) -> void:
 	AudioManager.set_zone(room.acoustic_zone)
+	set_ambient(room.ambient_light, AMBIENT_FADE)
+
+
+## Teinte l'écran selon la lumière ambiante (0 = pénombre, 1 = plein jour), en
+## « duration » secondes. Le calcul de ce que voient les Sentinelles lit la même
+## valeur dans la salle (Lighting.ambient_at).
+func set_ambient(ambient: float, duration: float = 0.0) -> void:
+	var tint: Color = Lighting.ambient_color(ambient)
+	if _tint_tween:
+		_tint_tween.kill()
+	if duration <= 0.0:
+		ambient_tint.color = tint
+		if _sky_tint:
+			_sky_tint.color = tint
+		return
+	_tint_tween = create_tween().set_parallel()
+	_tint_tween.tween_property(ambient_tint, "color", tint, duration)
+	if _sky_tint:
+		_tint_tween.tween_property(_sky_tint, "color", tint, duration)
+
+
+## Un CanvasModulate multiplie la couleur de tout ce qui est dessiné dans son
+## calque : c'est un « variateur » de la lumière ambiante. Le ciel est dans un
+## autre calque (CanvasLayer « Sky ») : il a le sien.
+func _create_tints() -> void:
+	ambient_tint = CanvasModulate.new()
+	ambient_tint.name = "AmbientTint"
+	add_child(ambient_tint)
+	var sky: CanvasLayer = get_node_or_null(^"Sky") as CanvasLayer
+	if sky:
+		_sky_tint = CanvasModulate.new()
+		_sky_tint.name = "SkyTint"
+		sky.add_child(_sky_tint)
 
 
 func _unhandled_input(event: InputEvent) -> void:

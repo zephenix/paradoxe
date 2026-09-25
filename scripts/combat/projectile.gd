@@ -8,13 +8,14 @@ extends Node2D
 ## que ce rayon touche en premier :
 ##   - un bouclier ennemi (couche SHIELDS)  -> le bouclier l'arrête (ou se brise) ;
 ##   - un personnage visé (joueur/ennemis)  -> on lui demande take_hit(projectile) ;
+##   - une lampe (couche PROPS, J6)         -> take_hit aussi : elle se brise ;
 ##   - le décor (couche WORLD)              -> impact sur le mur.
 ## Les boucliers de son propre camp sont ignorés (on ne se tire pas dans le dos).
 ##
 ## Les projectiles sont dans le groupe « projectiles » : la réapparition au
 ## checkpoint les efface tous (et le rembobinage de J4 aussi, pour rester simple).
 
-## Le tir a touché quelque chose. kind : &"wall", &"shield", &"body".
+## Le tir a touché quelque chose. kind : &"wall", &"shield", &"body", &"prop" (lampe).
 signal impacted(kind: StringName, at: Vector2)
 
 ## Camps : les tirs d'Élias visent les ennemis, et inversement.
@@ -84,7 +85,8 @@ func step(delta: float) -> void:
 			return
 		if collider.has_method(&"take_hit"):
 			if collider.call(&"take_hit", self):
-				_impact(&"body", hit["position"])
+				# Une lampe touchée joue son propre bruit de verre (J6).
+				_impact(&"prop" if collider is LightSource else &"body", hit["position"])
 				return
 			_exclude.append(hit["rid"])  # esquive (roulade) : le tir continue
 			continue
@@ -97,10 +99,11 @@ func step(delta: float) -> void:
 		queue_free()
 
 
-## Couches que ce projectile peut toucher : le décor, les boucliers, et le camp adverse.
+## Couches que ce projectile peut toucher : le décor, les boucliers, les objets
+## (lampes, J6) et le camp adverse.
 func collision_mask() -> int:
 	var targets: int = PhysicsLayers.ENEMIES if team == TEAM_PLAYER else PhysicsLayers.PLAYER | PhysicsLayers.COMPANION
-	return PhysicsLayers.WORLD | PhysicsLayers.SHIELDS | targets
+	return PhysicsLayers.WORLD | PhysicsLayers.SHIELDS | PhysicsLayers.PROPS | targets
 
 
 func _cast(from: Vector2, to: Vector2) -> Dictionary:
@@ -113,7 +116,7 @@ func _impact(kind: StringName, at: Vector2) -> void:
 	_done = true
 	global_position = at
 	impacted.emit(kind, at)
-	if kind != &"shield":  # le bouclier joue son propre son
+	if kind != &"shield" and kind != &"prop":  # bouclier et lampe jouent leur propre son
 		AudioManager.play_sfx(&"impact_body" if kind == &"body" else &"impact_wall", at, shooter)
 	ImpactFlash.spawn(get_parent(), at, color, 1.6 if charged else 1.0)
 	queue_free()

@@ -57,9 +57,13 @@ FAMILIES: dict[str, tuple[float, float, list[str]]] = {
     "Réceptions et chutes": (-21.5, 1.5, ["foley_land", "foley_land_heavy", "foley_body_fall"]),
     "Gestes": (-27.5, 2.0, [
         "foley_jump", "foley_roll", "foley_slide", "foley_skid", "foley_grab", "foley_climb"]),
-    "Petits gestes": (-35.0, 2.5, ["foley_turn", "foley_crouch", "weapon_draw", "weapon_holster"]),
+    "Petits gestes": (-35.0, 2.5, [
+        "foley_turn", "foley_crouch", "weapon_draw", "weapon_holster", "stone_throw", "stone_pickup"]),
     "Tirs": (-21.0, 1.5, ["weapon_shot", "weapon_shot_sentinel", "weapon_shot_charged"]),
     "Impacts": (-24.0, 1.5, ["impact_wall", "impact_body", "shield_hit"]),
+    # Bruits de diversion (J6) : pierre qui retombe, lampe brisée. Très contrastés
+    # (rebonds, éclats) : leur niveau moyen reste un peu sous celui des impacts.
+    "Bruits de diversion": (-26.0, 2.0, ["stone_impact", "lamp_break"]),
     "Bouclier levé / baissé": (-28.0, 2.0, ["shield_up", "shield_down"]),
     "Signaux de l'arme": (-31.5, 2.0, ["weapon_charge_ready", "weapon_empty"]),
     "Voix des Sentinelles": (-21.0, 1.5, [

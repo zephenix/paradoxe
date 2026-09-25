@@ -1,7 +1,11 @@
 extends SentinelState
-## Alerte : un bruit l'a intriguée. Elle s'arrête, se tourne vers lui et
-## « grogne » (intonation montante), pendant suspicious_duration secondes.
-## Puis elle va voir (Search). Si elle voit Élias entre-temps : Combat.
+## Alerte : un indice l'a intriguée (bruit, silhouette entrevue). Elle
+## s'arrête, se tourne vers lui et « grogne » (intonation montante), pendant
+## suspicious_duration secondes. Ensuite :
+##   - sa suspicion a atteint search_threshold -> elle va voir (Search) ;
+##   - sinon, ce n'était rien : retour à la patrouille (intonation descendante).
+## Si elle voit nettement Élias entre-temps : Combat. Si elle l'entrevoit
+## encore, elle garde les yeux sur lui (sa suspicion continue de monter).
 ## Un nouveau bruit la fait se retourner et relance l'attente.
 
 var _clue: Vector2 = Vector2.ZERO
@@ -25,8 +29,18 @@ func physics_update(delta: float) -> void:
 	s.move_at(0.0, delta)
 	if check_sight():
 		return
+	if s.sees_target:
+		_clue = s.last_clue
+		s.face_toward(_clue)
 	if time_in_state >= s.config.suspicious_duration:
-		machine.transition_to(&"Search", {"clue": _clue})
+		if s.suspicion >= s.config.search_threshold:
+			machine.transition_to(&"Search", {"clue": _clue})
+		else:
+			# Ce n'était rien : elle se rassure (sa jauge redescend sous le seuil
+			# d'alerte, sinon elle s'alerterait de nouveau aussitôt).
+			s.say(&"calm")
+			s.suspicion = minf(s.suspicion, s.config.suspicious_threshold * 0.5)
+			machine.transition_to(&"Patrol")
 
 
 func on_noise(at: Vector2) -> void:
