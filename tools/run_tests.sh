@@ -10,9 +10,10 @@ GODOT="${GODOT:-godot}"
 # 1) Import : (ré)génère les ressources importées (sons, images) si besoin.
 "$GODOT" --headless --path . --import >/dev/null 2>&1 || true
 
-# 2) Tests.
+# 2) Tests. --fixed-fps 60 : chaque image avance d'exactement 1/60 s, aussi vite
+#    que possible (simulation reproductible et rapide, indépendante de la machine).
 if [[ $# -gt 0 ]]; then
-	exec "$GODOT" --headless --path . -s res://tests/run_tests.gd -- "$@"
+	exec "$GODOT" --headless --path . --fixed-fps 60 -s res://tests/run_tests.gd -- "$@"
 else
-	exec "$GODOT" --headless --path . -s res://tests/run_tests.gd
+	exec "$GODOT" --headless --path . --fixed-fps 60 -s res://tests/run_tests.gd
 fi

@@ -47,6 +47,8 @@ Il est jouable sur le Web (GitHub Pages) et en exécutables Windows/Linux (GitHu
 GAME_VERSION=0.2.0 ./tools/export.sh all     # export avec un numéro de version
 ./tools/screenshot.sh res://scenes/ui/title_screen.tscn build/shots/x.png 90 [appui_à_l_image]
 ./tools/web/check_web.sh        # après un export Web : vérifie isolation, JS, son réel dans Chromium
+./tools/screenshot.sh res://tools/godot/pose_sheet.tscn build/shots/poses.png 10   # planche de toutes les poses d'Élias
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 -s res://tools/godot/level_tour.gd -- build/shots   # visite guidée de la salle de test (captures)
 python3 tools/audio/generate_sounds.py       # régénère les sons (puis réimport Godot)
 godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régénère la table de mixage
 ```
@@ -87,6 +89,10 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
 - Police par défaut (Open Sans) : certains symboles (→, ▸…) sont absents sur le Web. Rester
   en ASCII ou choisir une police dédiée.
 - `project.godot` : l'éditeur peut réécrire le fichier et supprimer les commentaires `;`.
+- Un script lancé avec `-s` (outils de `tools/godot/`, lanceur de tests) est compilé **avant**
+  les autoloads : il ne doit pas typer statiquement une classe qui utilise un autoload
+  (`Player`, `CameraDirector`…), sous peine d'« Identifier not found: GameState ». Utiliser
+  `Node` et des appels dynamiques ; les fichiers de test, chargés plus tard, n'ont pas ce souci.
 - Vérifier le **site publié** (`node tools/web/check_web.js https://zephenix.github.io/paradoxe/ build/shots`)
   dans une session cloud : Chromium doit faire confiance à l'autorité du proxy HTTPS. Si
   `ERR_CERT_AUTHORITY_INVALID`, ajouter les certificats « Anthropic » de
@@ -114,3 +120,40 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
      CI crée le tag sur le commit de `main` ;
    - **poste local** : `git tag -a vX.Y -m "PARADOXE vX.Y — Jx" && git push origin vX.Y`.
 7. Vérifier la Release et la version Web (`https://zephenix.github.io/paradoxe/`).
+
+## Règle : conseil de niveau d'effort
+
+Claude ne peut pas changer lui-même le niveau d'effort de la session : c'est le propriétaire
+qui le fait. Le rôle de Claude est de lui dire précisément quand le changer.
+
+1. Au début de chaque jalon, et avant chaque tâche importante hors jalon, écrire un bloc
+   d'une ou deux lignes au format :
+   > ⚙️ EFFORT RECOMMANDÉ : [low/medium/high/xhigh] — ULTRACODE : [non / mot-clé conseillé pour la sous-tâche X] — Raison : [une phrase]
+
+   Si le niveau recommandé diffère de celui en cours, **s'arrêter après ce bloc** et attendre
+   que le propriétaire confirme avoir changé de niveau avant de commencer.
+2. Claude ne connaît pas toujours le niveau d'effort actif : en cas de doute, le demander
+   plutôt que le supposer.
+3. Référence par jalon (Opus 5.5, dont le défaut est medium) :
+   - PLAN.md et révisions d'architecture : high
+   - J1 setup, CI, export : medium
+   - J2 déplacements, parkour, transitions : medium
+   - J3 combat, énergie, ennemis, checkpoints : high
+   - J4 rembobinage temporel : high (xhigh si un problème de synchronisation d'état résiste)
+   - J5 sons procéduraux : medium, avec le mot-clé ultracode possible pour la génération en série
+   - J6 infiltration lumière/son : high
+   - J7 compagnon et interactions, J8 musique et scènes : medium (high si l'IA du compagnon pose problème)
+   - J9 menus, options, polish : medium
+4. Signaler aussi un changement en cours de jalon, avec le même bloc, dans ces cas :
+   - deux échecs de suite sur le même bug ou le même test : recommander de monter d'un cran
+     pour ce problème précis ;
+   - problème résolu après une montée d'effort : recommander de redescendre au niveau du jalon ;
+   - tâche répétitive et découpable en parties indépendantes (série d'assets, audit de tous
+     les fichiers, boucle « tester et corriger jusqu'au succès ») : proposer le mot-clé
+     ultracode avec la taille de workflow « small », et rédiger la ligne exacte à taper.
+5. Ne jamais recommander le mode ultracode de session (`/effort ultracode`) : le projet a
+   besoin des validations du propriétaire entre les étapes, ce que les workflows ne
+   permettent pas. Le mot-clé ultracode est réservé aux sous-tâches autonomes, qui n'ont
+   pas besoin de son avis en cours de route.
+6. Avant chaque tag de version, proposer l'audit du code en ultracode (taille small) et
+   rédiger la ligne à taper.

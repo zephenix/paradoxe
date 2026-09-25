@@ -1,0 +1,45 @@
+extends PlayerState
+## Se hisser sur un rebord (depuis la suspension ou depuis le sol si le
+## rebord est à portée de main). Engagé. Le corps suit un chemin en deux
+## temps : monter, puis avancer sur le rebord. Les collisions sont ignorées
+## pendant le mouvement (l'espace d'arrivée a été vérifié avant).
+
+var _start: Vector2
+var _top: Vector2
+var _end: Vector2
+var _duration: float = 0.6
+
+
+func enter(_previous: StringName, data: Dictionary) -> void:
+	var p: Player = player
+	var ledge: Dictionary = data["ledge"]
+	var point: Vector2 = ledge["point"]
+	_start = p.global_position
+	_top = Vector2(_start.x, point.y)
+	_end = Vector2(point.x + p.facing * (p.config.body_width * 0.5 + 4.0), point.y)
+	var height: float = _start.y - point.y
+	# Une marche basse se franchit plus vite qu'un mur à hauteur de mains.
+	_duration = p.config.climb_duration * clampf(height / p.config.hang_hand_height, 0.45, 1.0)
+	p.velocity = Vector2.ZERO
+	p.set_crouched(false)
+	p.visual.play(&"climb", _duration)
+	p.anim_event.emit(&"climb")
+
+
+func is_committed() -> bool:
+	return true
+
+
+func physics_update(_delta: float) -> void:
+	var p: Player = player
+	var k: float = clampf(time_in_state / _duration, 0.0, 1.0)
+	if k < 0.6:
+		var t: float = ease(k / 0.6, 0.6)
+		p.global_position = _start.lerp(_top, t)
+	else:
+		var t2: float = ease((k - 0.6) / 0.4, 0.8)
+		p.global_position = _top.lerp(_end, t2)
+	if k >= 1.0:
+		p.global_position = _end
+		p.air_top_y = _end.y
+		machine.transition_to(&"Idle")

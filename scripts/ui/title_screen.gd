@@ -1,5 +1,5 @@
 extends Control
-## Écran titre — version J1 : scène de test de la chaîne complète.
+## Écran titre (provisoire) : accès à la salle de test et banc de test audio.
 ##
 ## 1. Attend un clic ou une touche (obligatoire sur le Web pour avoir du son).
 ## 2. Débloque l'audio, joue un son de validation, lance le bourdonnement du portail.
@@ -12,6 +12,7 @@ const SOUND_CONFIRM: AudioStream = preload("res://assets/audio/generated/ui/ui_c
 const SOUND_IMPACT: AudioStream = preload("res://assets/audio/generated/sfx/test_impact.wav")
 const SOUND_PORTAL_HUM: AudioStream = preload("res://assets/audio/generated/ambience/portal_hum_loop.wav")
 
+const TEST_LEVEL: String = "res://scenes/levels/test_level.tscn"
 const HUM_LOOP_ID: StringName = &"title_portal_hum"
 const HUM_VOLUME_DB: float = -8.0
 ## Décalage vers la gauche du portail et du titre quand le banc de test s'ouvre.
@@ -22,6 +23,7 @@ const SHIFT_WHEN_PANEL_OPEN: float = -210.0
 @onready var _prompt: Label = %Prompt
 @onready var _panel: Control = %TestPanel
 @onready var _diagnostics: Label = %Diagnostics
+@onready var _level_button: Button = %LevelButton
 @onready var _impact_button: Button = %ImpactButton
 @onready var _hum_toggle: CheckButton = %HumToggle
 @onready var _reverb_toggle: CheckButton = %ReverbToggle
@@ -43,6 +45,7 @@ func _ready() -> void:
 	blink.tween_property(_prompt, "modulate:a", 0.25, 1.1).set_trans(Tween.TRANS_SINE)
 	blink.tween_property(_prompt, "modulate:a", 1.0, 1.1).set_trans(Tween.TRANS_SINE)
 
+	_level_button.pressed.connect(_on_level_pressed)
 	_impact_button.pressed.connect(_on_impact_pressed)
 	_hum_toggle.toggled.connect(_on_hum_toggled)
 	_reverb_toggle.toggled.connect(_on_reverb_toggled)
@@ -110,7 +113,7 @@ func _show_test_panel(animate: bool = false) -> void:
 		_portal.position.x = portal_x
 		_title.position.x = title_x
 	_hum_toggle.set_pressed_no_signal(AudioManager.is_loop_playing(HUM_LOOP_ID))
-	_impact_button.grab_focus()  # navigation au clavier / à la manette
+	_level_button.grab_focus()  # navigation au clavier / à la manette
 
 
 func _update_diagnostics() -> void:
@@ -128,6 +131,12 @@ func _update_diagnostics() -> void:
 
 
 # --- Banc de test ----------------------------------------------------------
+
+func _on_level_pressed() -> void:
+	AudioManager.play_stream(SOUND_CONFIRM, AudioBuses.UI)
+	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
+	SceneTransition.change_scene(TEST_LEVEL)
+
 
 func _on_impact_pressed() -> void:
 	AudioManager.play_stream(SOUND_IMPACT, AudioBuses.SFX, -3.0, randf_range(0.94, 1.06))

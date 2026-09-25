@@ -100,7 +100,28 @@ Colonnes : **rayon** = distance (pixels) à laquelle les ennemis entendent le so
 | `sfx/test_impact.wav` | Choc métallique : attaque sèche + résonances. Sert à entendre la réverbération | Bouton « Choc métallique » du banc de test | SFX | — | non |
 | `ambience/portal_hum_loop.wav` | Bourdonnement du portail : drone grave (La 55 Hz), battements lents, crépitements | Démarre au premier clic ; interrupteur du banc de test | Ambiance | — | oui (8 s) |
 
-*Les catégories Foley, arme, créatures, ambiances de zones et musique seront ajoutées en J5
+### Foley provisoire du déplacement (J2)
+
+Ces sons sont déclenchés par les **évènements d'animation** d'Élias : le pied qui touche le
+sol, les mains qui agrippent… Le script `scripts/player/player_foley.gd` fait la
+correspondance entre évènement et son. Chaque lecture passe par un `AudioStreamRandomizer`,
+qui tire une variante au hasard et fait varier hauteur et volume. **Provisoires** : J5 les
+remplacera par des sons selon la surface, avec respiration et rayons de bruit.
+
+| Fichier (`foley/`) | Rôle | Déclencheur (évènement d'animation) | Bus | Rayon |
+|---|---|---|---|---|
+| `foley_step_stone_01` à `04` | Pas sur pierre (4 variantes) | `footstep` (marche, -12 dB), `footstep_run` (course, -6 dB), `footstep_soft` (accroupi, -24 dB), `climb_knee` | SFX | — (J6) |
+| `foley_jump` | Frottement de tissu à l'impulsion | Décollage d'un saut | SFX | — |
+| `foley_land` | Double impact des pieds | Réception légère | SFX | — |
+| `foley_land_heavy` | Impact grave + souffle | Réception lourde (2 à 3 blocs) | SFX | — |
+| `foley_roll` | Tissu et épaule au sol | Roulade (esquive ou réception) | SFX | — |
+| `foley_slide` | Raclement qui s'éteint | Glissade | SFX | — |
+| `foley_skid` | Semelles qui frottent | Dérapage en fin de course | SFX | — |
+| `foley_grab` | Mains qui agrippent | Prise d'un rebord | SFX | — |
+| `foley_climb` | Effort, tissu | Se hisser | SFX | — |
+| `foley_body_fall` | Corps qui s'effondre | Mort (à la fin de l'animation) | SFX | — |
+
+*Les catégories arme, créatures, ambiances de zones et musique seront ajoutées en J5
 (voir PLAN §6.4 à §6.8).*
 
 ---

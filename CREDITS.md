@@ -22,6 +22,8 @@ extérieure doit y être ajoutée avant d'être versionnée : source, auteur, li
 |---|---|
 | `icon.svg` (icône du jeu) | Original, dessiné à la main en SVG (anneau polygonal et spirale calculée). |
 | Anneau du portail (écran titre) | Original, dessiné par code (`scripts/fx/portal_ring.gd`). |
+| Silhouette d'Élias et ses animations | Original, polygones et poses définis par code (`scripts/player/visual/`). |
+| Décors de la salle de test, silhouettes de ville | Originaux, générés par code (`scripts/world/solid_block.gd`, `scripts/fx/skyline.gd`). |
 
 ## Sons
 
@@ -34,6 +36,7 @@ utilisé pour l'instant.
 | `assets/audio/generated/ui/ui_confirm.wav` | Synthèse procédurale (original) |
 | `assets/audio/generated/sfx/test_impact.wav` | Synthèse procédurale (original) |
 | `assets/audio/generated/ambience/portal_hum_loop.wav` | Synthèse procédurale (original) |
+| `assets/audio/generated/foley/*.wav` (13 fichiers : pas, sauts, réceptions, roulade…) | Synthèse procédurale (original) |
 
 ## Sons CC0 extérieurs
 

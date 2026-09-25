@@ -166,3 +166,158 @@ bus Monde, et tous les pas, voix et ambiances résonnent aussitôt, sans que cha
 à s'en occuper. Côté code : `AudioServer.get_bus_effect(index_du_bus, index_de_l_effet)`
 donne accès à un effet pour modifier ses réglages en direct (c'est ce que fait
 `AudioManager.set_muffle`).
+
+---
+
+## J2 — Déplacements, parkour et salles (v0.2)
+
+### Ce qui a été fait
+
+- **Élias** (`scenes/player/elias.tscn`) : un corps physique (`CharacterBody2D`) piloté
+  par une **machine à états** de 16 états, chacun dans son propre script
+  (`scripts/player/states/`) :
+  - au sol : arrêt, marche, course, dérapage, demi-tour, accroupi, marche accroupie ;
+  - en l'air : saut (sur place, sans élan, avec élan), chute ;
+  - réceptions : réception (légère ou lourde), roulade ;
+  - parkour : glissade, suspension, hissage, descente d'un rebord ;
+  - mort.
+- **Mouvements engagés** : un saut, une roulade, un hissage vont à leur terme, et la
+  trajectoire d'un saut ne se corrige pas en l'air. Les commandes données pendant ce temps
+  sont **mémorisées** (tampon de 0,2 s) et s'enchaînent dès que possible.
+- **Parkour moderne**, désactivé en mode classique :
+  - glissade sous les obstacles ;
+  - rattrapage automatique des rebords (en classique, il faut maintenir Haut) ;
+  - roulade d'esquive brièvement invulnérable ;
+  - « temps du coyote » : on peut sauter un instant après avoir quitté un bord ;
+  - garde-bord : en marchant, Élias s'arrête devant un vide dangereux.
+- **Chutes** : sans conséquence jusqu'à 3 blocs, réception lourde au-delà de 2 blocs,
+  roulade obligatoire entre 3 et 5 blocs, mortelle au-delà.
+- **Réglages** dans `resources/player/player_movement.tres`. Les sauts sont exprimés
+  **en blocs** (« le saut avec élan franchit 4 blocs ») et le code en déduit les vitesses.
+- **Silhouette polygonale animée** : un squelette de polygones construit par code et
+  19 animations générées à partir de **tables de poses**
+  (`scripts/player/visual/elias_poses.gd`). Les états ne connaissent que l'interface
+  `CharacterVisual` : une version rotoscopée pourra remplacer ce dessin sans toucher aux
+  états.
+- **Monde** :
+  - blocs de décor dessinés et dimensionnés dans l'éditeur (`SolidBlock`, script `@tool`) ;
+  - salles (`Room`) et caméra « écran par écran » (`CameraDirector`), qui glisse d'une salle
+    à l'autre (ou coupe net), recule dans les grandes salles et suit Élias sans montrer
+    l'extérieur ;
+  - fonds de ville en **parallaxe** (`Parallax2D`), dessinés par code.
+- **Salle de test** (`scenes/levels/test_level.tscn`) : 5 salles avec panneaux d'aide.
+  Elle est accessible depuis l'écran titre. À la mort, Élias réapparaît au début de la
+  salle, en attendant les vrais checkpoints de J3.
+- **Bruitages provisoires** : 13 sons générés (pas, saut, réceptions, roulade, glissade,
+  prise de rebord…), déclenchés par les évènements d'animation.
+- **Tests** : 74 au total, dont 21 sur le déplacement, joués dans des décors construits par
+  les tests eux-mêmes. S'y ajoutent des tests sur la caméra, les salles et la machine à
+  états. La simulation avance image par image (`--fixed-fps 60`) : les tests sont
+  reproductibles et rapides (moins d'une seconde pour tout).
+
+### Comment tester
+
+1. Écran titre : cliquer ou appuyer sur une touche, puis **« Salle de test : déplacements
+   (J2) »**.
+2. Suivre les panneaux, de gauche à droite :
+
+| Salle | À essayer |
+|---|---|
+| **A - Les bases** | Marcher, courir (Maj), demi-tour, **Haut** devant la marche et devant le mur (se hisser), **Bas** puis avancer dans le tunnel, **C** pour la roulade |
+| **B - Sauts** | Espace **en marchant** (2 blocs), Espace **en courant** (4 blocs, pour le grand trou), **Bas en courant** pour glisser sous le bloc suspendu. Tomber dans un trou (3 blocs) puis en ressortir (Haut contre la paroi) |
+| **C - Rebords et chutes** | Haut contre le mur de 3 blocs (saut, prise, puis Haut pour se hisser), deuxième mur, puis sauter de la tour (4 blocs : roulade). Au bord d'un vide : **Bas** pour descendre et s'accrocher |
+| **D - Le puits** | Tomber dans le puits de la salle C : caméra qui descend, chute mortelle, réapparition |
+| **E - Grand hall** | La caméra recule (zoom) et suit Élias. Terrain libre |
+
+3. **Échap** ramène à l'écran titre. Le **mode classique** n'a pas encore d'option dans
+   l'interface (J9) : il est vérifié par les tests automatisés.
+
+### Ce qu'il faut écouter
+
+| Action | Ce que tu dois entendre |
+|---|---|
+| Marcher | Pas sourds et réguliers, calés sur le moment où le pied touche le sol. Deux pas successifs ne sont jamais identiques (4 variantes, hauteur et volume légèrement aléatoires). |
+| Courir | Mêmes pas, plus forts et plus rapprochés. |
+| Avancer accroupi | Pas presque inaudibles : c'est la base de l'infiltration (J6). |
+| Sauter / retomber | Frottement de tissu au décollage, double impact à la réception. |
+| Chute de 2 à 3 blocs | Impact plus grave et un souffle (réception lourde). |
+| Roulade, glissade, dérapage | Frottements de tissu, raclement qui s'éteint, crissement de semelles. |
+| Prise de rebord, hissage | Claquement des mains, puis effort. |
+| Chute mortelle | Corps qui s'effondre, puis fondu au noir. |
+
+Ces sons sont volontairement simples : ils vérifient la synchronisation entre animation et
+son. Les vrais bruitages (selon la surface, avec la respiration) arrivent en J5.
+
+### Décisions prises (et pourquoi)
+
+- **Haut = saut sur place**, comme dans les jeux d'origine. Contre un mur, ce saut attrape
+  le rebord : c'est la façon naturelle de grimper. Un rebord à hauteur de mains se franchit
+  directement, sans sauter.
+- **Garde-bord** : en marchant, Élias s'arrête devant un vide de plus de 3 blocs. En
+  courant, il ne s'arrête pas (on assume son élan). Cette assistance limite les morts
+  bêtes sans retirer le danger ; elle est désactivée en mode classique.
+- **Hauteur accroupie** : 1,2 bloc (58 px), pour coller au dessin. Les passages bas font
+  donc 1,5 bloc.
+- **Tout le niveau dans une seule scène** : les salles sont posées côte à côte, et la caméra
+  passe de l'une à l'autre sans temps de chargement (voir PLAN §3.3).
+- **Squelette et animations construits par code** à partir de tables de poses : les poses
+  se retouchent en changeant des nombres. La planche de poses
+  (`./tools/screenshot.sh res://tools/godot/pose_sheet.tscn build/shots/poses.png 10`)
+  les montre toutes d'un coup.
+- **Réapparition au début de la salle** : c'est provisoire, les checkpoints arrivent en J3.
+- **Pièges techniques rencontrés** :
+  - à la première image, le moteur n'a pas encore détecté le sol : une tolérance de
+    0,05 s évite un faux départ en chute ;
+  - un script d'outil lancé avec `-s` est compilé avant les autoloads : il ne doit pas
+    utiliser la classe `Player` (voir CLAUDE.md).
+
+### Vérifications effectuées
+
+- 74 tests automatisés au vert, dont les distances de saut mesurées :
+  - saut sans élan : entre 1,7 et 2,9 blocs ;
+  - saut avec élan : entre 3,7 et 5 blocs.
+- Planche de poses (19 animations) et « visite guidée » de la salle de test
+  (`tools/godot/level_tour.gd`). J'ai regardé les captures : accroupi dans le tunnel, saut,
+  suspension, hissage, glissement de caméra entre deux salles, recul de caméra dans le
+  grand hall.
+
+### Reste à faire / points d'attention
+
+- Les distances de saut et les vitesses sont à juger **manette en main** : dis-moi si c'est
+  trop lent, trop flottant ou trop sec. Tout se règle dans
+  `resources/player/player_movement.tres`.
+- Pas encore de sons selon la surface ni de respiration (J5), pas de rayon de bruit (J6).
+- Jalon suivant : **J3, arme, énergie, ennemis, mort et checkpoints**.
+
+### Concepts Godot expliqués
+
+**1. La machine à états (un script par état)**
+
+Un personnage de jeu d'action est toujours « dans un état » : à l'arrêt, en course, en l'air,
+suspendu… La tentation est d'écrire une seule grosse fonction :
+
+```
+Select Case etat          ' (en VBA)
+    Case "course" : ...   ' 30 lignes
+    Case "saut"   : ...   ' 40 lignes
+    ...                   ' 16 cas, 600 lignes
+End Select
+```
+
+Ici, chaque `Case` devient un **fichier** (`run.gd`, `jump.gd`…) avec trois procédures :
+`enter` (ce qu'on fait en arrivant), `physics_update` (60 fois par seconde) et `exit` (en
+partant). Un état décide lui-même quand passer à un autre :
+`machine.transition_to(&"Jump", {"kind": &"running"})`. Ajouter un mouvement revient à
+ajouter un fichier, sans toucher aux autres. La même machine (`scripts/core/`) servira
+aux ennemis (J3) et au compagnon (J7).
+
+**2. Les Resources (`.tres`) : régler le jeu sans toucher au code**
+
+Une *Resource* est un objet de données enregistré dans un fichier. Le script
+`player_movement_config.gd` déclare les réglages avec `@export` (vitesses, hauteurs de
+saut, seuils de chute…), et `resources/player/player_movement.tres` en contient les valeurs.
+Double-clique sur ce fichier dans l'éditeur : l'inspecteur affiche tous les réglages,
+groupés et commentés, comme une feuille de paramètres Excel. Change « Running Jump Distance
+Blocks » de 4 à 5 : le saut avec élan ira plus loin. Le code, lui, recalcule seul la vitesse
+nécessaire (`jump_velocity()`, avec les formules de la chute libre). Les ennemis, l'énergie
+et la perception auront chacun leur fichier de réglages.

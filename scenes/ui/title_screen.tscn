@@ -103,7 +103,16 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(0.43, 1, 0.75, 1)
 theme_override_font_sizes/font_size = 18
-text = "Banc de test audio (J1)"
+text = "PARADOXE - prototype"
+
+[node name="LevelButton" type="Button" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Salle de test : déplacements (J2)"
+
+[node name="Separator" type="HSeparator" parent="TestPanel/Items"]
+layout_mode = 2
 
 [node name="ImpactButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
