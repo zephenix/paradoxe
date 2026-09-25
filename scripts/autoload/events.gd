@@ -27,6 +27,9 @@ signal player_died(cause: StringName)
 ## Le joueur réapparaît au dernier checkpoint. (J3)
 signal player_respawned
 
+## Un ennemi vient de mourir. Émis par l'ennemi (Sentinel). (J3)
+signal enemy_died(enemy: Node)
+
 ## Un checkpoint vient d'être atteint. (J3)
 signal checkpoint_reached(checkpoint_id: StringName)
 

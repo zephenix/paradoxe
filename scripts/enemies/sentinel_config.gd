@@ -1,0 +1,80 @@
+class_name SentinelConfig
+extends Resource
+## Réglages d'une Sentinelle (fichier resources/enemies/sentinel.tres).
+##
+## Ouvrir le .tres dans l'éditeur Godot : l'inspecteur montre tous les réglages
+## ci-dessous, groupés. Les nombres de CE script sont les valeurs par défaut.
+## Les distances sont en pixels (1 bloc = 48 px), les durées en secondes.
+## L'arme et la jauge d'énergie ont leurs propres fichiers
+## (resources/weapons/sentinel_gun.tres, resources/enemies/sentinel_energy.tres).
+
+@export_group("Déplacement")
+## Vitesse de marche (patrouille, recherche) et de course (poursuite).
+@export var walk_speed: float = 70.0
+@export var run_speed: float = 180.0
+## Accélération et freinage au sol (pixels par seconde²).
+@export var acceleration: float = 900.0
+## Gravité et vitesse de chute maximale (comme Élias).
+@export var gravity: float = 2000.0
+@export var max_fall_speed: float = 1200.0
+## Une Sentinelle ne descend pas une marche plus haute que ceci (en blocs) :
+## elle s'arrête au bord des plates-formes au lieu de tomber.
+@export var max_step_down_blocks: float = 1.0
+## Durée d'un cycle de l'animation de marche / de course : à régler avec la
+## vitesse pour que les pieds ne glissent pas sur le sol.
+@export var walk_cycle_duration: float = 1.7
+@export var run_cycle_duration: float = 0.7
+
+@export_group("Patrouille")
+## Pause à chaque bout du trajet de patrouille.
+@export var patrol_pause: float = 1.2
+
+@export_group("Vue (J3 : simple ; J6 : lumière et suspicion)")
+## Distance maximale à laquelle elle voit Élias, devant elle.
+@export var view_distance: float = 620.0
+## Écart de hauteur maximal (pixels) : elle ne voit pas un étage plus haut ou plus bas.
+@export var view_height: float = 120.0
+## Hauteur de ses yeux au-dessus de ses pieds.
+@export var eye_height: float = 80.0
+## Temps de réaction entre le moment où elle voit Élias et son premier geste.
+@export var reaction_time: float = 0.4
+
+@export_group("Ouïe")
+## Multiplie le rayon des bruits entendus (1 = normal, 0 = sourde).
+@export var hearing_factor: float = 1.0
+
+@export_group("Alerte et recherche")
+## Durée de l'alerte (elle s'arrête, se tourne vers le bruit) avant d'aller voir.
+@export var suspicious_duration: float = 1.4
+## Durée de la recherche avant de reprendre la patrouille.
+@export var search_duration: float = 4.0
+## Pendant la recherche, elle se retourne à cet intervalle pour regarder autour.
+@export var search_look_interval: float = 1.2
+## Durée de la poursuite (vers le dernier endroit où elle a vu Élias).
+@export var chase_duration: float = 5.0
+
+@export_group("Combat")
+## Temps de visée avant chaque tir : c'est l'avertissement pour le joueur.
+@export var aim_time: float = 0.55
+## Pause entre la fin d'un tir et la visée suivante.
+@export var fire_pause: float = 0.7
+## Distance qu'elle cherche à garder avec Élias (elle s'approche si plus loin).
+@export var preferred_distance: float = 380.0
+## Temps sans voir Élias avant de passer à la poursuite.
+@export var lose_sight_time: float = 1.0
+
+@export_group("Bouclier")
+## Probabilité de lever le bouclier face à un tir (0 = jamais, 1 = toujours).
+@export_range(0.0, 1.0) var shield_chance: float = 0.7
+## Temps de réaction pour lever le bouclier quand un tir arrive.
+@export var shield_reaction_time: float = 0.15
+## Durée pendant laquelle elle garde le bouclier levé.
+@export var shield_hold_time: float = 0.8
+## Distance à laquelle elle remarque un tir qui arrive sur elle.
+@export var threat_distance: float = 420.0
+## Temps pendant lequel elle reste sonnée quand son bouclier tombe (brisé, jauge vide).
+@export var stagger_time: float = 0.6
+
+@export_group("Silhouette (collisions)")
+@export var body_width: float = 24.0
+@export var body_height: float = 92.0
