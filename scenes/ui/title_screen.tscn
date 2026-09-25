@@ -1,0 +1,174 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/title_screen.gd" id="1_title"]
+[ext_resource type="Script" path="res://scripts/fx/portal_ring.gd" id="2_portal"]
+
+[sub_resource type="FontVariation" id="FontVariation_title"]
+spacing_glyph = 18
+variation_embolden = 0.35
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 20.0
+content_margin_top = 16.0
+content_margin_right = 20.0
+content_margin_bottom = 16.0
+bg_color = Color(0.03, 0.08, 0.08, 0.82)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.43, 1, 0.75, 0.35)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_title")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.03, 0.05, 1)
+
+[node name="Portal" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(640, 250)
+script = ExtResource("2_portal")
+
+[node name="Title" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 440.0
+offset_bottom = 540.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.9, 1, 0.95, 1)
+theme_override_colors/font_shadow_color = Color(0.25, 1, 0.65, 0.35)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_constants/shadow_outline_size = 18
+theme_override_fonts/font = SubResource("FontVariation_title")
+theme_override_font_sizes/font_size = 80
+text = "PARADOXE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Prompt" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 580.0
+offset_bottom = 620.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 0.8, 1)
+theme_override_font_sizes/font_size = 22
+text = "Appuyez sur une touche ou cliquez"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TestPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -390.0
+offset_top = 70.0
+offset_right = -24.0
+offset_bottom = -110.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Items" type="VBoxContainer" parent="TestPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Heading" type="Label" parent="TestPanel/Items"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.43, 1, 0.75, 1)
+theme_override_font_sizes/font_size = 18
+text = "Banc de test audio (J1)"
+
+[node name="ImpactButton" type="Button" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Choc métallique  (SFX > Monde)"
+
+[node name="HumToggle" type="CheckButton" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Bourdonnement du portail  (Ambiance)"
+
+[node name="ReverbToggle" type="CheckButton" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Réverbération « grand hall »  (Monde)"
+
+[node name="MuffleToggle" type="CheckButton" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Étouffement  (Master, filtre)"
+
+[node name="SilenceButton" type="Button" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Coupure brutale au silence"
+
+[node name="VolumeLabel" type="Label" parent="TestPanel/Items"]
+layout_mode = 2
+text = "Volume général"
+
+[node name="VolumeSlider" type="HSlider" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="Spacer" type="Control" parent="TestPanel/Items"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FullscreenButton" type="Button" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Plein écran"
+
+[node name="QuitButton" type="Button" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Quitter"
+
+[node name="Diagnostics" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -62.0
+offset_right = -24.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.55, 1)
+theme_override_font_sizes/font_size = 14
+text = "Diagnostic"
+vertical_alignment = 2
