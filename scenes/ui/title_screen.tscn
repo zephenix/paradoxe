@@ -109,7 +109,13 @@ text = "PARADOXE - prototype"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Salle de test : mouvement, combat, temps (J4)"
+text = "Salle de test (mouvement, combat, son)"
+
+[node name="SoundBoardButton" type="Button" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Banc d'écoute : tous les sons (J5)"
 
 [node name="ClassicToggle" type="CheckButton" parent="TestPanel/Items"]
 unique_name_in_owner = true

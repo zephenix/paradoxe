@@ -27,6 +27,11 @@ const MUFFLE_MIN_HZ: float = 350.0
 
 ## Bibliothèque de sons (J5) : identifiant -> fichiers, bus, volume, rayon de bruit.
 var library: SoundLibrary = preload("res://resources/audio/sound_library.tres")
+## Réglages faits au banc d'écoute (J5), appliqués par-dessus la bibliothèque à
+## chaque démarrage. Fichier JSON : {identifiant: {volume_db: …, …}}.
+var tuning_path: String = "user://sound_tuning.json"
+## Réglages d'origine (ceux du fichier .tres) : identifiant -> get_tuning().
+var _factory: Dictionary = {}
 
 ## Vrai une fois que le joueur a cliqué ou appuyé sur une touche.
 ## Sur le Web, aucun son ne peut sortir avant ce moment.
@@ -67,6 +72,9 @@ func _ready() -> void:
 	ambience = AmbiencePlayer.new()
 	ambience.name = "Ambience"
 	add_child(ambience)
+	for entry in library.entries:
+		_factory[entry.id] = entry.get_tuning()
+	load_tuning()
 	_apply_muffle()
 	_apply_drama_gain()
 
@@ -281,6 +289,66 @@ func world_lowpass_hz() -> float:
 
 func world_reverb() -> AudioEffectReverb:
 	return _effect(AudioBuses.WORLD, AudioBuses.WORLD_FX_REVERB) as AudioEffectReverb
+
+
+# --------------------------------------------------------------------------
+# Réglages du banc d'écoute (J5)
+# --------------------------------------------------------------------------
+
+## Vrai si le son « id » a été modifié par rapport à la bibliothèque d'origine.
+func is_tuned(id: StringName) -> bool:
+	var entry: SoundEntry = library.get_entry(id)
+	return entry != null and _factory.has(id) and entry.get_tuning() != _factory[id]
+
+
+## Remet le son « id » à ses réglages d'origine.
+func reset_tuning(id: StringName) -> void:
+	var entry: SoundEntry = library.get_entry(id)
+	if entry and _factory.has(id):
+		entry.set_tuning(_factory[id])
+
+
+## Enregistre les sons modifiés dans tuning_path (les autres n'y figurent pas).
+func save_tuning() -> Error:
+	var data: Dictionary = {}
+	for entry in library.entries:
+		if is_tuned(entry.id):
+			data[String(entry.id)] = entry.get_tuning()
+	var file := FileAccess.open(tuning_path, FileAccess.WRITE)
+	if file == null:
+		return FileAccess.get_open_error()
+	file.store_string(JSON.stringify(data, "\t", true))
+	return OK
+
+
+## Applique les réglages enregistrés. Renvoie le nombre de sons réglés.
+func load_tuning() -> int:
+	if not FileAccess.file_exists(tuning_path):
+		return 0
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(tuning_path))
+	if not parsed is Dictionary:
+		push_warning("AudioManager : réglages de sons illisibles (%s)" % tuning_path)
+		return 0
+	var count: int = 0
+	for id: String in parsed:
+		var entry: SoundEntry = library.get_entry(StringName(id))
+		if entry and parsed[id] is Dictionary:
+			entry.set_tuning(parsed[id])
+			count += 1
+	return count
+
+
+## Texte lisible des réglages modifiés, à copier-coller (pour reporter les
+## valeurs dans resources/audio/sound_library.tres).
+func tuning_report() -> String:
+	var lines: PackedStringArray = []
+	for entry in library.entries:
+		if is_tuned(entry.id):
+			lines.append("%s : bus = %s ; volume_db = %.1f ; pitch_random = %.2f ; volume_random_db = %.1f ; noise_radius = %.0f" % [
+				entry.id, entry.bus, entry.volume_db, entry.pitch_random, entry.volume_random_db, entry.noise_radius])
+	if lines.is_empty():
+		return "Aucun son modifié."
+	return "Réglages PARADOXE (banc d'écoute)\n" + "\n".join(lines)
 
 
 # --------------------------------------------------------------------------

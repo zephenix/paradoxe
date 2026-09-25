@@ -30,3 +30,19 @@ func pick(rng: RandomNumberGenerator) -> AudioStream:
 	if streams.is_empty():
 		return null
 	return streams[rng.randi_range(0, streams.size() - 1)]
+
+
+## Réglages modifiables (banc d'écoute) : {"bus", "volume_db", "pitch_random",
+## "volume_random_db", "noise_radius"}.
+func get_tuning() -> Dictionary:
+	return {"bus": String(bus), "volume_db": volume_db, "pitch_random": pitch_random,
+			"volume_random_db": volume_random_db, "noise_radius": noise_radius}
+
+
+## Applique des réglages (seuls les champs présents et connus sont pris).
+func set_tuning(values: Dictionary) -> void:
+	if values.has("bus"):
+		bus = StringName(values["bus"])
+	for field: String in ["volume_db", "pitch_random", "volume_random_db", "noise_radius"]:
+		if values.has(field):
+			set(field, float(values[field]))
