@@ -29,6 +29,10 @@ Tous les éléments du jeu (images, sons, musique) sont originaux ou générés 
 - Il faut un navigateur récent (Chrome, Edge, Firefox, Safari 15.2 ou plus).
 - **Au premier chargement, la page se recharge automatiquement une fois.** C'est normal :
   cela active le mode multithread, qui assure un son de qualité.
+- **Après une mise à jour du jeu, la page se recharge aussi une fois toute seule**, une ou
+  deux secondes après l'ouverture. Le navigateur garde une copie du jeu pour démarrer plus
+  vite ; ce rechargement la remplace par la nouvelle version. Le numéro de version est
+  affiché en bas de l'écran titre.
 - **Cliquez une fois dans la page ou appuyez sur une touche pour activer le son.** Les
   navigateurs interdisent le son avant une interaction.
 - La navigation privée de Firefox n'est pas prise en charge : elle bloque les « service

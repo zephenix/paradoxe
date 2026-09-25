@@ -20,6 +20,12 @@ var inventory: Array[StringName] = []
 var time_trial: bool = false
 
 
+func _ready() -> void:
+	# Numéro de version dans la console (utile pour vérifier quelle version tourne,
+	# notamment sur le Web où le navigateur peut garder une ancienne version en cache).
+	print("PARADOXE v%s" % ProjectSettings.get_setting("application/config/version"))
+
+
 ## Le mode classique est un réglage du joueur ; on le relit ici pour que le
 ## code du gameplay n'ait qu'un seul endroit à interroger.
 func is_classic_mode() -> bool:

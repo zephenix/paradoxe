@@ -47,6 +47,7 @@ Il est jouable sur le Web (GitHub Pages) et en exécutables Windows/Linux (GitHu
 GAME_VERSION=0.2.0 ./tools/export.sh all     # export avec un numéro de version
 ./tools/screenshot.sh res://scenes/ui/title_screen.tscn build/shots/x.png 90 [appui_à_l_image]
 ./tools/web/check_web.sh        # après un export Web : vérifie isolation, JS, son réel dans Chromium
+./tools/web/check_update.sh     # vérifie qu'une nouvelle version Web remplace l'ancienne (~2 min)
 ./tools/screenshot.sh res://tools/godot/pose_sheet.tscn build/shots/poses.png 10   # planche de toutes les poses d'Élias
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/level_tour.gd -- build/shots   # visite guidée (captures)
 python3 tools/audio/generate_sounds.py       # régénère les sons (puis réimport Godot)
@@ -93,6 +94,12 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   (`export_presets.cfg`) recharge la page quand le service worker s'active trop tard au
   premier chargement. Repli possible : `variant/thread_support=false` (latence audio plus
   élevée).
+- **Mise à jour Web** : le service worker de Godot sert le jeu depuis son cache (« cache
+  d'abord »), et une nouvelle version attendrait la fermeture de tous les onglets. Le script
+  de `html/head_include` la fait prendre au chargement (message `'update'` au nouveau service
+  worker, puis rechargement). Après toute modification de ce script ou de la version de
+  Godot : `./tools/web/check_update.sh`. Juste après la toute première installation du
+  service worker, Chromium met les recherches de mise à jour en attente environ 60 s.
 - Les fichiers `*.uid` (scripts) et `*.import` (sons, images) **se versionnent**. Le
   dossier `.godot/` ne se versionne pas.
 - `build/` contient un `.gdignore` (créé par `tools/export.sh`), et `tools/web/` et
