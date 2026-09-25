@@ -98,7 +98,9 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
    Godot expliqués simplement. Le titre doit contenir `(vX.Y)` : `tools/release_notes.sh`
    s'en sert pour le texte de la Release.
 4. Mettre à jour `config/version` dans `project.godot` (X.Y.0).
-5. Ouvrir une Pull Request vers `main`, attendre la CI verte, puis faire fusionner la PR.
+5. Ouvrir une Pull Request vers `main` et attendre la CI verte, puis **fusionner la PR
+   soi-même**, sans attendre de relecture (autorisation donnée par le propriétaire le
+   25/09/2026). Il relit les PR après coup.
 6. **Créer la release** : après la fusion, depuis `main` à jour,
    `git tag -a vX.Y -m "PARADOXE vX.Y — Jx" && git push origin vX.Y`. La CI exporte et
    publie la Release (Windows `.exe` unique, Linux `.zip`, Web `.zip`).
