@@ -12,9 +12,11 @@ extends Node
 ## J1 : lecture simple de sons, boucles, effets de bus et déblocage Web.
 ## Les fonctions à venir sont listées dans docs/PLAN.md §6.3.
 
-## Un bruit vient d'être produit dans le monde du jeu (écouté par les ennemis en J6).
+## Un bruit vient d'être produit dans le monde du jeu (écouté par les ennemis).
 ## position : où ; radius : jusqu'où il porte (pixels) ; source : qui l'a produit.
 signal noise_emitted(position: Vector2, radius: float, source: Node)
+## Un son de la bibliothèque vient d'être joué (banc d'écoute, tests).
+signal sfx_played(id: StringName)
 
 ## Nombre de lecteurs audio préparés à l'avance pour les sons courts.
 const POOL_SIZE: int = 16
@@ -22,6 +24,14 @@ const POOL_SIZE: int = 16
 const SILENT_DB: float = -80.0
 ## Coupure du filtre passe-bas quand l'étouffement est maximal.
 const MUFFLE_MIN_HZ: float = 350.0
+
+## Bibliothèque de sons (J5) : identifiant -> fichiers, bus, volume, rayon de bruit.
+var library: SoundLibrary = preload("res://resources/audio/sound_library.tres")
+## Réglages faits au banc d'écoute (J5), appliqués par-dessus la bibliothèque à
+## chaque démarrage. Fichier JSON : {identifiant: {volume_db: …, …}}.
+var tuning_path: String = "user://sound_tuning.json"
+## Réglages d'origine (ceux du fichier .tres) : identifiant -> get_tuning().
+var _factory: Dictionary = {}
 
 ## Vrai une fois que le joueur a cliqué ou appuyé sur une touche.
 ## Sur le Web, aucun son ne peut sortir avant ce moment.
@@ -43,11 +53,14 @@ var drama_gain_db: float = 0.0:
 ## Distance (pixels) au-delà de laquelle un son positionné n'est plus audible.
 const POSITIONAL_MAX_DISTANCE: float = 2200.0
 
+var _rng := RandomNumberGenerator.new()
 var _pool: Array[AudioStreamPlayer] = []
 var _pool_2d: Array[AudioStreamPlayer2D] = []
 var _loops: Dictionary = {}  # identifiant -> AudioStreamPlayer
 var _muffle_tween: Tween
 var _gain_tween: Tween
+## Ambiance de la zone acoustique courante (J5) : voir set_zone().
+var ambience: AmbiencePlayer
 
 
 func _ready() -> void:
@@ -56,6 +69,12 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	for i in POOL_SIZE:
 		_pool.append(_make_player())
+	ambience = AmbiencePlayer.new()
+	ambience.name = "Ambience"
+	add_child(ambience)
+	for entry in library.entries:
+		_factory[entry.id] = entry.get_tuning()
+	load_tuning()
 	_apply_muffle()
 	_apply_drama_gain()
 
@@ -79,9 +98,47 @@ func unlock() -> void:
 # Lecture de sons
 # --------------------------------------------------------------------------
 
-## Joue un son court, non positionné, sur un bus donné.
-## (J5 ajoutera play_sfx(id, position) : sons positionnés, variations
-## aléatoires et rayon de bruit tirés de la bibliothèque de sons.)
+## Joue un son de la BIBLIOTHÈQUE (J5, PLAN §6.3) : une variante au hasard, avec
+## de légères variations de hauteur et de volume, sur le bus de l'entrée.
+##   at : position dans le monde (Vector2) ; null = son non positionné (interface).
+##   source : qui fait le bruit (les ennemis ignorent leurs propres bruits).
+##   volume_offset_db : ajouté au volume de l'entrée (pas de marche plus doux…).
+##   noise_scale : multiplie le rayon de bruit de l'entrée (0 = inaudible pour les ennemis).
+## Si le son a un rayon de bruit et une position, les ennemis sont prévenus
+## (signal noise_emitted) : un seul système pour le joueur et les ennemis.
+## Renvoie le lecteur utilisé (ou null si l'identifiant est inconnu).
+func play_sfx(id: StringName, at: Variant = null, source: Node = null, volume_offset_db: float = 0.0,
+		noise_scale: float = 1.0) -> Node:
+	var entry: SoundEntry = library.get_entry(id)
+	if entry == null or entry.streams.is_empty():
+		push_warning("AudioManager.play_sfx : son inconnu « %s »" % id)
+		return null
+	var volume: float = entry.volume_db + volume_offset_db + _rng.randf_range(-entry.volume_random_db, entry.volume_random_db)
+	var pitch: float = 1.0 + _rng.randf_range(-entry.pitch_random, entry.pitch_random)
+	var stream: AudioStream = entry.pick(_rng)
+	sfx_played.emit(id)
+	if at is Vector2:
+		return play_stream_2d(stream, at, entry.bus, volume, pitch, entry.noise_radius * noise_scale, source)
+	return play_stream(stream, entry.bus, volume, pitch)
+
+
+## Premier fichier d'une entrée (pour les boucles : play_loop(id, stream_of(id)…)).
+func stream_of(id: StringName) -> AudioStream:
+	var entry: SoundEntry = library.get_entry(id)
+	return entry.streams[0] if entry and not entry.streams.is_empty() else null
+
+
+## Démarre une boucle de la bibliothèque (bus et volume de l'entrée).
+func play_loop_sfx(loop_id: StringName, sound_id: StringName, fade_in: float = 0.3, volume_offset_db: float = 0.0) -> void:
+	var entry: SoundEntry = library.get_entry(sound_id)
+	if entry == null or entry.streams.is_empty():
+		push_warning("AudioManager.play_loop_sfx : son inconnu « %s »" % sound_id)
+		return
+	play_loop(loop_id, entry.streams[0], entry.bus, entry.volume_db + volume_offset_db, fade_in)
+
+
+## Joue un son court, non positionné, sur un bus donné (flux déjà chargé).
+## Préférer play_sfx(id) : réglages de la bibliothèque et rayon de bruit.
 func play_stream(stream: AudioStream, bus: StringName = AudioBuses.SFX, volume_db: float = 0.0,
 		pitch: float = 1.0) -> AudioStreamPlayer:
 	if stream == null:
@@ -204,7 +261,7 @@ func restore_from_silence(fade_back: float = 1.5) -> void:
 ## Règle la réverbération de la salle (bus Monde).
 ## wet : quantité d'écho (0 = sec) ; room_size : taille perçue (0 à 1) ;
 ## damping : amortissement des aigus (0 = métal brillant, 1 = pièce feutrée).
-## J5 remplacera cet appel par des préréglages par zone (set_zone).
+## Les zones acoustiques (set_zone) la règlent d'elles-mêmes.
 func set_reverb(wet: float, room_size: float = 0.6, damping: float = 0.5) -> void:
 	var reverb: AudioEffectReverb = _effect(AudioBuses.WORLD, AudioBuses.WORLD_FX_REVERB) as AudioEffectReverb
 	if reverb == null:
@@ -213,6 +270,95 @@ func set_reverb(wet: float, room_size: float = 0.6, damping: float = 0.5) -> voi
 	reverb.room_size = clampf(room_size, 0.0, 1.0)
 	reverb.damping = clampf(damping, 0.0, 1.0)
 	AudioServer.set_bus_effect_enabled(AudioBuses.index(AudioBuses.WORLD), AudioBuses.WORLD_FX_REVERB, wet > 0.0)
+
+
+## Filtre passe-bas des sons du monde (bus Monde), en Hz : 20500 = aucun filtre.
+func set_world_lowpass(cutoff_hz: float) -> void:
+	var lowpass: AudioEffectLowPassFilter = _effect(AudioBuses.WORLD, AudioBuses.WORLD_FX_LOWPASS) as AudioEffectLowPassFilter
+	if lowpass == null:
+		return
+	lowpass.cutoff_hz = clampf(cutoff_hz, 50.0, AudioBuses.LOWPASS_OPEN_HZ)
+	AudioServer.set_bus_effect_enabled(AudioBuses.index(AudioBuses.WORLD), AudioBuses.WORLD_FX_LOWPASS,
+			cutoff_hz < AudioBuses.LOWPASS_OPEN_HZ - 1.0)
+
+
+func world_lowpass_hz() -> float:
+	var lowpass: AudioEffectLowPassFilter = _effect(AudioBuses.WORLD, AudioBuses.WORLD_FX_LOWPASS) as AudioEffectLowPassFilter
+	return lowpass.cutoff_hz if lowpass else AudioBuses.LOWPASS_OPEN_HZ
+
+
+func world_reverb() -> AudioEffectReverb:
+	return _effect(AudioBuses.WORLD, AudioBuses.WORLD_FX_REVERB) as AudioEffectReverb
+
+
+# --------------------------------------------------------------------------
+# Réglages du banc d'écoute (J5)
+# --------------------------------------------------------------------------
+
+## Vrai si le son « id » a été modifié par rapport à la bibliothèque d'origine.
+func is_tuned(id: StringName) -> bool:
+	var entry: SoundEntry = library.get_entry(id)
+	return entry != null and _factory.has(id) and entry.get_tuning() != _factory[id]
+
+
+## Remet le son « id » à ses réglages d'origine.
+func reset_tuning(id: StringName) -> void:
+	var entry: SoundEntry = library.get_entry(id)
+	if entry and _factory.has(id):
+		entry.set_tuning(_factory[id])
+
+
+## Enregistre les sons modifiés dans tuning_path (les autres n'y figurent pas).
+func save_tuning() -> Error:
+	var data: Dictionary = {}
+	for entry in library.entries:
+		if is_tuned(entry.id):
+			data[String(entry.id)] = entry.get_tuning()
+	var file := FileAccess.open(tuning_path, FileAccess.WRITE)
+	if file == null:
+		return FileAccess.get_open_error()
+	file.store_string(JSON.stringify(data, "\t", true))
+	return OK
+
+
+## Applique les réglages enregistrés. Renvoie le nombre de sons réglés.
+func load_tuning() -> int:
+	if not FileAccess.file_exists(tuning_path):
+		return 0
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(tuning_path))
+	if not parsed is Dictionary:
+		push_warning("AudioManager : réglages de sons illisibles (%s)" % tuning_path)
+		return 0
+	var count: int = 0
+	for id: String in parsed:
+		var entry: SoundEntry = library.get_entry(StringName(id))
+		if entry and parsed[id] is Dictionary:
+			entry.set_tuning(parsed[id])
+			count += 1
+	return count
+
+
+## Texte lisible des réglages modifiés, à copier-coller (pour reporter les
+## valeurs dans resources/audio/sound_library.tres).
+func tuning_report() -> String:
+	var lines: PackedStringArray = []
+	for entry in library.entries:
+		if is_tuned(entry.id):
+			lines.append("%s : bus = %s ; volume_db = %.1f ; pitch_random = %.2f ; volume_random_db = %.1f ; noise_radius = %.0f" % [
+				entry.id, entry.bus, entry.volume_db, entry.pitch_random, entry.volume_random_db, entry.noise_radius])
+	if lines.is_empty():
+		return "Aucun son modifié."
+	return "Réglages PARADOXE (banc d'écoute)\n" + "\n".join(lines)
+
+
+# --------------------------------------------------------------------------
+# Zones acoustiques (J5)
+# --------------------------------------------------------------------------
+
+## Passe en fondu à l'ambiance et à l'acoustique de la zone « id »
+## (resources/audio/zones/<id>.tres). &"" = silence (on quitte le niveau).
+func set_zone(id: StringName, fade: float = 2.5) -> void:
+	ambience.set_zone(id, fade)
 
 
 # --------------------------------------------------------------------------

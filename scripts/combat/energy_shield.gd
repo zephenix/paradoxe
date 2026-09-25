@@ -81,8 +81,8 @@ func raise() -> bool:
 	collision_layer = PhysicsLayers.SHIELDS
 	visible = true
 	_flash = 0.6
-	AudioManager.play_stream_2d(CombatSounds.SHIELD_UP, global_position, AudioBuses.SFX, -8.0)
-	AudioManager.play_loop(_loop_id, CombatSounds.SHIELD_LOOP, AudioBuses.SFX, -14.0, 0.1)
+	AudioManager.play_sfx(&"shield_up", global_position, get_parent())
+	AudioManager.play_loop_sfx(_loop_id, &"shield_loop", 0.1)
 	return true
 
 
@@ -91,7 +91,7 @@ func lower() -> void:
 	if not is_up:
 		return
 	_set_down()
-	AudioManager.play_stream_2d(CombatSounds.SHIELD_DOWN, global_position, AudioBuses.SFX, -10.0)
+	AudioManager.play_sfx(&"shield_down", global_position, get_parent())
 
 
 ## Appelé par un projectile adverse qui vient de heurter le bouclier.
@@ -99,13 +99,12 @@ func absorb(projectile: Projectile) -> void:
 	if projectile.charged:
 		_set_down()
 		broken_timer = config.shield_broken_cooldown if config else 2.0
-		AudioManager.play_stream_2d(CombatSounds.SHIELD_BREAK, global_position, AudioBuses.SFX, -2.0)
+		AudioManager.play_sfx(&"shield_break", global_position, get_parent())
 		ImpactFlash.spawn(get_parent(), global_position + Vector2(0, -50), Color.WHITE, 3.0)
 		broken.emit()
 	else:
 		_flash = 1.0
-		AudioManager.play_stream_2d(CombatSounds.SHIELD_HIT, global_position, AudioBuses.SFX, -4.0,
-				randf_range(0.94, 1.06))
+		AudioManager.play_sfx(&"shield_hit", global_position, get_parent())
 	blocked.emit(projectile)
 
 

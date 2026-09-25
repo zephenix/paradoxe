@@ -304,7 +304,9 @@ func test_shot_seen_coming_triggers_combat_toward_the_shooter() -> void:
 
 func test_shot_hidden_by_a_wall_is_ignored() -> void:
 	block(15, 4, 1, 6)  # mur de x 720 à 768
-	var s: Sentinel = spawn_sentinel(900.0, -1)
+	# Assez loin du mur pour ne pas ENTENDRE l'impact (J5) : on teste la vue.
+	var radius: float = AudioManager.library.get_entry(&"impact_wall").noise_radius
+	var s: Sentinel = spawn_sentinel(720.0 + radius + 60.0, -1)
 	await wait_physics(3)
 	var shot := Projectile.new()
 	shot.setup(null, Projectile.TEAM_PLAYER, 1, 900.0, false, WeaponConfig.new())
@@ -312,6 +314,18 @@ func test_shot_hidden_by_a_wall_is_ignored() -> void:
 	shot.global_position = Vector2(600.0, FLOOR_Y - 76.0)
 	await wait_physics(15)
 	assert_eq(s.machine.current_name, &"Patrol", "le tir s'écrase sur le mur")
+
+
+func test_impact_on_a_nearby_wall_is_heard() -> void:
+	block(15, 4, 1, 6)  # mur de x 720 à 768
+	var s: Sentinel = spawn_sentinel(900.0, -1)
+	await wait_physics(3)
+	var shot := Projectile.new()
+	shot.setup(null, Projectile.TEAM_PLAYER, 1, 900.0, false, WeaponConfig.new())
+	arena.add_child(shot)
+	shot.global_position = Vector2(600.0, FLOOR_Y - 76.0)
+	await wait_physics(15)
+	assert_eq(s.machine.current_name, &"Suspicious", "le bruit de l'impact l'intrigue")
 
 
 func test_shot_from_behind_is_a_surprise() -> void:

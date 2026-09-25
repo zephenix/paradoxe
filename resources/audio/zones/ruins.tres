@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AcousticZone" format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/acoustic_zone.gd" id="1_zone"]
+
+[resource]
+script = ExtResource("1_zone")
+id = &"ruins"
+title = "Ruines de la ville"
+layers = Array[StringName]([&"amb_wind_loop", &"amb_city_loop"])
+layer_volumes_db = Array[float]([0.0, -3.0])
+swell_depth_db = 4.0
+swell_period = 20.0
+events = Array[StringName]([&"amb_debris", &"amb_creak", &"amb_cry"])
+event_interval_min = 4.0
+event_interval_max = 10.0
+event_distance_min = 400.0
+event_distance_max = 1400.0
+event_volume_db = -2.0
+reverb_wet = 0.08
+reverb_room_size = 0.3
+reverb_damping = 0.6
+lowpass_hz = 20500.0

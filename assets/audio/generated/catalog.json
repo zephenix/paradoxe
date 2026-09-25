@@ -1,0 +1,392 @@
+{
+ "amb_buzz_01": {
+  "category": "ambience",
+  "description": "Grésillement de lampe, variante 1 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_buzz_02": {
+  "category": "ambience",
+  "description": "Grésillement de lampe, variante 2 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_city_loop": {
+  "category": "ambience",
+  "description": "Ville morte au loin : rumeur sourde, tintements métalliques rares (13 s, J5).",
+  "loop": true
+ },
+ "amb_creak_01": {
+  "category": "ambience",
+  "description": "Craquement de structure, variante 1 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_creak_02": {
+  "category": "ambience",
+  "description": "Craquement de structure, variante 2 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_cry_01": {
+  "category": "ambience",
+  "description": "Cri de faune lointain, variante 1 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_cry_02": {
+  "category": "ambience",
+  "description": "Cri de faune lointain, variante 2 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_debris_01": {
+  "category": "ambience",
+  "description": "Gravats qui roulent, variante 1 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_debris_02": {
+  "category": "ambience",
+  "description": "Gravats qui roulent, variante 2 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_drip_01": {
+  "category": "ambience",
+  "description": "Goutte qui tombe, variante 1 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_drip_02": {
+  "category": "ambience",
+  "description": "Goutte qui tombe, variante 2 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_drip_03": {
+  "category": "ambience",
+  "description": "Goutte qui tombe, variante 3 (événement d'ambiance, J5).",
+  "loop": false
+ },
+ "amb_electric_loop": {
+  "category": "ambience",
+  "description": "Grésillement électrique irrégulier (11 s, J5).",
+  "loop": true
+ },
+ "amb_hall_loop": {
+  "category": "ambience",
+  "description": "Grand hall : présence de la pièce et machinerie lointaine (17 s, J5).",
+  "loop": true
+ },
+ "amb_lab_loop": {
+  "category": "ambience",
+  "description": "Laboratoire : ventilation et bourdonnement électrique à 50 Hz (13 s, J5).",
+  "loop": true
+ },
+ "amb_shaft_loop": {
+  "category": "ambience",
+  "description": "Puits : grondement très grave, air qui circule (13 s, J5).",
+  "loop": true
+ },
+ "amb_wind_loop": {
+  "category": "ambience",
+  "description": "Vent dans les ruines : souffle grave qui enfle et retombe (17 s, J5).",
+  "loop": true
+ },
+ "breath_calm_01": {
+  "category": "voice",
+  "description": "Respiration calme, variante 1 (J5).",
+  "loop": false
+ },
+ "breath_calm_02": {
+  "category": "voice",
+  "description": "Respiration calme, variante 2 (J5).",
+  "loop": false
+ },
+ "breath_effort_01": {
+  "category": "voice",
+  "description": "Respiration d'effort (après une course), variante 1 (J5).",
+  "loop": false
+ },
+ "breath_effort_02": {
+  "category": "voice",
+  "description": "Respiration d'effort (après une course), variante 2 (J5).",
+  "loop": false
+ },
+ "breath_exhausted_01": {
+  "category": "voice",
+  "description": "Essoufflement (effort prolongé), variante 1 (J5).",
+  "loop": false
+ },
+ "breath_exhausted_02": {
+  "category": "voice",
+  "description": "Essoufflement (effort prolongé), variante 2 (J5).",
+  "loop": false
+ },
+ "checkpoint_on": {
+  "category": "sfx",
+  "description": "Checkpoint atteint : trois notes douces qui montent (provisoire J3).",
+  "loop": false
+ },
+ "creature_alert": {
+  "category": "creature",
+  "description": "Sentinelle en alerte : aiguë et hachée (provisoire J3).",
+  "loop": false
+ },
+ "creature_calm": {
+  "category": "creature",
+  "description": "Sentinelle calme : deux syllabes descendantes (provisoire J3).",
+  "loop": false
+ },
+ "creature_curious": {
+  "category": "creature",
+  "description": "Sentinelle intriguée : intonation montante (provisoire J3).",
+  "loop": false
+ },
+ "creature_death": {
+  "category": "creature",
+  "description": "Sentinelle touchée : cri qui retombe (provisoire J3).",
+  "loop": false
+ },
+ "creature_search": {
+  "category": "creature",
+  "description": "Sentinelle qui cherche : grognement grave, interrogatif (provisoire J3).",
+  "loop": false
+ },
+ "foley_body_fall": {
+  "category": "foley",
+  "description": "Corps qui s'effondre au sol (provisoire J2).",
+  "loop": false
+ },
+ "foley_climb": {
+  "category": "foley",
+  "description": "Effort pour se hisser : frottement + souffle (provisoire J2).",
+  "loop": false
+ },
+ "foley_crouch": {
+  "category": "foley",
+  "description": "S'accroupir : tissu et genou qui se plie (J5).",
+  "loop": false
+ },
+ "foley_grab": {
+  "category": "foley",
+  "description": "Mains qui agrippent un rebord (provisoire J2).",
+  "loop": false
+ },
+ "foley_jump": {
+  "category": "foley",
+  "description": "Impulsion d'un saut : frottement de tissu rapide (provisoire J2).",
+  "loop": false
+ },
+ "foley_land": {
+  "category": "foley",
+  "description": "Réception légère : double impact pieds (provisoire J2).",
+  "loop": false
+ },
+ "foley_land_heavy": {
+  "category": "foley",
+  "description": "Réception lourde : impact grave + souffle (provisoire J2).",
+  "loop": false
+ },
+ "foley_roll": {
+  "category": "foley",
+  "description": "Roulade : frottements de tissu et d'épaule au sol (provisoire J2).",
+  "loop": false
+ },
+ "foley_skid": {
+  "category": "foley",
+  "description": "Dérapage : semelles qui frottent (provisoire J2).",
+  "loop": false
+ },
+ "foley_slide": {
+  "category": "foley",
+  "description": "Glissade : raclement qui s'éteint (provisoire J2).",
+  "loop": false
+ },
+ "foley_step_metal_01": {
+  "category": "foley",
+  "description": "Pas sur métal, variante 1 (J5).",
+  "loop": false
+ },
+ "foley_step_metal_02": {
+  "category": "foley",
+  "description": "Pas sur métal, variante 2 (J5).",
+  "loop": false
+ },
+ "foley_step_metal_03": {
+  "category": "foley",
+  "description": "Pas sur métal, variante 3 (J5).",
+  "loop": false
+ },
+ "foley_step_metal_04": {
+  "category": "foley",
+  "description": "Pas sur métal, variante 4 (J5).",
+  "loop": false
+ },
+ "foley_step_plant_01": {
+  "category": "foley",
+  "description": "Pas sur végétation, variante 1 (J5).",
+  "loop": false
+ },
+ "foley_step_plant_02": {
+  "category": "foley",
+  "description": "Pas sur végétation, variante 2 (J5).",
+  "loop": false
+ },
+ "foley_step_plant_03": {
+  "category": "foley",
+  "description": "Pas sur végétation, variante 3 (J5).",
+  "loop": false
+ },
+ "foley_step_plant_04": {
+  "category": "foley",
+  "description": "Pas sur végétation, variante 4 (J5).",
+  "loop": false
+ },
+ "foley_step_stone_01": {
+  "category": "foley",
+  "description": "Pas sur pierre, variante 1 (provisoire J2).",
+  "loop": false
+ },
+ "foley_step_stone_02": {
+  "category": "foley",
+  "description": "Pas sur pierre, variante 2 (provisoire J2).",
+  "loop": false
+ },
+ "foley_step_stone_03": {
+  "category": "foley",
+  "description": "Pas sur pierre, variante 3 (provisoire J2).",
+  "loop": false
+ },
+ "foley_step_stone_04": {
+  "category": "foley",
+  "description": "Pas sur pierre, variante 4 (provisoire J2).",
+  "loop": false
+ },
+ "foley_step_water_01": {
+  "category": "foley",
+  "description": "Pas sur eau, variante 1 (J5).",
+  "loop": false
+ },
+ "foley_step_water_02": {
+  "category": "foley",
+  "description": "Pas sur eau, variante 2 (J5).",
+  "loop": false
+ },
+ "foley_step_water_03": {
+  "category": "foley",
+  "description": "Pas sur eau, variante 3 (J5).",
+  "loop": false
+ },
+ "foley_step_water_04": {
+  "category": "foley",
+  "description": "Pas sur eau, variante 4 (J5).",
+  "loop": false
+ },
+ "foley_turn": {
+  "category": "foley",
+  "description": "Demi-tour : bref froissement de la blouse (J5).",
+  "loop": false
+ },
+ "impact_body": {
+  "category": "combat",
+  "description": "Tir qui touche un corps : coup sourd (provisoire J3).",
+  "loop": false
+ },
+ "impact_wall": {
+  "category": "combat",
+  "description": "Tir qui frappe le décor : choc et grésillement (provisoire J3).",
+  "loop": false
+ },
+ "portal_hum_loop": {
+  "category": "ambience",
+  "description": "Bourdonnement du portail (boucle de 8 s) : drone grave, battements, crépitements.",
+  "loop": true
+ },
+ "rewind_loop": {
+  "category": "sfx",
+  "description": "Défilement arrière du temps : souffles inversés et sifflement de bande qui ondule (boucle, provisoire J4).",
+  "loop": true
+ },
+ "rewind_release": {
+  "category": "sfx",
+  "description": "Reprise après un rembobinage : souffle vers l'avant et coup sourd (provisoire J4).",
+  "loop": false
+ },
+ "shield_break": {
+  "category": "combat",
+  "description": "Bouclier brisé par un tir chargé : éclatement (provisoire J3).",
+  "loop": false
+ },
+ "shield_down": {
+  "category": "combat",
+  "description": "Le bouclier s'éteint : descente brève (provisoire J3).",
+  "loop": false
+ },
+ "shield_hit": {
+  "category": "combat",
+  "description": "Tir arrêté par un bouclier : claquement électrique (provisoire J3).",
+  "loop": false
+ },
+ "shield_loop": {
+  "category": "combat",
+  "description": "Bouclier levé : grésillement continu (boucle, provisoire J3).",
+  "loop": true
+ },
+ "shield_up": {
+  "category": "combat",
+  "description": "Le bouclier s'allume : montée brève (provisoire J3).",
+  "loop": false
+ },
+ "test_impact": {
+  "category": "sfx",
+  "description": "Choc métallique : transitoire bruité + résonances. Idéal pour entendre la réverbération.",
+  "loop": false
+ },
+ "ui_back": {
+  "category": "ui",
+  "description": "Retour dans un menu : deux notes descendantes (J5).",
+  "loop": false
+ },
+ "ui_confirm": {
+  "category": "ui",
+  "description": "Validation dans un menu : deux notes brèves, douces.",
+  "loop": false
+ },
+ "ui_move": {
+  "category": "ui",
+  "description": "Déplacement dans un menu : tic bref (J5).",
+  "loop": false
+ },
+ "weapon_charge": {
+  "category": "combat",
+  "description": "Charge du tir : tension qui monte pendant 0,8 s (provisoire J3).",
+  "loop": false
+ },
+ "weapon_charge_ready": {
+  "category": "combat",
+  "description": "Charge complète : tintement bref (provisoire J3).",
+  "loop": false
+ },
+ "weapon_draw": {
+  "category": "combat",
+  "description": "Dégainer : frottement de tissu et déclic métallique (provisoire J3).",
+  "loop": false
+ },
+ "weapon_empty": {
+  "category": "combat",
+  "description": "Clic à vide : plus d'énergie, rien ne part (provisoire J3).",
+  "loop": false
+ },
+ "weapon_holster": {
+  "category": "combat",
+  "description": "Rengainer : déclic puis frottement (J5).",
+  "loop": false
+ },
+ "weapon_shot": {
+  "category": "combat",
+  "description": "Tir du pistolet d'Élias : décharge brève et claire (provisoire J3).",
+  "loop": false
+ },
+ "weapon_shot_charged": {
+  "category": "combat",
+  "description": "Tir chargé : décharge lourde, grave, avec crépitements (provisoire J3).",
+  "loop": false
+ },
+ "weapon_shot_sentinel": {
+  "category": "combat",
+  "description": "Tir des Sentinelles : plus grave et bourdonnant, pour le distinguer du nôtre (provisoire J3).",
+  "loop": false
+ }
+}

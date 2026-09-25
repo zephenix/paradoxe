@@ -11,7 +11,7 @@ func enter(_previous: StringName, _data: Dictionary) -> void:
 	if not player.weapon.raise_shield():
 		# Jauge presque vide ou bouclier brisé à l'instant : clic à vide, on reste
 		# en garde. L'appui est « consommé » : il faudra relâcher et réappuyer.
-		AudioManager.play_stream_2d(CombatSounds.EMPTY, player.global_position + Vector2(0, -70), AudioBuses.SFX, -6.0)
+		AudioManager.play_sfx(&"weapon_empty", player.global_position + Vector2(0, -70), player)
 		player.input.consume(&"shield", INF)
 		machine.transition_to(&"Aim", {"shield_locked": true})
 

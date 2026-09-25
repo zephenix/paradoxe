@@ -2,9 +2,12 @@ extends PlayerState
 ## Accroupi, immobile. On ne se relève que s'il y a la place.
 
 
-func enter(_previous: StringName, _data: Dictionary) -> void:
+func enter(previous: StringName, data: Dictionary) -> void:
 	player.set_crouched(true)
 	player.visual.play(&"crouch")
+	# Bruit de vêtements en s'accroupissant (pas en passant de CrouchWalk à Crouch).
+	if previous != &"CrouchWalk" and not data.get("resumed", false):
+		player.anim_event.emit(&"crouch")
 
 
 func physics_update(delta: float) -> void:

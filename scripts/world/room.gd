@@ -5,7 +5,7 @@ extends Node2D
 ##
 ## La salle est un rectangle : l'origine du nœud est son coin haut-gauche et
 ## room_size sa taille. Quand Élias y entre, le CameraDirector cadre la salle
-## et l'AudioManager passera à son ambiance (J5). Une salle plus grande que
+## et l'AudioManager passe à son ambiance (zone acoustique). Une salle plus grande que
 ## l'écran fait défiler la caméra (et peut la faire reculer avec camera_zoom).
 
 enum Transition { SLIDE, CUT }

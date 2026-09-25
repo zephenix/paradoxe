@@ -68,7 +68,7 @@ func muzzle_position(low: bool = false) -> Vector2:
 ## Tire. Renvoie le projectile, ou null si l'énergie manque (clic à vide).
 func fire(charged: bool = false, low: bool = false) -> Projectile:
 	if energy == null or not energy.try_spend(_cost(charged)):
-		AudioManager.play_stream_2d(CombatSounds.EMPTY, muzzle_position(low), AudioBuses.SFX, -6.0)
+		AudioManager.play_sfx(&"weapon_empty", muzzle_position(low), get_parent())
 		dry_fired.emit()
 		return null
 	var projectile := Projectile.new()
@@ -77,10 +77,9 @@ func fire(charged: bool = false, low: bool = false) -> Projectile:
 	var container: Node = _projectile_container()
 	container.add_child(projectile)
 	projectile.global_position = muzzle_position(low)
-	var stream: AudioStream = CombatSounds.SHOT_CHARGED if charged else config.shot_sound
-	var noise: float = config.charged_noise_radius if charged else config.shot_noise_radius
-	AudioManager.play_stream_2d(stream, projectile.global_position, AudioBuses.SFX, -3.0,
-			randf_range(0.96, 1.04), noise, get_parent())
+	# Le son porte son rayon de bruit : les ennemis proches entendent le tir.
+	AudioManager.play_sfx(&"weapon_shot_charged" if charged else config.shot_sound_id,
+			projectile.global_position, get_parent())
 	ImpactFlash.spawn(container, projectile.global_position, config.projectile_color, 0.7)
 	fired.emit(projectile)
 	return projectile
@@ -88,7 +87,12 @@ func fire(charged: bool = false, low: bool = false) -> Projectile:
 
 ## Son de l'arme qu'on dégaine.
 func play_draw_sound() -> void:
-	AudioManager.play_stream_2d(CombatSounds.DRAW, global_position + Vector2(0, -60), AudioBuses.SFX, -10.0)
+	AudioManager.play_sfx(&"weapon_draw", global_position + Vector2(0, -60), get_parent())
+
+
+## Son de l'arme qu'on rengaine.
+func play_holster_sound() -> void:
+	AudioManager.play_sfx(&"weapon_holster", global_position + Vector2(0, -60), get_parent())
 
 
 # --------------------------------------------------------------------------
@@ -99,7 +103,7 @@ func start_charge() -> void:
 	is_charging = true
 	charge = 0.0
 	_charge_ready_sent = false
-	_charge_sound = AudioManager.play_stream_2d(CombatSounds.CHARGE, muzzle_position(), AudioBuses.SFX, -8.0)
+	_charge_sound = AudioManager.play_sfx(&"weapon_charge", muzzle_position(), get_parent()) as AudioStreamPlayer2D
 
 
 ## Fait monter la charge ; émet charge_ready (et un tintement) quand elle est complète.
@@ -113,7 +117,7 @@ func update_charge(delta: float) -> void:
 		energy.idle_time = 0.0
 	if is_charged() and not _charge_ready_sent:
 		_charge_ready_sent = true
-		AudioManager.play_stream_2d(CombatSounds.CHARGE_READY, muzzle_position(), AudioBuses.SFX, -10.0)
+		AudioManager.play_sfx(&"weapon_charge_ready", muzzle_position(), get_parent())
 		charge_ready.emit()
 
 
@@ -134,7 +138,7 @@ func cancel_charge() -> void:
 	charge = 0.0
 	# Le lecteur a pu être réutilisé pour un autre son une fois la charge jouée :
 	# on ne l'arrête que s'il joue encore NOTRE son de charge.
-	if _charge_sound and _charge_sound.playing and _charge_sound.stream == CombatSounds.CHARGE:
+	if _charge_sound and _charge_sound.playing and _charge_sound.stream == AudioManager.stream_of(&"weapon_charge"):
 		_charge_sound.stop()
 	_charge_sound = null
 

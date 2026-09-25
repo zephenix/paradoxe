@@ -217,7 +217,8 @@ func test_shot_is_heard_by_enemies() -> void:
 	AudioManager.noise_emitted.connect(listener)
 	weapon.fire()
 	AudioManager.noise_emitted.disconnect(listener)
-	assert_eq(heard, [weapon.config.shot_noise_radius] as Array[float], "un tir fait du bruit")
+	assert_eq(heard, [AudioManager.library.get_entry(weapon.config.shot_sound_id).noise_radius] as Array[float], "un tir fait du bruit")
+	assert_true(heard[0] > 0.0, "rayon de bruit réglé dans la bibliothèque")
 
 
 func test_charge_needs_full_time() -> void:

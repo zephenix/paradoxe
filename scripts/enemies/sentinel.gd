@@ -60,15 +60,11 @@ var _stays_dead: bool = false
 ## Hauteur de voix propre à chaque Sentinelle.
 var _voice_pitch: float = 1.0
 
-const STEP_SOUND: AudioStream = preload("res://assets/audio/generated/foley/foley_step_stone_02.wav")
-const BODY_FALL_SOUND: AudioStream = preload("res://assets/audio/generated/foley/foley_body_fall.wav")
-const VOICES: Dictionary = {
-	&"calm": preload("res://assets/audio/generated/creature/creature_calm.wav"),
-	&"curious": preload("res://assets/audio/generated/creature/creature_curious.wav"),
-	&"alert": preload("res://assets/audio/generated/creature/creature_alert.wav"),
-	&"search": preload("res://assets/audio/generated/creature/creature_search.wav"),
-	&"death": preload("res://assets/audio/generated/creature/creature_death.wav"),
-}
+## Humeurs connues : chacune a son son « creature_<humeur> » dans la bibliothèque.
+const MOODS: Array[StringName] = [&"calm", &"curious", &"alert", &"search", &"death"]
+## Pas des Sentinelles : plus discrets que ceux d'Élias, et sans rayon de bruit
+## (elles ne s'alertent pas entre elles au bruit de leurs pas).
+const STEP_VOLUME_OFFSET_DB: float = -12.0
 
 
 func _ready() -> void:
@@ -200,9 +196,10 @@ func face_toward(point: Vector2) -> void:
 
 ## Parle (voix des créatures : l'intonation dit son état, sans aucun mot).
 func say(mood: StringName) -> void:
-	if VOICES.has(mood):
-		AudioManager.play_stream_2d(VOICES[mood], global_position + Vector2(0, -80), AudioBuses.VOICE,
-				-4.0, _voice_pitch)
+	if MOODS.has(mood):
+		var player: Node = AudioManager.play_sfx(StringName("creature_" + String(mood)), global_position + Vector2(0, -80), self)
+		if player:
+			player.set(&"pitch_scale", _voice_pitch)
 
 
 ## Joue une animation de marche ou de course au bon rythme.
@@ -303,9 +300,9 @@ func _on_checkpoint_reached(_checkpoint_id: StringName) -> void:
 func _on_anim_event(event_name: StringName) -> void:
 	match event_name:
 		&"footstep", &"footstep_run":
-			AudioManager.play_stream_2d(STEP_SOUND, global_position, AudioBuses.SFX, -18.0, 0.8)
+			AudioManager.play_sfx(&"foley_step_stone", global_position, self, STEP_VOLUME_OFFSET_DB, 0.0)
 		&"body_fall":
-			AudioManager.play_stream_2d(BODY_FALL_SOUND, global_position, AudioBuses.SFX, -4.0, 0.9)
+			AudioManager.play_sfx(&"foley_body_fall", global_position, self)
 
 
 func _ray(from: Vector2, to: Vector2) -> Dictionary:

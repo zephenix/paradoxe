@@ -63,7 +63,12 @@ func test_death_events_are_intentionally_silent() -> void:
 	assert_false(PlayerFoley.is_silent(&"footstep"))
 
 
-func test_every_sound_file_exists() -> void:
+func test_every_sound_exists_in_the_library() -> void:
 	for event_name: StringName in PlayerFoley.EVENTS:
-		for file: String in PlayerFoley.EVENTS[event_name][0]:
-			assert_true(ResourceLoader.exists(PlayerFoley.DIR + file + ".wav"), "%s.wav" % file)
+		var sound_id: StringName = PlayerFoley.EVENTS[event_name][0]
+		if sound_id != PlayerFoley.STEP:
+			assert_true(AudioManager.library.has(sound_id), "%s -> %s" % [event_name, sound_id])
+	for surface: StringName in PlayerFoley.SURFACES:
+		assert_true(AudioManager.library.has(PlayerFoley.step_sound_for(surface)), "pas sur %s" % surface)
+	for tier: String in ["calm", "effort", "exhausted"]:
+		assert_true(AudioManager.library.has(StringName("breath_" + tier)), "respiration %s" % tier)

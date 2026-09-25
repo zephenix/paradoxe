@@ -20,12 +20,14 @@ fichiers (pas de modification inutile dans Git), sauf si on change --seed.
 J1 : trois sons de test pour valider la chaîne audio (bus, effets, Web).
 J3 : sons provisoires du combat (arme, bouclier, impacts, voix des Sentinelles).
 J4 : sons du rembobinage.
+J5 : Foley par surface, respiration, ambiances de zone, sons d'interface.
 J5 : bibliothèque complète (Foley, ambiances, arme, créatures, musique).
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import zlib
 from dataclasses import dataclass
@@ -488,8 +490,259 @@ def rewind_release(rng: np.random.Generator) -> np.ndarray:
 
 
 # =============================================================================
+# Foley complet (J5) : pas selon la surface, respiration, petits gestes
+# =============================================================================
+
+def _step_metal(rng: np.random.Generator, i: int) -> np.ndarray:
+    # --- Paramètres ---
+    duration = 0.35
+    modes = [(310 + 23 * i, 0.8, 0.18), (870 + 41 * i, 0.5, 0.12), (1930 + 67 * i, 0.3, 0.07)]
+    # ------------------
+    heel = _thump(rng, duration, 110.0 + 8 * i, 0.05, 2500.0, 0.3)
+    ring = dsp.modal_body(duration, modes)          # la tôle résonne un peu
+    return dsp.fade(dsp.normalize(heel + 0.35 * ring, 0.9), 0.001, 0.03)
+
+
+def _step_plant(rng: np.random.Generator, i: int) -> np.ndarray:
+    # --- Paramètres ---
+    duration = 0.4
+    # ------------------
+    soft = _thump(rng, duration, 80.0 + 6 * i, 0.06, 900.0, 0.1) * 0.6
+    leaves = dsp.bandpass(dsp.crackle(duration, rng, 260.0 + 30 * i), 1500, 7000, order=1)
+    leaves *= dsp.adsr(duration, 0.01, 0.08, 0.3, 0.2)
+    swish = dsp.bandpass(dsp.pink_noise(duration, rng), 800, 4000) * dsp.adsr(duration, 0.02, 0.1, 0.2, 0.15) * 0.5
+    return dsp.fade(dsp.normalize(soft + 0.8 * dsp.normalize(leaves) + swish, 0.8), 0.002, 0.04)
+
+
+def _step_water(rng: np.random.Generator, i: int) -> np.ndarray:
+    # --- Paramètres ---
+    duration = 0.45
+    # ------------------
+    splash = dsp.bandpass(dsp.white_noise(duration, rng), 600, 5000) * dsp.exp_decay(duration, 0.18)
+    bubbles = np.zeros(dsp.n_samples(duration))
+    for k in range(3 + i % 2):                       # quelques « plocs » : petites bulles
+        start = dsp.n_samples(0.02 + 0.05 * k + 0.01 * rng.uniform())
+        d = 0.08
+        f = rng.uniform(500, 1100)
+        blip = dsp.sine(dsp.ramp(d, f, f * 1.8), d) * dsp.exp_decay(d, 0.06)
+        bubbles[start:start + len(blip)] += blip[: len(bubbles) - start]
+    thud = _thump(rng, duration, 70.0, 0.05, 700.0, 0.0) * 0.4
+    return dsp.fade(dsp.normalize(splash + 0.4 * bubbles + thud, 0.8), 0.002, 0.05)
+
+
+def _register_surface_steps() -> None:
+    makers = {"metal": _step_metal, "plant": _step_plant, "water": _step_water}
+    labels = {"metal": "métal", "plant": "végétation", "water": "eau"}
+    for surface, maker in makers.items():
+        for i in range(1, 5):
+            def build(rng: np.random.Generator, i: int = i, maker=maker) -> np.ndarray:
+                return maker(rng, i)
+            sound(f"foley_step_{surface}_{i:02d}", "foley",
+                  description=f"Pas sur {labels[surface]}, variante {i} (J5).")(build)
+
+
+_register_surface_steps()
+
+
+def _breath(rng: np.random.Generator, inhale: float, exhale: float, gap: float, loud: float,
+            low: float, high: float) -> np.ndarray:
+    """Une respiration : souffle filtré (inspiration puis expiration)."""
+    def puff(d: float, lo: float, hi: float, level: float) -> np.ndarray:
+        return dsp.bandpass(dsp.pink_noise(d, rng), lo, hi) * dsp.adsr(d, d * 0.3, d * 0.2, 0.7, d * 0.4) * level
+    a = puff(inhale, low * 1.2, high * 1.3, 0.6)
+    b = puff(exhale, low, high, 1.0)
+    out = np.concatenate([a, np.zeros(dsp.n_samples(gap)), b])
+    return dsp.fade(dsp.normalize(out, loud), 0.01, 0.05)
+
+
+def _register_breaths() -> None:
+    # (nom, inspiration s, expiration s, pause s, volume, bande grave, bande aiguë)
+    table = [
+        ("breath_calm", 0.7, 0.9, 0.15, 0.35, 250, 1800, "Respiration calme"),
+        ("breath_effort", 0.35, 0.45, 0.05, 0.55, 300, 2600, "Respiration d'effort (après une course)"),
+        ("breath_exhausted", 0.22, 0.3, 0.03, 0.7, 350, 3200, "Essoufflement (effort prolongé)"),
+    ]
+    for name, inhale, exhale, gap, loud, lo, hi, label in table:
+        for i in range(1, 3):
+            def build(rng: np.random.Generator, a=inhale, b=exhale, g=gap, l=loud, lo=lo, hi=hi, i=i) -> np.ndarray:
+                k = 1.0 + 0.08 * (i - 1)
+                return _breath(rng, a * k, b * k, g, l, lo, hi)
+            sound(f"{name}_{i:02d}", "voice", description=f"{label}, variante {i} (J5).")(build)
+
+
+_register_breaths()
+
+
+@sound("foley_turn", "foley", description="Demi-tour : bref froissement de la blouse (J5).")
+def foley_turn(rng: np.random.Generator) -> np.ndarray:
+    d = 0.2
+    swish = dsp.bandpass(dsp.pink_noise(d, rng), 1500, 6000) * dsp.adsr(d, 0.04, 0.05, 0.3, 0.1)
+    return dsp.fade(dsp.normalize(swish, 0.4))
+
+
+@sound("foley_crouch", "foley", description="S'accroupir : tissu et genou qui se plie (J5).")
+def foley_crouch(rng: np.random.Generator) -> np.ndarray:
+    d = 0.3
+    cloth = dsp.bandpass(dsp.pink_noise(d, rng), 700, 4500) * dsp.adsr(d, 0.03, 0.1, 0.3, 0.15)
+    knee = np.concatenate([np.zeros(dsp.n_samples(0.1)), _thump(rng, 0.2, 90.0, 0.04, 800.0, 0.1) * 0.4])
+    return dsp.fade(dsp.normalize(dsp.mix(cloth, knee), 0.45))
+
+
+@sound("weapon_holster", "combat", description="Rengainer : déclic puis frottement (J5).")
+def weapon_holster(rng: np.random.Generator) -> np.ndarray:
+    clack = dsp.modal_body(0.12, [(1600, 1.0, 0.04), (2800, 0.4, 0.03)])
+    swish = dsp.bandpass(dsp.pink_noise(0.22, rng), 1000, 5000) * dsp.adsr(0.22, 0.02, 0.05, 0.3, 0.12)
+    out = dsp.mix(clack, np.concatenate([np.zeros(dsp.n_samples(0.06)), 0.6 * swish]))
+    return dsp.fade(dsp.normalize(out, 0.5))
+
+
+# =============================================================================
+# Ambiances de zone (J5) : boucles longues de durées différentes + événements
+# =============================================================================
+# Plusieurs boucles de durées différentes (11, 13, 17 s…) jouées ensemble ne
+# retombent en phase qu'au bout de très longtemps (11 × 13 × 17 s ≈ 40 min) :
+# l'oreille ne repère aucune répétition.
+
+def _loop(out: np.ndarray, crossfade: float, peak: float) -> np.ndarray:
+    return dsp.normalize(dsp.make_seamless_loop(out, crossfade), peak)
+
+
+@sound("amb_wind_loop", "ambience", loop=True, description="Vent dans les ruines : souffle grave qui enfle et retombe (17 s, J5).")
+def amb_wind_loop(rng: np.random.Generator) -> np.ndarray:
+    d = 17.0 + 1.0
+    t = dsp.time_axis(d)
+    gusts = 0.55 + 0.45 * np.sin(2 * np.pi * t / 6.3) * np.sin(2 * np.pi * t / 9.7 + 1.0)
+    body = dsp.lowpass(dsp.brown_noise(d, rng), 500) * gusts
+    whistle = dsp.bandpass(dsp.pink_noise(d, rng), 900, 1600) * np.clip(gusts - 0.5, 0, 1) * 0.6
+    return _loop(dsp.normalize(body) + whistle, 1.0, 0.6)
+
+
+@sound("amb_city_loop", "ambience", loop=True, description="Ville morte au loin : rumeur sourde, tintements métalliques rares (13 s, J5).")
+def amb_city_loop(rng: np.random.Generator) -> np.ndarray:
+    d = 13.0 + 1.0
+    rumble = dsp.lowpass(dsp.brown_noise(d, rng), 180)
+    ting = dsp.bandpass(dsp.crackle(d, rng, 0.8), 2500, 6000, order=1)
+    ting = dsp.lowpass(ting, 5000)
+    return _loop(dsp.normalize(rumble) + 0.3 * dsp.normalize(ting), 1.0, 0.5)
+
+
+@sound("amb_lab_loop", "ambience", loop=True, description="Laboratoire : ventilation et bourdonnement électrique à 50 Hz (13 s, J5).")
+def amb_lab_loop(rng: np.random.Generator) -> np.ndarray:
+    d = 13.0 + 1.0
+    hvac = dsp.lowpass(dsp.pink_noise(d, rng), 900)
+    mains = dsp.sine(50.0, d) + 0.5 * dsp.sine(100.0, d) + 0.25 * dsp.sine(150.0, d)
+    return _loop(dsp.normalize(hvac) * 0.7 + 0.25 * mains, 1.0, 0.5)
+
+
+@sound("amb_electric_loop", "ambience", loop=True, description="Grésillement électrique irrégulier (11 s, J5).")
+def amb_electric_loop(rng: np.random.Generator) -> np.ndarray:
+    d = 11.0 + 1.0
+    t = dsp.time_axis(d)
+    flicker = (np.sin(2 * np.pi * t * 0.37) > 0.6).astype(float) * 0.8 + 0.2
+    fizz = dsp.bandpass(dsp.crackle(d, rng, 90.0), 2500, 9000, order=1) * flicker
+    return _loop(dsp.normalize(fizz), 1.0, 0.35)
+
+
+@sound("amb_shaft_loop", "ambience", loop=True, description="Puits : grondement très grave, air qui circule (13 s, J5).")
+def amb_shaft_loop(rng: np.random.Generator) -> np.ndarray:
+    d = 13.0 + 1.0
+    t = dsp.time_axis(d)
+    rumble = dsp.lowpass(dsp.brown_noise(d, rng), 120) * (0.8 + 0.2 * np.sin(2 * np.pi * t / 5.1))
+    air = dsp.bandpass(dsp.pink_noise(d, rng), 200, 700) * 0.3
+    return _loop(dsp.normalize(rumble) + air, 1.0, 0.6)
+
+
+@sound("amb_hall_loop", "ambience", loop=True, description="Grand hall : présence de la pièce et machinerie lointaine (17 s, J5).")
+def amb_hall_loop(rng: np.random.Generator) -> np.ndarray:
+    d = 17.0 + 1.0
+    t = dsp.time_axis(d)
+    tone = dsp.lowpass(dsp.pink_noise(d, rng), 400) * 0.6
+    machine = dsp.saw(38.0, d) * (0.6 + 0.4 * np.sin(2 * np.pi * t / 4.25))
+    machine = dsp.lowpass(machine, 250)
+    return _loop(dsp.normalize(tone) + 0.35 * dsp.normalize(machine), 1.0, 0.5)
+
+
+def _register_ambience_events() -> None:
+    def drip(rng: np.random.Generator, i: int) -> np.ndarray:
+        d = 0.35
+        f = 900.0 + 250.0 * i
+        blip = dsp.sine(dsp.ramp(d, f, f * 1.6, 0.3), d) * dsp.exp_decay(d, 0.08)
+        tick = dsp.highpass(dsp.white_noise(d, rng), 3000) * dsp.exp_decay(d, 0.005) * 0.3
+        return dsp.fade(dsp.normalize(blip + tick, 0.6), 0.0005, 0.05)
+
+    def creak(rng: np.random.Generator, i: int) -> np.ndarray:
+        d = 1.2 + 0.3 * i
+        t = dsp.time_axis(d)
+        f = 140.0 + 40 * i + 25 * np.sin(2 * np.pi * t * (1.3 + 0.4 * i))
+        groan = dsp.bandpass(dsp.saw(f, d), 150, 1800) * dsp.adsr(d, 0.2, 0.2, 0.7, 0.5)
+        return dsp.fade(dsp.normalize(groan, 0.5), 0.05, 0.2)
+
+    def debris(rng: np.random.Generator, i: int) -> np.ndarray:
+        d = 1.0
+        out = np.zeros(dsp.n_samples(d))
+        for k in range(5 + i):
+            start = dsp.n_samples(rng.uniform(0.0, 0.6))
+            hit = _thump(rng, 0.25, rng.uniform(150, 400), 0.04, 3000.0, 0.8) * rng.uniform(0.3, 1.0)
+            out[start:start + len(hit)] += hit[: len(out) - start]
+        return dsp.fade(dsp.normalize(out, 0.5), 0.001, 0.1)
+
+    def buzz(rng: np.random.Generator, i: int) -> np.ndarray:
+        d = 0.6 + 0.2 * i
+        zap = dsp.lowpass(dsp.square(120.0 + 60 * i, d, 0.2), 3000) * dsp.adsr(d, 0.01, 0.05, 0.7, 0.1)
+        fizz = dsp.bandpass(dsp.crackle(d, rng, 300.0), 3000, 9000, order=1)
+        return dsp.fade(dsp.normalize(0.5 * zap + dsp.normalize(fizz), 0.4))
+
+    def cry(rng: np.random.Generator, i: int) -> np.ndarray:
+        # Cri d'animal lointain (faune inconnue) : glissando nasal, très filtré.
+        d = 1.1
+        f = dsp.ramp(d, 700.0 + 150 * i, 380.0 + 80 * i, 0.7)
+        voice = dsp.saw(f, d) * dsp.adsr(d, 0.08, 0.2, 0.6, 0.5)
+        voice = dsp.resonator(voice, 1200.0 + 200 * i, 5.0)
+        return dsp.fade(dsp.normalize(dsp.lowpass(voice, 2500), 0.4), 0.02, 0.2)
+
+    makers = {"amb_drip": (drip, 3, "Goutte qui tombe"), "amb_creak": (creak, 2, "Craquement de structure"),
+              "amb_debris": (debris, 2, "Gravats qui roulent"), "amb_buzz": (buzz, 2, "Grésillement de lampe"),
+              "amb_cry": (cry, 2, "Cri de faune lointain")}
+    for base, (maker, count, label) in makers.items():
+        for i in range(1, count + 1):
+            def build(rng: np.random.Generator, i: int = i, maker=maker) -> np.ndarray:
+                return maker(rng, i)
+            sound(f"{base}_{i:02d}", "ambience", description=f"{label}, variante {i} (événement d'ambiance, J5).")(build)
+
+
+_register_ambience_events()
+
+
+@sound("ui_move", "ui", description="Déplacement dans un menu : tic bref (J5).")
+def ui_move(rng: np.random.Generator) -> np.ndarray:
+    d = 0.08
+    tick = dsp.sine(1320.0, d) * dsp.exp_decay(d, 0.04)
+    return dsp.fade(dsp.normalize(tick, 0.35))
+
+
+@sound("ui_back", "ui", description="Retour dans un menu : deux notes descendantes (J5).")
+def ui_back(rng: np.random.Generator) -> np.ndarray:
+    def blip(freq: float) -> np.ndarray:
+        d = 0.14
+        return dsp.sine(freq, d) * dsp.adsr(d, 0.004, 0.05, 0.3, 0.08)
+    out = dsp.mix(blip(880.0), np.concatenate([np.zeros(dsp.n_samples(0.07)), blip(587.0)]))
+    return dsp.fade(dsp.normalize(out, 0.5))
+
+
+# =============================================================================
 # Programme principal
 # =============================================================================
+
+def write_catalog(out_dir: Path) -> None:
+    """Écrit catalog.json : nom, catégorie, boucle et description de chaque son.
+    L'outil Godot tools/godot/build_sound_library.gd s'en sert pour remplir la
+    bibliothèque de sons (resources/audio/sound_library.tres)."""
+    catalog = {spec.name: {"category": spec.category, "loop": spec.loop, "description": spec.description}
+               for spec in SOUNDS.values()}
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "catalog.json").write_text(json.dumps(catalog, ensure_ascii=False, indent=1, sort_keys=True) + "\n",
+                                          encoding="utf-8")
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Génère les sons procéduraux de PARADOXE.")
@@ -509,6 +762,7 @@ def main() -> int:
         print(f"Sons inconnus : {', '.join(unknown)} (voir --list)", file=sys.stderr)
         return 1
 
+    write_catalog(args.out)
     for spec in (SOUNDS[n] for n in args.names) if args.names else SOUNDS.values():
         # Graine propre à chaque son : ajouter un son ne change pas les autres.
         rng = np.random.default_rng(zlib.crc32(spec.name.encode()) + args.seed)

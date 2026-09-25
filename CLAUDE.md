@@ -27,9 +27,12 @@ Il est jouable sur le Web (GitHub Pages) et en exécutables Windows/Linux (GitHu
 - **GDScript uniquement**, typé (`var x: float = 0.0`, `func f(a: int) -> void:`).
 - **Pas de valeur de gameplay en dur** : vitesses, hauteurs, énergie, perception… vont dans
   des Resources `.tres` sous `resources/`.
-- **Audio : tout son passe par `AudioManager`** (autoload). Un son qui a un « rayon de
-  bruit » prévient les ennemis via le signal `noise_emitted` : un seul système pour
-  l'audition du joueur et celle des ennemis.
+- **Audio : tout son passe par `AudioManager.play_sfx(&"id")`** (ou `play_loop_sfx`), avec
+  un identifiant de la bibliothèque `resources/audio/sound_library.tres` : jamais de chemin
+  de fichier dans le code. Le rayon de bruit est réglé dans la bibliothèque ; un son qui en
+  a un prévient les ennemis via le signal `noise_emitted` : un seul système pour
+  l'audition du joueur et celle des ennemis. Ambiance : `AudioManager.set_zone(id)`
+  (zones dans `resources/audio/zones/`, une par valeur de `Room.acoustic_zone`).
 - **Bus audio** : décrits dans `scripts/audio/audio_buses.gd`. `default_bus_layout.tres` est
   **généré** par `tools/godot/generate_bus_layout.gd`. On ne l'édite pas à la main.
 - Architecture : « les appels descendent, les signaux remontent ». Les signaux globaux
@@ -50,7 +53,9 @@ GAME_VERSION=0.2.0 ./tools/export.sh all     # export avec un numéro de version
 ./tools/web/check_update.sh     # vérifie qu'une nouvelle version Web remplace l'ancienne (~2 min)
 ./tools/screenshot.sh res://tools/godot/pose_sheet.tscn build/shots/poses.png 10   # planche de toutes les poses d'Élias
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/level_tour.gd -- build/shots   # visite guidée (captures)
-python3 tools/audio/generate_sounds.py       # régénère les sons (puis réimport Godot)
+python3 tools/audio/generate_sounds.py       # régénère les sons + catalog.json (puis réimport Godot)
+godot --headless --path . --import           # réimporte les sons
+godot --headless --path . -s res://tools/godot/build_sound_library.gd   # ajoute les nouveaux sons à la bibliothèque
 godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régénère la table de mixage
 ```
 
@@ -76,6 +81,10 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   `expect_warning`, s'il ne vérifie rien, ou s'il dépasse le délai maximum (2 min simulées).
 - Les déclarations non typées sont des **erreurs** (`untyped_declaration=2`) :
   `test_every_script_compiles` impose la règle.
+- Sons : écouter `AudioManager.sfx_played(id)` (quel son) et `noise_emitted` (quel rayon).
+  Un test qui garde le nœud `Foley` d'Élias entend aussi sa respiration. Un test qui
+  change une zone la remet à `&""` dans `after_each()` ; un test qui règle un son appelle
+  `AudioManager.reset_tuning(id)` et utilise un `tuning_path` de test.
 - Déplacement d'Élias : piloter ses intentions (`player.input.from_devices = false`, puis
   `input.move`, `input.press(&"jump")`…) et retirer son nœud `Foley` dans les tests.
   Combat : `input.press(&"fire")` + `input.fire = true` pour charger, `input.shield = true`

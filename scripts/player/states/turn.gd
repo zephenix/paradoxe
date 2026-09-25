@@ -4,9 +4,11 @@ extends PlayerState
 var _flipped: bool = false
 
 
-func enter(_previous: StringName, _data: Dictionary) -> void:
+func enter(_previous: StringName, data: Dictionary) -> void:
 	_flipped = false
 	player.visual.play(&"turn", player.config.turn_duration)
+	if not data.get("resumed", false):
+		player.anim_event.emit(&"turn")
 
 
 func is_committed() -> bool:

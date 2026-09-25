@@ -28,7 +28,6 @@ extends Area2D
 
 const BEACON_OFF := Color("2c3b40")
 const BEACON_ON := Color("6dffb0")
-const SOUND: AudioStream = preload("res://assets/audio/generated/sfx/checkpoint_on.wav")
 
 ## Vrai si c'est le checkpoint actif.
 var is_active: bool = false
@@ -62,7 +61,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if player == null or player.is_dead:
 		return
 	if GameState.reach_checkpoint(id(), global_position, facing):
-		AudioManager.play_stream_2d(SOUND, global_position + Vector2(0, -60), AudioBuses.SFX, -8.0)
+		AudioManager.play_sfx(&"checkpoint_on", global_position + Vector2(0, -60))
 		_glow = 1.0
 
 

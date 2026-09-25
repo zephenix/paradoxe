@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AcousticZone" format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/acoustic_zone.gd" id="1_zone"]
+
+[resource]
+script = ExtResource("1_zone")
+id = &"shaft"
+title = "Puits"
+layers = Array[StringName]([&"amb_shaft_loop", &"amb_wind_loop"])
+layer_volumes_db = Array[float]([0.0, -10.0])
+swell_depth_db = 3.0
+swell_period = 14.0
+events = Array[StringName]([&"amb_drip", &"amb_creak", &"amb_debris"])
+event_interval_min = 3.0
+event_interval_max = 8.0
+event_distance_min = 200.0
+event_distance_max = 800.0
+event_volume_db = -3.0
+reverb_wet = 0.42
+reverb_room_size = 0.85
+reverb_damping = 0.45
+lowpass_hz = 9000.0
