@@ -113,9 +113,8 @@ func _impact(kind: StringName, at: Vector2) -> void:
 	_done = true
 	global_position = at
 	impacted.emit(kind, at)
-	var stream: AudioStream = CombatSounds.IMPACT_BODY if kind == &"body" else CombatSounds.IMPACT_WALL
 	if kind != &"shield":  # le bouclier joue son propre son
-		AudioManager.play_stream_2d(stream, at, AudioBuses.SFX, -4.0, randf_range(0.92, 1.08))
+		AudioManager.play_sfx(&"impact_body" if kind == &"body" else &"impact_wall", at, shooter)
 	ImpactFlash.spawn(get_parent(), at, color, 1.6 if charged else 1.0)
 	queue_free()
 

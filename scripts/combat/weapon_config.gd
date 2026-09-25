@@ -28,16 +28,12 @@ extends Resource
 @export var muzzle_offset: Vector2 = Vector2(38, -76)
 ## Point de départ d'un tir à genou (les Sentinelles visent ainsi un Élias accroupi).
 @export var low_muzzle_offset: Vector2 = Vector2(36, -40)
-## Rayon de bruit d'un tir (pixels) : jusqu'où les ennemis l'entendent.
-@export var shot_noise_radius: float = 700.0
 
 @export_group("Tir chargé")
 ## Temps de charge (secondes), en maintenant la détente après un tir.
 @export var charge_time: float = 0.8
 ## Vitesse du projectile chargé.
 @export var charged_projectile_speed: float = 1150.0
-## Rayon de bruit d'un tir chargé.
-@export var charged_noise_radius: float = 900.0
 
 @export_group("Bouclier")
 ## Distance entre le tireur et son bouclier (pixels, vers l'avant).
@@ -48,8 +44,10 @@ extends Resource
 @export var shield_broken_cooldown: float = 2.0
 
 @export_group("Apparence et son")
-## Son du tir normal (le tir chargé et le bouclier sont communs à toutes les armes).
-@export var shot_sound: AudioStream = CombatSounds.SHOT
+## Son du tir normal : identifiant dans la bibliothèque de sons (le tir chargé et
+## le bouclier sont communs à toutes les armes). Le RAYON DE BRUIT d'un tir est
+## réglé dans la bibliothèque (resources/audio/sound_library.tres), avec le son.
+@export var shot_sound_id: StringName = &"weapon_shot"
 ## Couleur du projectile et de ses impacts.
 @export var projectile_color: Color = Color("9ff5d0")
 ## Couleur du bouclier.

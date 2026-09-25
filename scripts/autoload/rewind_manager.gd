@@ -30,8 +30,6 @@ extends Node
 
 ## Groupe Godot des objets à enregistrer.
 const GROUP: StringName = &"rewindable"
-const LOOP_SOUND: AudioStream = preload("res://assets/audio/generated/sfx/rewind_loop.wav")
-const RELEASE_SOUND: AudioStream = preload("res://assets/audio/generated/sfx/rewind_release.wav")
 
 ## Réglages (durée d'historique, utilisations, vitesse…).
 var config: RewindConfig = preload("res://resources/rewind.tres")
@@ -136,7 +134,7 @@ func begin_rewind() -> void:
 	for node in get_tree().get_nodes_in_group(&"projectiles"):
 		node.queue_free()
 	AudioManager.set_muffle(config.muffle, 0.25)
-	AudioManager.play_loop(&"rewind", LOOP_SOUND, AudioBuses.UI, -6.0, 0.15)
+	AudioManager.play_loop_sfx(&"rewind", &"rewind_loop", 0.15)
 
 
 ## Remonte le temps de « real_delta » secondes réelles (× rewind_speed) et
@@ -184,7 +182,7 @@ func finish_rewind() -> bool:
 	_since_capture = 0.0
 	GameState.rewinds_left = maxi(GameState.rewinds_left - 1, 0)
 	_end_effects()
-	AudioManager.play_stream(RELEASE_SOUND, AudioBuses.UI, -4.0)
+	AudioManager.play_sfx(&"rewind_release")
 	is_rewinding = false
 	recording = true
 	return true

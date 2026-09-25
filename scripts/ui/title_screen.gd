@@ -8,13 +8,9 @@ extends Control
 ##
 ## Le vrai menu principal arrive en J9 ; cette scène restera l'écran titre.
 
-const SOUND_CONFIRM: AudioStream = preload("res://assets/audio/generated/ui/ui_confirm.wav")
-const SOUND_IMPACT: AudioStream = preload("res://assets/audio/generated/sfx/test_impact.wav")
-const SOUND_PORTAL_HUM: AudioStream = preload("res://assets/audio/generated/ambience/portal_hum_loop.wav")
 
 const TEST_LEVEL: String = "res://scenes/levels/test_level.tscn"
 const HUM_LOOP_ID: StringName = &"title_portal_hum"
-const HUM_VOLUME_DB: float = -8.0
 ## Décalage vers la gauche du portail et du titre quand le banc de test s'ouvre.
 const SHIFT_WHEN_PANEL_OPEN: float = -210.0
 
@@ -91,8 +87,8 @@ func _is_activation(event: InputEvent) -> bool:
 
 func _unlock_audio() -> void:
 	AudioManager.unlock()
-	AudioManager.play_stream(SOUND_CONFIRM, AudioBuses.UI)
-	AudioManager.play_loop(HUM_LOOP_ID, SOUND_PORTAL_HUM, AudioBuses.AMBIENCE, HUM_VOLUME_DB, 2.5)
+	AudioManager.play_sfx(&"ui_confirm")
+	AudioManager.play_loop_sfx(HUM_LOOP_ID, &"portal_hum_loop", 2.5)
 	# Le portail « s'allume » en même temps que le son.
 	var tween: Tween = create_tween()
 	tween.tween_property(_portal, "intensity", 1.6, 0.25)
@@ -139,7 +135,7 @@ func _update_diagnostics() -> void:
 
 func _on_level_pressed() -> void:
 	_level_button.disabled = true  # un double clic ne lance pas deux transitions
-	AudioManager.play_stream(SOUND_CONFIRM, AudioBuses.UI)
+	AudioManager.play_sfx(&"ui_confirm")
 	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
 	SceneTransition.change_scene(TEST_LEVEL)
 
@@ -153,12 +149,12 @@ func _on_classic_toggled(enabled: bool) -> void:
 
 
 func _on_impact_pressed() -> void:
-	AudioManager.play_stream(SOUND_IMPACT, AudioBuses.SFX, -3.0, randf_range(0.94, 1.06))
+	AudioManager.play_sfx(&"test_impact")
 
 
 func _on_hum_toggled(enabled: bool) -> void:
 	if enabled:
-		AudioManager.play_loop(HUM_LOOP_ID, SOUND_PORTAL_HUM, AudioBuses.AMBIENCE, HUM_VOLUME_DB, 1.0)
+		AudioManager.play_loop_sfx(HUM_LOOP_ID, &"portal_hum_loop", 1.0)
 	else:
 		AudioManager.stop_loop(HUM_LOOP_ID, 1.0)
 
