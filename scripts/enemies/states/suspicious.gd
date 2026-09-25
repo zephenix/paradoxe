@@ -30,8 +30,11 @@ func physics_update(delta: float) -> void:
 	if check_sight():
 		return
 	if s.sees_target:
+		# Tant qu'elle l'entrevoit, elle continue de le fixer : l'alerte dure,
+		# et sa suspicion monte jusqu'à ce qu'elle le reconnaisse.
 		_clue = s.last_clue
 		s.face_toward(_clue)
+		time_in_state = minf(time_in_state, s.config.suspicious_duration * 0.5)
 	if time_in_state >= s.config.suspicious_duration:
 		if s.suspicion >= s.config.search_threshold:
 			machine.transition_to(&"Search", {"clue": _clue})

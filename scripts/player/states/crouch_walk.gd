@@ -15,6 +15,8 @@ func physics_update(delta: float) -> void:
 	# Tirer ou se protéger : Élias se relève pour dégainer (s'il y a la place).
 	if handle_combat_actions():
 		return
+	if handle_throw_action():
+		return
 	if not p.input.down and p.can_stand():
 		machine.transition_to(&"Walk" if p.input.move != 0 else &"Idle")
 		return

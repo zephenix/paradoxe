@@ -34,6 +34,10 @@ var classic_mode: bool = false
 ## Plein écran (sans effet dans le navigateur tant que le joueur ne l'a pas demandé).
 var fullscreen: bool = false
 
+## Accessibilité « Voir les sons » (J6) : un cercle montre jusqu'où porte chaque
+## bruit d'Élias (le rayon exact que perçoivent les ennemis).
+var show_sounds: bool = false
+
 
 func _ready() -> void:
 	InputActions.install_defaults()
@@ -79,6 +83,7 @@ func load_settings() -> void:
 		volumes[bus] = clampf(float(config.get_value("audio", String(bus), DEFAULT_VOLUMES[bus])), 0.0, 1.0)
 	classic_mode = bool(config.get_value("gameplay", "classic_mode", false))
 	fullscreen = bool(config.get_value("display", "fullscreen", false))
+	show_sounds = bool(config.get_value("accessibility", "show_sounds", false))
 
 
 ## Écrit les réglages sur le disque. Renvoie OK (0) si tout s'est bien passé.
@@ -88,6 +93,7 @@ func save_settings() -> Error:
 		config.set_value("audio", String(bus), volumes[bus])
 	config.set_value("gameplay", "classic_mode", classic_mode)
 	config.set_value("display", "fullscreen", fullscreen)
+	config.set_value("accessibility", "show_sounds", show_sounds)
 	return config.save(file_path)
 
 
@@ -96,6 +102,7 @@ func reset_to_defaults() -> void:
 	volumes = DEFAULT_VOLUMES.duplicate()
 	classic_mode = false
 	fullscreen = false
+	show_sounds = false
 	apply_all()
 	Events.settings_changed.emit()
 

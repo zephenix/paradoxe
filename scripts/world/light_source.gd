@@ -37,10 +37,16 @@ signal broken
 		_update_light()
 ## Un tir peut-il la briser ?
 @export var destructible: bool = true
-## Longueur du fil (pixels, vers le haut) : pur décor.
+## Longueur du fil (pixels, vers le haut) : lampe suspendue. Pur décor.
 @export var cord_length: float = 60.0:
 	set(value):
 		cord_length = value
+		queue_redraw()
+## Longueur du poteau (pixels, vers le bas) : réverbère posé au sol. 0 = pas de
+## poteau. Pur décor.
+@export var post_length: float = 0.0:
+	set(value):
+		post_length = value
 		queue_redraw()
 
 ## Vrai tant que la lampe éclaire.
@@ -174,8 +180,12 @@ static func _make_texture() -> GradientTexture2D:
 
 
 func _draw() -> void:
-	# Fil, abat-jour conique, ampoule (allumée : claire ; brisée : sombre).
-	draw_line(Vector2(0.0, -cord_length), Vector2(0.0, -14.0), Color(0.2, 0.22, 0.25), 2.0)
+	# Fil (ou poteau), abat-jour conique, ampoule (allumée : claire ; brisée : sombre).
+	if cord_length > 0.0:
+		draw_line(Vector2(0.0, -cord_length), Vector2(0.0, -14.0), Color(0.2, 0.22, 0.25), 2.0)
+	if post_length > 0.0:
+		draw_line(Vector2(0.0, -14.0), Vector2(0.0, post_length), Color(0.24, 0.26, 0.3), 5.0)
+		draw_line(Vector2(-10.0, post_length), Vector2(10.0, post_length), Color(0.24, 0.26, 0.3), 4.0)
 	draw_colored_polygon(PackedVector2Array([Vector2(-5, -16), Vector2(5, -16), Vector2(14, -2), Vector2(-14, -2)]),
 			Color(0.28, 0.3, 0.33))
 	if lit:

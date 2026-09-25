@@ -33,7 +33,8 @@ func physics_update(delta: float) -> void:
 		machine.transition_to(&"Suspicious", {"clue": s.last_clue})
 		return
 	if is_equal_approx(_left(), _right()) and absf(s.global_position.x - s.home.x) < 4.0:
-		_stand(delta)  # poste de garde fixe
+		s.facing = s.start_facing  # de retour à son poste de garde : elle reprend sa surveillance
+		_stand(delta)
 		return
 	if _pause > 0.0:
 		_pause -= delta

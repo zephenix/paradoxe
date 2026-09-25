@@ -128,14 +128,24 @@ func test_full_light_means_immediate_combat() -> void:
 
 
 func test_darkness_hides_elias_at_a_distance() -> void:
-	await setup(450.0, DARK)
+	await setup(400.0, DARK)
+	player.input.down = true
+	await wait_physics(10)
 	assert_true(sentinel.visibility > 0.0, "une vague silhouette")
-	assert_true(sentinel.visibility < cfg.clear_sight, "mais pas nette (%.2f)" % sentinel.visibility)
-	await wait_physics_seconds(1.0)
-	assert_ne(state(), &"Combat", "pas de combat immédiat dans le noir")
+	assert_true(sentinel.visibility * cfg.sight_gain < cfg.suspicion_decay, "trop vague pour l'inquiéter (%.3f)" % sentinel.visibility)
+	await wait_physics_seconds(8.0)
+	assert_eq(state(), &"Patrol", "accroupi dans le noir, à distance : jamais repéré")
+	assert_almost_eq(sentinel.suspicion, 0.0, 0.001)
+
+
+func test_darkness_only_delays_detection_up_close() -> void:
+	await setup(180.0, DARK)  # debout, assez près
+	assert_true(sentinel.visibility < cfg.clear_sight, "pas nette (%.2f)" % sentinel.visibility)
+	await wait_physics_seconds(0.5)
+	assert_eq(state(), &"Patrol", "pas de réaction immédiate dans le noir")
 	# La suspicion monte peu à peu : elle finit par s'alerter, puis par le reconnaître.
-	assert_true(await wait_until_state(&"Suspicious", 600), "elle s'alerte (suspicion %.2f)" % sentinel.suspicion)
-	assert_true(await wait_until_state(&"Combat", 900), "à force de le regarder, elle le reconnaît")
+	assert_true(await wait_until_state(&"Suspicious", 900), "elle s'alerte (suspicion %.2f)" % sentinel.suspicion)
+	assert_true(await wait_until_state(&"Combat", 1200), "à force de le regarder, elle le reconnaît")
 
 
 func test_crouching_makes_elias_less_visible() -> void:
@@ -149,8 +159,8 @@ func test_crouching_makes_elias_less_visible() -> void:
 
 
 func test_a_lamp_reveals_elias_in_the_dark() -> void:
-	var light: LightSource = lamp(Vector2(250, 330), 280.0, 0.9)
-	await setup(450.0, DARK)  # Élias à x = 250, sous la lampe
+	var light: LightSource = lamp(Vector2(350, 330), 280.0, 0.9)
+	await setup(350.0, DARK)  # Élias à x = 350, sous la lampe
 	await wait_physics(3)
 	assert_true(sentinel.visibility >= cfg.clear_sight, "sous la lampe : vu (%.2f)" % sentinel.visibility)
 	light.shatter()

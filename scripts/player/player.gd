@@ -21,6 +21,11 @@ signal anim_event(event_name: StringName)
 @export var config: PlayerMovementConfig = preload("res://resources/player/player_movement.tres")
 ## Sens du regard au départ : 1 = droite, -1 = gauche.
 @export_enum("Gauche:-1", "Droite:1") var start_facing: int = 1
+## Réglages du lancer de pierre (J6).
+@export var throw_config: ThrowConfig = preload("res://resources/player/throw.tres")
+
+## Pierres portées (J6) : on en ramasse sur les tas de gravats (RubblePile).
+var stones: int = 0
 
 ## Sens du regard : 1 = droite, -1 = gauche.
 var facing: int = 1:
@@ -345,6 +350,24 @@ func kill(cause: StringName) -> void:
 
 
 # --------------------------------------------------------------------------
+# Lancer de pierre (J6)
+# --------------------------------------------------------------------------
+
+## Lance une pierre devant lui (appelé par l'état Throw au bon instant du geste).
+func throw_stone(crouched: bool) -> ThrownStone:
+	if stones <= 0:
+		return null
+	stones -= 1
+	var stone := ThrownStone.new()
+	stone.setup(self, throw_config.launch_velocity(facing), throw_config)
+	get_parent().add_child(stone)
+	var hand_height: float = config.crouch_height if crouched else config.stand_height
+	stone.global_position = global_position + Vector2(facing * 14.0, -hand_height * 0.95)
+	AudioManager.play_sfx(&"stone_throw", global_position, self)
+	return stone
+
+
+# --------------------------------------------------------------------------
 # Rembobinage (J4) : voir RewindManager
 # --------------------------------------------------------------------------
 
@@ -360,7 +383,7 @@ func capture_state() -> Dictionary:
 		"time_since_grounded": time_since_grounded, "grab_cooldown": grab_cooldown,
 		"state": state, "state_data": state_data, "stable": stable,
 		"energy": energy.capture_state(), "shield_broken": weapon.shield.broken_timer,
-		"pose": visual.capture_pose(),
+		"pose": visual.capture_pose(), "stones": stones,
 	}
 
 
@@ -380,6 +403,7 @@ func apply_state(state: Dictionary) -> void:
 	weapon.reset()
 	weapon.shield.broken_timer = state["shield_broken"]
 	visual.restore_pose(state["pose"])
+	stones = state["stones"]
 
 
 ## Repart de cette photo : la machine à états reprend dans l'état enregistré

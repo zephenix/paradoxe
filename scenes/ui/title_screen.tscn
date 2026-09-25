@@ -109,7 +109,7 @@ text = "PARADOXE - prototype"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Salle de test (mouvement, combat, son)"
+text = "Salle de test (mouvement, combat, infiltration)"
 
 [node name="SoundBoardButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
@@ -122,6 +122,12 @@ unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Comme les jeux d'origine : pas de rembobinage, pas de glissade, pas de rattrapage automatique des rebords, pas d'aides."
 text = "Mode classique (sans rembobinage ni aides)"
+
+[node name="ShowSoundsToggle" type="CheckButton" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Accessibilité : un cercle montre jusqu'où porte chaque bruit d'Élias (la distance à laquelle les ennemis l'entendent)."
+text = "Voir les sons (cercles de bruit)"
 
 [node name="Separator" type="HSeparator" parent="TestPanel/Items"]
 layout_mode = 2

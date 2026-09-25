@@ -109,6 +109,15 @@ const POSES: Dictionary = {
 		"thigh_f": 20, "shin_f": -18, "thigh_b": -16, "shin_b": -12, "coat": -2},
 	"guard": {"torso": -6, "head": -8, "hips_y": 5, "arm_f": 75, "fore_f": 40, "arm_b": 55, "fore_b": 60,
 		"thigh_f": 22, "shin_f": -16, "thigh_b": -20, "shin_b": -12, "coat": 8},
+	# Lancer (J6) : bras armé derrière la tête, puis fouetté vers l'avant.
+	"throw_back": {"torso": -8, "head": -6, "hips_y": 2, "arm_f": -130, "fore_f": 70, "arm_b": 45, "fore_b": 20,
+		"thigh_f": 18, "shin_f": -8, "thigh_b": -14, "shin_b": -6, "coat": 6},
+	"throw_release": {"torso": 16, "head": -2, "hips_y": 3, "arm_f": 115, "fore_f": 10, "arm_b": -25, "fore_b": 20,
+		"thigh_f": 24, "shin_f": -14, "thigh_b": -18, "shin_b": -10, "coat": -8},
+	"crouch_throw_back": {"hips_y": 24, "thigh_f": 75, "shin_f": -125, "thigh_b": 60, "shin_b": -120,
+		"torso": 25, "head": -18, "arm_f": -120, "fore_f": 70, "arm_b": 20, "fore_b": 30, "coat": -40},
+	"crouch_throw_release": {"hips_y": 24, "thigh_f": 75, "shin_f": -125, "thigh_b": 60, "shin_b": -120,
+		"torso": 45, "head": -25, "arm_f": 105, "fore_f": 10, "arm_b": 10, "fore_b": 30, "coat": -40},
 	# À genou (tir bas des Sentinelles) : jambes de l'accroupi, buste droit.
 	"kneel_aim": {"hips_y": 24, "thigh_f": 75, "shin_f": -125, "thigh_b": 60, "shin_b": -120,
 		"torso": 8, "head": -4, "arm_f": 82, "fore_f": 0, "arm_b": 40, "fore_b": 70, "coat": -40},
@@ -154,6 +163,10 @@ const ANIMATIONS: Dictionary = {
 	"shield": {"length": 0.15, "keys": [[0.0, "aim"], [0.15, "guard"]]},
 	"kneel_aim": {"length": 0.2, "keys": [[0.0, "crouch"], [0.2, "kneel_aim"]]},
 	"kneel_shoot": {"length": 0.28, "keys": [[0.0, "kneel_aim"], [0.05, "kneel_aim", false, {"arm_f": 96, "torso": 2}], [0.28, "kneel_aim"]]},
+	# Lancer (J6) : dure throw_config.duration (resources/player/throw.tres).
+	"throw": {"length": 0.4, "keys": [[0.0, "stand"], [0.12, "throw_back"], [0.2, "throw_release"], [0.4, "stand"]]},
+	"crouch_throw": {"length": 0.4,
+		"keys": [[0.0, "crouch"], [0.12, "crouch_throw_back"], [0.2, "crouch_throw_release"], [0.4, "crouch"]]},
 	"death": {"length": 0.8, "keys": [[0.0, "land_heavy"], [0.25, "collapse"], [0.7, "lying"], [0.8, "lying"]],
 		"events": [[0.62, "body_fall"]]},
 }

@@ -31,7 +31,7 @@ var _pressed_at: Dictionary = {}   # action -> date
 var _consumed: Dictionary = {}     # action -> date de l'appui déjà utilisé
 
 ## Commandes « à impulsion » suivies par le tampon.
-const BUFFERED: Array[StringName] = [&"jump", &"roll", &"move_up", &"move_down", &"interact", &"fire", &"shield"]
+const BUFFERED: Array[StringName] = [&"jump", &"roll", &"move_up", &"move_down", &"interact", &"fire", &"shield", &"throw"]
 
 
 ## Lit clavier et manette (appelé par le joueur à chaque pas de physique).

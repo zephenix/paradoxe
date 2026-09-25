@@ -124,15 +124,17 @@ func _physics_process(delta: float) -> void:
 
 
 ## La jauge de suspicion suit ce qu'elle voit : une silhouette nette la remplit
-## d'un coup, une silhouette dans la pénombre peu à peu. Elle ne retombe qu'en
-## patrouille (en alerte ou en recherche, elle garde ses soupçons).
+## d'un coup, une silhouette dans la pénombre peu à peu. En patrouille, elle
+## retombe aussi d'elle-même (suspicion_decay) : une silhouette trop vague ne
+## l'inquiète jamais. En alerte ou en recherche, elle garde ses soupçons.
 func _update_suspicion(delta: float) -> void:
 	if visibility >= config.clear_sight:
 		suspicion = 1.0
-	elif visibility > 0.0:
-		suspicion = minf(suspicion + visibility * config.sight_gain * delta, 1.0)
-	elif machine.current_name == &"Patrol":
-		suspicion = maxf(suspicion - config.suspicion_decay * delta, 0.0)
+		return
+	var change: float = visibility * config.sight_gain
+	if machine.current_name == &"Patrol":
+		change -= config.suspicion_decay
+	suspicion = clampf(suspicion + change * delta, 0.0, 1.0)
 
 
 # --------------------------------------------------------------------------
@@ -149,8 +151,8 @@ func can_see(who: Player) -> bool:
 ##      près à sa hauteur, dans son cône de vision (sauf tout près), et sa tête
 ##      ou son buste ne doit pas être caché par le décor ;
 ##   2. tout près (close_distance), elle le remarque même dans le noir : 1 ;
-##   3. sinon : lumière sur lui × (crouch_visibility s'il est accroupi)
-##      × (1 - (distance / view_distance)²).
+##   3. sinon : lumière perçue (lumière ^ light_exponent) × (crouch_visibility
+##      s'il est accroupi) × (1 - (distance / view_distance)²).
 ## En mode classique, l'étape 3 disparaît : dans son champ de vision = 1.
 func visibility_of(who: Player) -> float:
 	if who == null or not is_instance_valid(who) or who.is_dead:
@@ -177,7 +179,7 @@ func visibility_of(who: Player) -> float:
 		return 0.0
 	if GameState.is_classic_mode() or distance <= config.close_distance:
 		return 1.0
-	var light: float = Lighting.level_at(self, seen_point)
+	var light: float = pow(Lighting.level_at(self, seen_point), config.light_exponent)
 	var posture: float = config.crouch_visibility if who.is_crouched else 1.0
 	var ratio: float = distance / config.view_distance
 	return clampf(light * posture * (1.0 - ratio * ratio), 0.0, 1.0)

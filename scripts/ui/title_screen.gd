@@ -24,6 +24,7 @@ const SHIFT_WHEN_PANEL_OPEN: float = -210.0
 @onready var _level_button: Button = %LevelButton
 @onready var _sound_board_button: Button = %SoundBoardButton
 @onready var _classic_toggle: CheckButton = %ClassicToggle
+@onready var _show_sounds_toggle: CheckButton = %ShowSoundsToggle
 @onready var _impact_button: Button = %ImpactButton
 @onready var _hum_toggle: CheckButton = %HumToggle
 @onready var _reverb_toggle: CheckButton = %ReverbToggle
@@ -49,6 +50,8 @@ func _ready() -> void:
 	_sound_board_button.pressed.connect(_on_sound_board_pressed)
 	_classic_toggle.set_pressed_no_signal(Settings.classic_mode)
 	_classic_toggle.toggled.connect(_on_classic_toggled)
+	_show_sounds_toggle.set_pressed_no_signal(Settings.show_sounds)
+	_show_sounds_toggle.toggled.connect(_on_show_sounds_toggled)
 	_impact_button.pressed.connect(_on_impact_pressed)
 	_hum_toggle.toggled.connect(_on_hum_toggled)
 	_reverb_toggle.toggled.connect(_on_reverb_toggled)
@@ -155,6 +158,14 @@ func _on_sound_board_pressed() -> void:
 ## d'options arrive en J9 ; en attendant, l'interrupteur est ici.
 func _on_classic_toggled(enabled: bool) -> void:
 	Settings.classic_mode = enabled
+	Settings.save_settings()
+	Events.settings_changed.emit()
+
+
+## « Voir les sons » (J6) : option d'accessibilité, sauvegardée. Elle ira dans
+## le menu d'options en J9.
+func _on_show_sounds_toggled(enabled: bool) -> void:
+	Settings.show_sounds = enabled
 	Settings.save_settings()
 	Events.settings_changed.emit()
 

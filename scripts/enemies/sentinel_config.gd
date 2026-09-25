@@ -43,11 +43,16 @@ extends Resource
 
 @export_group("Lumière et suspicion (J6)")
 ## Ce qu'elle perçoit d'Élias (« visibilité », de 0 à 1) =
-##     lumière sur Élias × (crouch_visibility s'il est accroupi) × facteur de distance,
+##     lumière perçue × (crouch_visibility s'il est accroupi) × facteur de distance,
+## où la lumière perçue vaut lumière ^ light_exponent (l'œil distingue mal la
+## pénombre : 0,15 de lumière n'est perçue que comme 0,06), et
 ## où le facteur de distance vaut 1 tout près et 0 à view_distance (courbe en
 ## 1 - (d / view_distance)²). Voir Sentinel.visibility_of().
 ## Accroupi, Élias est moins visible (0,6 = 60 % de sa visibilité debout).
 @export_range(0.0, 1.0, 0.05) var crouch_visibility: float = 0.6
+## Exposant de la lumière perçue (1 = proportionnelle ; plus grand = la pénombre
+## cache mieux).
+@export_range(1.0, 3.0, 0.1) var light_exponent: float = 1.5
 ## Tout près (pixels), elle le remarque même dans le noir.
 @export var close_distance: float = 90.0
 ## Visibilité à partir de laquelle elle le reconnaît immédiatement (combat).
@@ -60,7 +65,8 @@ extends Resource
 ## puis recherche (elle va voir) à la fin de l'alerte. À 1 : combat, si elle le voit.
 @export_range(0.0, 1.0, 0.05) var suspicious_threshold: float = 0.25
 @export_range(0.0, 1.0, 0.05) var search_threshold: float = 0.5
-## La suspicion retombe de tant par seconde quand rien ne l'alimente.
+## En patrouille, la suspicion retombe de tant par seconde. Une silhouette trop
+## vague (visibilité × sight_gain plus petit que ceci) ne l'inquiète donc jamais.
 @export var suspicion_decay: float = 0.08
 
 @export_group("Ouïe")
