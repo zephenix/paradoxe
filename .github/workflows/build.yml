@@ -6,6 +6,10 @@
 #  - Push sur main : export Web publié sur GitHub Pages.
 #  - Tag de version (v0.1, v0.2…) : exécutables Windows et Linux (et une archive
 #    de la version Web) publiés dans une GitHub Release.
+#  - Lancement manuel (onglet Actions > Build > Run workflow, sur main) avec le
+#    champ « release_tag » rempli (ex. v0.2) : la CI crée elle-même le tag sur le
+#    commit de main, puis publie la Release. Utile quand on ne peut pas pousser
+#    de tag (sessions cloud) ; les deux méthodes produisent la même Release.
 #
 # La version de Godot vient de setup.sh (GODOT_VERSION) : une seule source de vérité.
 # =============================================================================
@@ -17,11 +21,17 @@ on:
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Tag de version à créer et publier (ex. v0.2). Laisser vide pour un simple build."
+        required: false
+        default: ""
 
-# Un nouveau push annule le build précédent de la même branche (sauf pour les tags).
+# Sur une Pull Request, un nouveau push annule le build précédent. Sur main et
+# les tags, on laisse toujours aller au bout (publication Pages / Release).
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ inputs.release_tag }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -60,7 +70,7 @@ jobs:
   web:
     name: Export Web
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -100,13 +110,25 @@ jobs:
   release:
     name: Release (Windows, Linux, Web)
     needs: test
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.release_tag != '')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
       contents: write
+    env:
+      # Tag poussé (v0.1…) ou tag demandé au lancement manuel.
+      RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v7
+
+      - name: Vérification du tag
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+            echo "Tag invalide : « $RELEASE_TAG » (attendu : v0.1, v0.2, v1.0.1…)" >&2
+            exit 1
+          fi
 
       - uses: actions/cache@v6
         with:
@@ -117,14 +139,14 @@ jobs:
 
       - name: Exports Windows, Linux et Web
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${RELEASE_TAG#v}"
           # v0.1 -> 0.1.0 (format X.Y.Z attendu par les métadonnées Windows)
           if [[ "$version" =~ ^[0-9]+\.[0-9]+$ ]]; then version="${version}.0"; fi
           GAME_VERSION="$version" ./tools/export.sh all
 
       - name: Préparation des fichiers
         run: |
-          tag="$GITHUB_REF_NAME"
+          tag="$RELEASE_TAG"
           mkdir -p dist
           cp build/windows/Paradoxe.exe "dist/Paradoxe-${tag}-windows.exe"
           # zip conserve le droit d'exécution du binaire Linux
@@ -138,9 +160,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="$GITHUB_REF_NAME"
+          tag="$RELEASE_TAG"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" dist/Paradoxe-* --clobber
           else
-            gh release create "$tag" dist/Paradoxe-* --title "PARADOXE $tag" --notes-file dist/NOTES.md
+            # --target : si le tag n'existe pas encore (lancement manuel), GitHub le
+            # crée sur ce commit. S'il existe déjà (tag poussé), il est réutilisé.
+            gh release create "$tag" dist/Paradoxe-* --title "PARADOXE $tag" \
+              --notes-file dist/NOTES.md --target "$GITHUB_SHA"
           fi

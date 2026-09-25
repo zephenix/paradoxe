@@ -133,7 +133,9 @@ docs/        PLAN.md (feuille de route), JOURNAL.md (avancement), SOUND_DESIGN.m
 - Chaque **Pull Request** lance les tests.
 - Chaque **push sur `main`** publie la version Web sur GitHub Pages.
 - Chaque **tag de version** (`v0.1`, `v0.2`…) produit une Release avec les exécutables
-  Windows et Linux.
+  Windows et Linux. On peut aussi lancer le workflow à la main depuis l'onglet
+  *Actions → Build → Run workflow* (branche `main`) en indiquant le tag voulu dans
+  `release_tag` : la CI crée alors le tag elle-même.
 
 Le détail est dans [`.github/workflows/build.yml`](.github/workflows/build.yml).
 
