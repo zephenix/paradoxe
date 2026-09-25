@@ -65,6 +65,7 @@ wav={
 2d_physics/layer_4="compagnon"
 2d_physics/layer_5="projectiles"
 2d_physics/layer_6="declencheurs"
+2d_physics/layer_7="boucliers"
 
 [physics]
 

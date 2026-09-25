@@ -18,6 +18,7 @@ Le hasard est « graine fixe » : relancer le script donne exactement les mêmes
 fichiers (pas de modification inutile dans Git), sauf si on change --seed.
 
 J1 : trois sons de test pour valider la chaîne audio (bus, effets, Web).
+J3 : sons provisoires du combat (arme, bouclier, impacts, voix des Sentinelles).
 J5 : bibliothèque complète (Foley, ambiances, arme, créatures, musique).
 """
 
@@ -216,6 +217,236 @@ def foley_body_fall(rng: np.random.Generator) -> np.ndarray:
     first = _thump(rng, 0.5, 55.0, 0.2, 900.0, 0.6)
     second = _thump(rng, 0.4, 70.0, 0.12, 1100.0, 0.4) * 0.6
     return dsp.normalize(dsp.mix(first, np.concatenate([np.zeros(dsp.n_samples(0.12)), second])), 0.95)
+
+
+# =============================================================================
+# Combat provisoire (J3) — arme, bouclier, impacts, voix des Sentinelles
+# =============================================================================
+
+def _zap(rng: np.random.Generator, duration: float, f_start: float, f_end: float,
+         curve: float, noise_amount: float, thump_hz: float) -> np.ndarray:
+    """Décharge d'énergie : une fréquence qui plonge très vite (le « piou »),
+    un souffle d'étincelles au départ et un petit coup grave (le recul)."""
+    sweep = dsp.ramp(duration, f_start, f_end, curve)
+    tone = dsp.sine(sweep, duration) + 0.35 * dsp.saw(sweep * 0.5, duration)
+    tone *= dsp.exp_decay(duration, duration * 0.9)
+    burst = dsp.highpass(dsp.white_noise(duration, rng), 2500) * dsp.exp_decay(duration, 0.04) * noise_amount
+    thump = dsp.sine(thump_hz, duration) * dsp.exp_decay(duration, 0.08)
+    return dsp.fade(dsp.normalize(0.8 * tone + burst + 0.6 * thump, 0.9), 0.0005, 0.02)
+
+
+@sound("weapon_shot", "combat", description="Tir du pistolet d'Élias : décharge brève et claire (provisoire J3).")
+def weapon_shot(rng: np.random.Generator) -> np.ndarray:
+    # --- Paramètres ---
+    duration = 0.22
+    f_start, f_end = 2600.0, 260.0        # la fréquence plonge : c'est le « piou »
+    # ------------------
+    return _zap(rng, duration, f_start, f_end, 0.35, 0.7, 110.0)
+
+
+@sound("weapon_shot_charged", "combat", description="Tir chargé : décharge lourde, grave, avec crépitements (provisoire J3).")
+def weapon_shot_charged(rng: np.random.Generator) -> np.ndarray:
+    # --- Paramètres ---
+    duration = 0.7
+    f_start, f_end = 1900.0, 90.0
+    # ------------------
+    core = _zap(rng, duration, f_start, f_end, 0.5, 1.0, 55.0)
+    sparks = dsp.bandpass(dsp.crackle(duration, rng, 140.0), 1500, 9000, order=1) * dsp.exp_decay(duration, 0.5)
+    sub = dsp.sine(dsp.ramp(duration, 90.0, 40.0), duration) * dsp.exp_decay(duration, 0.4)
+    return dsp.fade(dsp.normalize(core + 0.5 * dsp.normalize(sparks) + 0.6 * sub, 0.95), 0.0005, 0.05)
+
+
+@sound("weapon_shot_sentinel", "combat",
+       description="Tir des Sentinelles : plus grave et bourdonnant, pour le distinguer du nôtre (provisoire J3).")
+def weapon_shot_sentinel(rng: np.random.Generator) -> np.ndarray:
+    # --- Paramètres ---
+    duration = 0.32
+    f_start, f_end = 950.0, 180.0
+    vibrato_hz = 38.0                     # « grain » organique : la fréquence tremble vite
+    # ------------------
+    t = dsp.time_axis(duration)
+    sweep = dsp.ramp(duration, f_start, f_end, 0.6) * (1.0 + 0.06 * np.sin(2 * np.pi * vibrato_hz * t))
+    buzz = dsp.lowpass(dsp.square(sweep, duration, 0.3), 3500) * dsp.exp_decay(duration, 0.28)
+    burst = dsp.bandpass(dsp.white_noise(duration, rng), 800, 5000) * dsp.exp_decay(duration, 0.05)
+    thump = dsp.sine(80.0, duration) * dsp.exp_decay(duration, 0.1)
+    return dsp.fade(dsp.normalize(buzz + 0.6 * burst + 0.7 * thump, 0.9), 0.0005, 0.03)
+
+
+@sound("weapon_charge", "combat", description="Charge du tir : tension qui monte pendant 0,8 s (provisoire J3).")
+def weapon_charge(rng: np.random.Generator) -> np.ndarray:
+    # --- Paramètres ---
+    duration = 0.8                        # = temps de charge du pistolet (pistol.tres)
+    f_start, f_end = 180.0, 1400.0
+    # ------------------
+    t = dsp.time_axis(duration)
+    sweep = dsp.ramp(duration, f_start, f_end, 1.6)
+    tremolo = 0.6 + 0.4 * np.sin(2 * np.pi * dsp.ramp(duration, 6.0, 28.0) * t)
+    tone = (dsp.saw(sweep, duration) + 0.5 * dsp.sine(sweep * 2.0, duration)) * tremolo
+    hiss = dsp.bandpass(dsp.white_noise(duration, rng), 3000, 9000) * dsp.ramp(duration, 0.0, 0.4, 2.0)
+    env = dsp.ramp(duration, 0.2, 1.0, 1.3)
+    return dsp.fade(dsp.normalize(dsp.lowpass(tone, 4000) * env + hiss, 0.7), 0.01, 0.02)
+
+
+@sound("weapon_charge_ready", "combat", description="Charge complète : tintement bref (provisoire J3).")
+def weapon_charge_ready(rng: np.random.Generator) -> np.ndarray:
+    duration = 0.35
+    ping = dsp.sine(1760.0, duration) + 0.6 * dsp.sine(2640.0, duration) + 0.2 * dsp.sine(3520.0, duration)
+    return dsp.fade(dsp.normalize(ping * dsp.exp_decay(duration, 0.3), 0.5))
+
+
+@sound("weapon_empty", "combat", description="Clic à vide : plus d'énergie, rien ne part (provisoire J3).")
+def weapon_empty(rng: np.random.Generator) -> np.ndarray:
+    duration = 0.12
+    def click(delay: float) -> np.ndarray:
+        body = dsp.modal_body(duration, [(2350, 1.0, 0.03), (3900, 0.6, 0.02), (5200, 0.3, 0.015)])
+        tick = dsp.highpass(dsp.white_noise(duration, rng), 4000) * dsp.exp_decay(duration, 0.008)
+        return np.concatenate([np.zeros(dsp.n_samples(delay)), body + tick])
+    return dsp.fade(dsp.normalize(dsp.mix(click(0.0), 0.6 * click(0.035)), 0.6), 0.0005, 0.02)
+
+
+@sound("weapon_draw", "combat", description="Dégainer : frottement de tissu et déclic métallique (provisoire J3).")
+def weapon_draw(rng: np.random.Generator) -> np.ndarray:
+    duration = 0.25
+    swish = dsp.bandpass(dsp.pink_noise(duration, rng), 1200, 6000) * dsp.adsr(duration, 0.03, 0.05, 0.3, 0.1)
+    clack = np.concatenate([np.zeros(dsp.n_samples(0.1)),
+                            dsp.modal_body(0.15, [(1800, 1.0, 0.04), (3100, 0.5, 0.03)])])
+    return dsp.fade(dsp.normalize(dsp.mix(0.6 * swish, clack), 0.6))
+
+
+def _shield_hum(rng: np.random.Generator, duration: float) -> np.ndarray:
+    """Grésillement d'un mur d'énergie : bourdonnement grave + crépitements."""
+    t = dsp.time_axis(duration)
+    hum = dsp.saw(110.0, duration) + dsp.saw(110.7, duration) + 0.5 * dsp.saw(221.0, duration)
+    hum = dsp.lowpass(hum, 900, order=4) * (0.8 + 0.2 * np.sin(2 * np.pi * 3.0 * t))
+    fizz = dsp.bandpass(dsp.crackle(duration, rng, 60.0), 2000, 8000, order=1)
+    return dsp.normalize(hum) * 0.7 + 0.4 * dsp.normalize(fizz)
+
+
+@sound("shield_loop", "combat", loop=True, description="Bouclier levé : grésillement continu (boucle, provisoire J3).")
+def shield_loop(rng: np.random.Generator) -> np.ndarray:
+    # --- Paramètres ---
+    loop_length = 2.0
+    crossfade = 0.25
+    # ------------------
+    return dsp.normalize(dsp.make_seamless_loop(_shield_hum(rng, loop_length + crossfade), crossfade), 0.6)
+
+
+@sound("shield_up", "combat", description="Le bouclier s'allume : montée brève (provisoire J3).")
+def shield_up(rng: np.random.Generator) -> np.ndarray:
+    duration = 0.25
+    rise = dsp.sine(dsp.ramp(duration, 200.0, 900.0, 0.6), duration) * dsp.adsr(duration, 0.02, 0.1, 0.5, 0.12)
+    return dsp.fade(dsp.normalize(rise + 0.5 * _shield_hum(rng, duration) * dsp.ramp(duration, 0.0, 1.0), 0.6))
+
+
+@sound("shield_down", "combat", description="Le bouclier s'éteint : descente brève (provisoire J3).")
+def shield_down(rng: np.random.Generator) -> np.ndarray:
+    duration = 0.25
+    fall = dsp.sine(dsp.ramp(duration, 800.0, 150.0, 0.6), duration) * dsp.exp_decay(duration, 0.2)
+    return dsp.fade(dsp.normalize(fall + 0.4 * _shield_hum(rng, duration) * dsp.ramp(duration, 1.0, 0.0), 0.5))
+
+
+@sound("shield_hit", "combat", description="Tir arrêté par un bouclier : claquement électrique (provisoire J3).")
+def shield_hit(rng: np.random.Generator) -> np.ndarray:
+    duration = 0.35
+    zap = dsp.bandpass(dsp.white_noise(duration, rng), 1500, 7000) * dsp.exp_decay(duration, 0.08)
+    ring = dsp.modal_body(duration, [(660, 1.0, 0.25), (1570, 0.6, 0.15), (2890, 0.3, 0.08)])
+    sparks = dsp.bandpass(dsp.crackle(duration, rng, 200.0), 3000, 9000, order=1) * dsp.exp_decay(duration, 0.2)
+    return dsp.fade(dsp.normalize(zap + 0.5 * ring + 0.4 * dsp.normalize(sparks), 0.85), 0.0005, 0.03)
+
+
+@sound("shield_break", "combat", description="Bouclier brisé par un tir chargé : éclatement (provisoire J3).")
+def shield_break(rng: np.random.Generator) -> np.ndarray:
+    duration = 0.9
+    shatter = dsp.bandpass(dsp.crackle(duration, rng, 900.0), 2000, 12000, order=1) * dsp.exp_decay(duration, 0.5)
+    fall = dsp.saw(dsp.ramp(duration, 700.0, 60.0, 0.5), duration) * dsp.exp_decay(duration, 0.6)
+    boom = dsp.sine(55.0, duration) * dsp.exp_decay(duration, 0.3)
+    return dsp.fade(dsp.normalize(dsp.normalize(shatter) + 0.5 * dsp.lowpass(fall, 2500) + 0.7 * boom, 0.95),
+                    0.0005, 0.08)
+
+
+@sound("impact_wall", "combat", description="Tir qui frappe le décor : choc et grésillement (provisoire J3).")
+def impact_wall(rng: np.random.Generator) -> np.ndarray:
+    duration = 0.3
+    hit = _thump(rng, duration, 140.0, 0.06, 3000.0, 0.8)
+    sizzle = dsp.bandpass(dsp.white_noise(duration, rng), 3000, 9000) * dsp.exp_decay(duration, 0.2) * 0.4
+    return dsp.fade(dsp.normalize(hit + sizzle, 0.8), 0.0005, 0.03)
+
+
+@sound("impact_body", "combat", description="Tir qui touche un corps : coup sourd (provisoire J3).")
+def impact_body(rng: np.random.Generator) -> np.ndarray:
+    duration = 0.35
+    thud = dsp.lowpass(_thump(rng, duration, 70.0, 0.15, 700.0, 0.2), 1200)
+    sizzle = dsp.bandpass(dsp.white_noise(duration, rng), 2000, 6000) * dsp.exp_decay(duration, 0.12) * 0.25
+    return dsp.fade(dsp.normalize(thud + sizzle, 0.9), 0.0005, 0.03)
+
+
+# Voix des Sentinelles : aucune langue réelle. Une « glotte » (dent de scie
+# dont la hauteur varie) passe dans des résonateurs placés sur les formants
+# d'une voyelle. L'INTONATION porte l'émotion (PLAN §6.6).
+VOWELS = {  # formants (Hz) des voyelles, voix grave
+    "a": (730, 1090, 2440), "o": (500, 850, 2400), "u": (340, 870, 2240),
+    "e": (480, 1720, 2520), "i": (300, 2100, 2900),
+}
+
+
+def _syllable(rng: np.random.Generator, duration: float, f0_start: float, f0_end: float,
+              vowel: str, rasp: float = 0.2) -> np.ndarray:
+    t = dsp.time_axis(duration)
+    f0 = dsp.ramp(duration, f0_start, f0_end) * (1.0 + 0.015 * np.sin(2 * np.pi * 5.5 * t))
+    source = dsp.saw(f0, duration) + rasp * dsp.white_noise(duration, rng)
+    f1, f2, f3 = VOWELS[vowel]
+    voiced = dsp.resonator(source, f1, 6.0) + 0.7 * dsp.resonator(source, f2, 9.0) + 0.3 * dsp.resonator(source, f3, 12.0)
+    return dsp.normalize(voiced) * dsp.adsr(duration, 0.03, 0.05, 0.8, duration * 0.35)
+
+
+def _phrase(rng: np.random.Generator, syllables: list[tuple[float, float, float, str, float]],
+            gap: float = 0.04) -> np.ndarray:
+    """Enchaîne des syllabes (durée, hauteur départ, hauteur fin, voyelle, raucité)."""
+    parts = []
+    for duration, f_a, f_b, vowel, rasp in syllables:
+        parts.append(_syllable(rng, duration, f_a, f_b, vowel, rasp))
+        parts.append(np.zeros(dsp.n_samples(gap)))
+    return dsp.fade(dsp.normalize(np.concatenate(parts), 0.8), 0.005, 0.05)
+
+
+@sound("creature_calm", "creature", description="Sentinelle calme : deux syllabes descendantes (provisoire J3).")
+def creature_calm(rng: np.random.Generator) -> np.ndarray:
+    return _phrase(rng, [(0.22, 120, 105, "o", 0.1), (0.3, 110, 85, "u", 0.1)])
+
+
+@sound("creature_curious", "creature", description="Sentinelle intriguée : intonation montante (provisoire J3).")
+def creature_curious(rng: np.random.Generator) -> np.ndarray:
+    return _phrase(rng, [(0.16, 110, 118, "e", 0.15), (0.34, 115, 190, "a", 0.15)], gap=0.06)
+
+
+@sound("creature_alert", "creature", description="Sentinelle en alerte : aiguë et hachée (provisoire J3).")
+def creature_alert(rng: np.random.Generator) -> np.ndarray:
+    return _phrase(rng, [(0.09, 210, 240, "a", 0.3), (0.09, 230, 250, "a", 0.3),
+                         (0.2, 250, 200, "i", 0.35)], gap=0.025)
+
+
+@sound("creature_search", "creature", description="Sentinelle qui cherche : grognement grave, interrogatif (provisoire J3).")
+def creature_search(rng: np.random.Generator) -> np.ndarray:
+    return _phrase(rng, [(0.35, 90, 100, "u", 0.25), (0.25, 95, 120, "o", 0.2)], gap=0.1)
+
+
+@sound("creature_death", "creature", description="Sentinelle touchée : cri qui retombe (provisoire J3).")
+def creature_death(rng: np.random.Generator) -> np.ndarray:
+    return _phrase(rng, [(0.12, 260, 300, "a", 0.4), (0.55, 280, 90, "o", 0.5)], gap=0.0)
+
+
+@sound("checkpoint_on", "sfx", description="Checkpoint atteint : trois notes douces qui montent (provisoire J3).")
+def checkpoint_on(rng: np.random.Generator) -> np.ndarray:
+    notes = [523.25, 659.25, 783.99]      # do, mi, sol : accord majeur = « rassurant »
+    step = 0.09
+    tail = 0.6
+    out = np.zeros(dsp.n_samples(step * len(notes) + tail))
+    for i, freq in enumerate(notes):
+        d = tail + step * (len(notes) - i)
+        tone = (dsp.sine(freq, d) + 0.3 * dsp.sine(freq * 2, d)) * dsp.adsr(d, 0.005, 0.05, 0.4, d * 0.8)
+        start = dsp.n_samples(step * i)
+        out[start:start + len(tone)] += tone[: len(out) - start]
+    return dsp.fade(dsp.normalize(out, 0.5))
 
 
 # =============================================================================

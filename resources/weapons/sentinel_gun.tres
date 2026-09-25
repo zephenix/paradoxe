@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponConfig" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/weapon_config.gd" id="1_cfg"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_shot_sentinel.wav" id="2_shot"]
+
+[resource]
+script = ExtResource("1_cfg")
+projectile_speed = 560.0
+fire_cooldown = 0.35
+charged_projectile_speed = 800.0
+shot_noise_radius = 650.0
+projectile_color = Color(1, 0.55, 0.35, 1)
+shield_color = Color(0.55, 1, 0.6, 1)
+shot_sound = ExtResource("2_shot")
