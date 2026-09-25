@@ -108,6 +108,80 @@ func test_tunnel_and_obstacle_leave_exactly_one_and_a_half_blocks() -> void:
 		assert_almost_eq(gap, 1.5 * B, 0.1, "passage bas %s" % pair[0])
 
 
+func test_combat_room_can_be_won() -> void:
+	# « Combat jouable contre 2 sentinelles » (PLAN §9, J3) : un pilote simple,
+	# comme un joueur prudent, doit gagner.
+	#   - un tir ennemi arrive : bouclier ;
+	#   - sinon, s'il a l'énergie : un tir puis, détente maintenue, un tir chargé
+	#     (qui brise un bouclier ou tue) ;
+	#   - aucune Sentinelle ne le voit : il avance vers la suivante.
+	var room: Room = level.get_node("RoomF")
+	var sentinels: Array[Sentinel] = []
+	for node in room.find_children("*", "Sentinel", false, false):
+		sentinels.append(node as Sentinel)
+	player.respawn((level.get_node("RoomF/Checkpoint") as Checkpoint).global_position, 1)
+	level.camera.snap_to_target()
+	await wait_physics(5)
+	var cfg: EnergyConfig = player.energy.config
+	var deaths: int = 0
+	var stalled: int = 0
+	var last_x: float = player.global_position.x
+	var frame: int = 0
+	while frame < 60 * 90:
+		frame += 1
+		var alive: Array[Sentinel] = sentinels.filter(func(s: Sentinel) -> bool: return not s.is_dead)
+		if alive.is_empty():
+			break
+		if player.is_dead:
+			deaths += 1
+			await wait_physics_seconds(level.respawn.total_time() + 0.1)
+			continue
+		var input: PlayerInput = player.input
+		var fighting: bool = alive.any(func(s: Sentinel) -> bool: return s.sees_target)
+		if _incoming_threat():
+			input.move = 0
+			input.fire = false
+			input.shield = true
+		elif fighting:
+			input.move = 0
+			input.shield = false
+			var state: StringName = player.machine.current_name
+			if state == &"Charge":
+				input.fire = not player.weapon.is_charged()
+			elif state in [&"Idle", &"Aim"] and player.energy.value >= cfg.shot_cost + cfg.charged_shot_cost:
+				input.press(&"fire")
+				input.fire = true
+			else:
+				input.fire = false
+		else:
+			# Personne ne le voit : il avance, et escalade les murets qui le bloquent.
+			input.shield = false
+			input.fire = false
+			input.move = 1
+			var walking: bool = player.machine.current_name in [&"Idle", &"Walk"]
+			stalled = stalled + 1 if walking and absf(player.global_position.x - last_x) < 0.5 else 0
+			if stalled >= 10:
+				input.press(&"move_up")
+				stalled = 0
+		last_x = player.global_position.x
+		await wait_physics(1)
+	var survivors: int = sentinels.filter(func(s: Sentinel) -> bool: return not s.is_dead).size()
+	assert_eq(survivors, 0, "les deux Sentinelles vaincues (morts d'Élias : %d)" % deaths)
+	assert_true(deaths <= 2, "un joueur prudent s'en sort sans trop mourir (%d morts)" % deaths)
+
+
+## Vrai si un tir ennemi arrive sur Élias (moins de 0,5 s avant l'impact).
+func _incoming_threat() -> bool:
+	for node in tree.get_nodes_in_group(&"projectiles"):
+		var p: Projectile = node as Projectile
+		if p == null or p.team != Projectile.TEAM_ENEMY or p.is_queued_for_deletion():
+			continue
+		var dx: float = player.global_position.x - p.global_position.x
+		if signf(dx) == p.direction and absf(dx) < p.speed * 0.5:
+			return true
+	return false
+
+
 func _wait_until(condition: Callable, max_frames: int) -> bool:
 	for i in max_frames:
 		if condition.call():

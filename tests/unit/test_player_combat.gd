@@ -67,8 +67,9 @@ func wait_until(condition: Callable, max_frames: int = 240) -> bool:
 	return condition.call()
 
 
+## Hauteur d'un tir debout de Sentinelle (celle de son arme, pas de celle d'Élias).
 func muzzle_height() -> float:
-	return -player.weapon.config.muzzle_offset.y
+	return -(load("res://resources/weapons/sentinel_gun.tres") as WeaponConfig).muzzle_offset.y
 
 
 # --- Tir ---------------------------------------------------------------------
@@ -108,15 +109,16 @@ func test_empty_gun_clicks_and_fires_nothing() -> void:
 
 func test_hold_fire_to_charge_then_release() -> void:
 	var cfg: EnergyConfig = player.energy.config
+	var shots: Array[Projectile] = []
+	player.weapon.fired.connect(func(p: Projectile) -> void: shots.append(p))
 	player.input.press(&"fire")
 	player.input.fire = true
 	assert_true(await wait_until(func() -> bool: return state() == &"Charge", 60), "la charge commence")
 	await wait_physics_seconds(player.weapon.config.charge_time + 0.05)
 	player.input.fire = false
 	await wait_physics(2)
-	var shots: Array[Projectile] = projectiles()
 	assert_eq(shots.size(), 2, "le tir normal, puis le tir chargé")
-	assert_true(shots.any(func(p: Projectile) -> bool: return p.charged), "un tir chargé")
+	assert_true(shots.size() == 2 and shots[1].charged, "le second est chargé")
 	assert_almost_eq(player.energy.value, cfg.capacity - cfg.shot_cost - cfg.charged_shot_cost, 0.01)
 	assert_eq(state(), &"Shoot", "recul du tir chargé")
 
@@ -233,7 +235,7 @@ func test_crouching_dodges_a_standing_shot() -> void:
 func test_low_shot_hits_a_crouching_elias() -> void:
 	player.input.down = true
 	await wait_physics(10)
-	enemy_shot(700.0, -player.weapon.config.low_muzzle_offset.y)
+	enemy_shot(700.0, -(load("res://resources/weapons/sentinel_gun.tres") as WeaponConfig).low_muzzle_offset.y)
 	assert_true(await wait_until(func() -> bool: return player.is_dead, 90), "un tir à genou le touche")
 
 

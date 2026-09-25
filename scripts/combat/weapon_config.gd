@@ -18,8 +18,9 @@ extends Resource
 @export var holster_delay: float = 3.0
 ## Vitesse du projectile (pixels par seconde).
 @export var projectile_speed: float = 900.0
-## Distance maximale parcourue par un projectile avant de s'éteindre (pixels).
-@export var projectile_range: float = 1500.0
+## Distance maximale parcourue par un projectile avant de s'éteindre (pixels) :
+## environ la largeur d'un écran. Pas de tir d'un bout à l'autre d'une grande salle.
+@export var projectile_range: float = 1000.0
 ## Point de départ du tir debout, depuis les pieds. Sa hauteur compte pour le
 ## gameplay : un personnage accroupi (1,2 bloc = 58 px) est plus bas que le tir,
 ## qui lui passe au-dessus ; un couvert de 1,5 bloc (72 px) arrête les tirs bas

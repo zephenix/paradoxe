@@ -130,8 +130,8 @@ func can_see(who: Player) -> bool:
 	return false
 
 
-## Vrai si un tir d'Élias arrive droit sur elle (assez près pour réagir).
-## Renvoie le projectile concerné, ou null.
+## Un tir d'Élias qui arrive droit sur elle (assez près pour réagir, sans
+## décor entre eux) : renvoie ce projectile, ou null.
 func incoming_projectile() -> Projectile:
 	for node in get_tree().get_nodes_in_group(&"projectiles"):
 		var p: Projectile = node as Projectile
@@ -141,8 +141,10 @@ func incoming_projectile() -> Projectile:
 		if signf(dx) != p.direction or absf(dx) > config.threat_distance:
 			continue  # il s'éloigne, ou il est trop loin
 		var dy: float = global_position.y - p.global_position.y
-		if dy >= 0.0 and dy <= config.body_height:
-			return p
+		if dy < 0.0 or dy > config.body_height:
+			continue  # il passe au-dessus ou en dessous
+		if _ray(p.global_position, Vector2(global_position.x, p.global_position.y)).is_empty():
+			return p  # rien entre le tir et elle : il va la toucher
 	return null
 
 

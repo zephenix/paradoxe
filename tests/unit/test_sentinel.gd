@@ -279,3 +279,49 @@ func test_sentinel_killed_before_a_checkpoint_stays_dead() -> void:
 	Events.checkpoint_reached.emit(&"test")
 	Events.player_respawned.emit()
 	assert_true(s.is_dead, "tuée avant le checkpoint : elle ne revient pas")
+
+
+# --- Tirs qui arrivent -------------------------------------------------------------
+
+func test_shot_seen_coming_triggers_combat_toward_the_shooter() -> void:
+	var s: Sentinel = spawn_sentinel(900.0, -1, 0.0, 0.0, func(c: SentinelConfig) -> void:
+		c.view_distance = 200.0  # elle ne voit pas Élias, seulement le tir
+		c.shield_chance = 1.0)
+	spawn_player(100.0)
+	player.set_physics_process(false)
+	await wait_physics(3)
+	var shot := Projectile.new()
+	shot.setup(player, Projectile.TEAM_PLAYER, 1, 900.0, false, WeaponConfig.new())
+	arena.add_child(shot)
+	shot.global_position = Vector2(500.0, FLOOR_Y - 76.0)
+	assert_true(await wait_until(func() -> bool: return s.machine.current_name == &"Combat", 20), "combat")
+	await wait_physics(30)
+	assert_false(s.is_dead, "bouclier levé à temps")
+	await wait_physics_seconds(s.config.lose_sight_time + 0.3)
+	assert_eq(s.machine.current_name, &"Chase", "elle part chercher le tireur")
+	assert_true(s.velocity.x < 0.0, "vers la gauche, où est Élias (pas vers l'origine du monde)")
+
+
+func test_shot_hidden_by_a_wall_is_ignored() -> void:
+	block(15, 4, 1, 6)  # mur de x 720 à 768
+	var s: Sentinel = spawn_sentinel(900.0, -1)
+	await wait_physics(3)
+	var shot := Projectile.new()
+	shot.setup(null, Projectile.TEAM_PLAYER, 1, 900.0, false, WeaponConfig.new())
+	arena.add_child(shot)
+	shot.global_position = Vector2(600.0, FLOOR_Y - 76.0)
+	await wait_physics(15)
+	assert_eq(s.machine.current_name, &"Patrol", "le tir s'écrase sur le mur")
+
+
+func test_shot_from_behind_is_a_surprise() -> void:
+	var s: Sentinel = spawn_sentinel(700.0, 1, 0.0, 0.0, func(c: SentinelConfig) -> void: c.shield_chance = 1.0)
+	await wait_physics(3)
+	var shot := Projectile.new()
+	shot.setup(null, Projectile.TEAM_PLAYER, 1, 900.0, false, WeaponConfig.new())
+	arena.add_child(shot)
+	shot.global_position = Vector2(400.0, FLOOR_Y - 76.0)
+	await wait_physics(10)
+	assert_eq(s.machine.current_name, &"Patrol", "elle ne l'a pas vu venir")
+	await wait_physics(20)
+	assert_true(s.is_dead, "dans le dos : pas de bouclier")

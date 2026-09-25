@@ -15,9 +15,21 @@ func on_noise(at: Vector2) -> void:
 	machine.transition_to(&"Suspicious", {"clue": at})
 
 
-## Si elle voit Élias, elle passe au combat. Renvoie vrai si c'est le cas.
+## Si elle voit Élias, ou si un tir arrive sur elle DE FACE (elle le voit
+## venir), elle passe au combat ; l'état Combat décide alors de lever le
+## bouclier. Un tir dans le dos la surprend : elle ne réagit pas.
+## Renvoie vrai s'il y a eu transition.
 func check_sight() -> bool:
-	if sentinel.sees_target:
+	var s: Sentinel = sentinel
+	var incoming: Projectile = s.incoming_projectile()
+	var seen_coming: bool = incoming != null and signf(incoming.global_position.x - s.global_position.x) == s.facing
+	if seen_coming and not s.sees_target:
+		# Elle ne voit pas le tireur, mais sait d'où vient le tir : c'est là
+		# qu'elle le cherchera si elle ne le voit toujours pas.
+		var shooter: Node2D = incoming.shooter as Node2D
+		s.last_seen_position = shooter.global_position if is_instance_valid(shooter) else incoming.global_position
+		s.time_since_seen = 0.0
+	if s.sees_target or seen_coming:
 		machine.transition_to(&"Combat")
 		return true
 	return false
