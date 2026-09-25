@@ -1,0 +1,8 @@
+{
+  "name": "paradoxe-web-check",
+  "private": true,
+  "description": "Vérification automatique de l'export Web dans Chromium (voir check_web.sh).",
+  "dependencies": {
+    "playwright-core": "^1.55.0"
+  }
+}

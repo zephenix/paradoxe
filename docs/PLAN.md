@@ -218,6 +218,7 @@ setup.sh, export_presets.cfg, project.godot, README.md, CLAUDE.md, CREDITS.md
 | `audio/sound_emitter_2d.tscn` | Source sonore positionnée (machine, cascade, créature) |
 | `rooms/room.tscn` | Gabarit de salle (limites, cadrage, acoustique, lumière ambiante) |
 | `fx/*.tscn` | Pluie, brouillard, éclairs, particules de spores, impacts |
+| `cutscenes/cutscene_player.tscn` | Lecteur de cinématiques : bandes noires, enchaînement des plans, passer la cinématique (voir §5.12) |
 | `ui/bracelet.tscn` | Interface holographique au poignet |
 | `ui/ghost.tscn` | Fantôme du mode chrono |
 
@@ -227,13 +228,14 @@ setup.sh, export_presets.cfg, project.godot, README.md, CLAUDE.md, CREDITS.md
 `ui/main_menu.tscn`, `ui/pause_menu.tscn`, `ui/options_menu.tscn`
 (volumes, touches, mode classique, assistances, accessibilité),
 `ui/sound_board.tscn` (banc d'écoute), `ui/credits.tscn`,
+`cutscenes/intro.tscn` (cinématique d'ouverture), `cutscenes/capture.tscn`, `cutscenes/meeting.tscn`, `cutscenes/ending.tscn`,
 `levels/prototype.tscn` (le niveau complet), `levels/test_room.tscn` (salle de test J1–J3).
 
 ### 4.3 Les 8 écrans du prototype
 
 | # | Écran | Ce qui s'y passe | Mécaniques | Son |
 |---|---|---|---|---|
-| 1 | **Laboratoire, 2140** (intro) | Nuit d'orage. Élias, seul, traverse le labo, lance l'expérience au terminal. Le portail s'allume (lueur **verte**), surcharge, flash, noir. Sur le bureau : une photo d'Élias avec son collègue, qui porte un **pendentif en spirale**. | Marche, interaction, cinématique (passable) | Pluie contre les vitres, tonnerre, ventilation, bourdonnement du portail qui monte, **coupure brutale** avant le flash |
+| 1 | **Laboratoire, 2140** (cinématique d'intro) | **Cinématique d'ouverture non interactive** (≈ 75 s, voir §5.12) : nuit d'orage, arrivée d'Élias au labo, photo avec son collègue (qui porte un **pendentif en spirale**), lancement de l'expérience, portail à lueur **verte**, la foudre frappe, flash, silence, titre. | Aucune (passable, rejouable depuis le menu) | Pluie, tonnerre, bourdonnement du portail qui monte, **thème d'intro**, **coupure brutale** avant le flash |
 | 2 | **Arrivée** | Élias tombe du ciel dans une ville en ruine envahie par une jungle luminescente. **La caméra s'écarte** : on devine les restes du labo (même logo sur une enseigne tordue). Un prédateur surgit : fuite. | Première course, sauts, fuite scénarisée | **Thème d'arrivée** (seule musique de l'écran), faune extraterrestre, vent. Le prédateur a un cri reconnaissable. |
 | 3 | **Canopée** | Parkour dans les hauteurs : poutres, façades, lianes, trous. | Glissade, rattrapage de rebord, roulade, sauts avec élan | Pas sur métal / végétation / pierre, respiration qui s'accélère, craquements de structure |
 | 4 | **Clairière — capture** | Fin du parcours ; Élias est encerclé par des humanoïdes lumineux. Fondu. | Séquence scénarisée | **Silence** soudain, puis voix des créatures (intonation menaçante) |
@@ -370,6 +372,45 @@ Un interrupteur unique `GameState.classic_mode`, lu par : le parkour (5.1), le r
   réduction des flashs (éclairs, portail) et des secousses d'écran.
 - Volumes par bus : Master, Musique, Ambiance, SFX, Voix, UI.
 
+### 5.12 Cinématiques (système en J7, intro en J8)
+
+Les cinématiques en images de synthèse polygonales sont la signature des jeux d'origine :
+gros plans, cadrages audacieux (plongées, contre-plongées), montage rythmé, aucune
+parole compréhensible. On reprend cette grammaire, avec nos propres images.
+
+**Comment c'est construit**
+- Une cinématique = une scène (`scenes/cutscenes/intro.tscn`) contenant plusieurs **plans**
+  (`Shot`) : chaque plan est une petite composition autonome (décor, personnages en gros
+  plan, lumières), comme une case de BD. Les gros plans (une main, des yeux, un écran)
+  n'ont donc pas besoin d'exister dans le niveau.
+- Un `AnimationPlayer` joue le rôle de **table de montage** : une piste affiche le plan
+  courant (coupes franches ou fondus), d'autres pistes animent les polygones, les
+  lumières, la caméra de chaque plan, et des pistes d'appel déclenchent les sons via
+  l'`AudioManager` (synchronisation à l'image près).
+- Le `CutscenePlayer` ajoute les **bandes noires** cinéma, gère le **passage** (maintenir
+  une touche 1 s, avec une jauge discrète) et rend la main au jeu à la fin.
+- Les cinématiques « dans le décor » (capture, rencontre avec Marek, fin) utilisent le
+  même lecteur, mais leurs plans filment directement les salles du niveau.
+
+**Découpage de la cinématique d'ouverture** (≈ 75 s, 11 plans)
+
+| # | Plan | Image | Son |
+|---|---|---|---|
+| 1 | Noir | — | Pluie seule, lointaine. |
+| 2 | Plan d'ensemble | Un complexe de recherche isolé sur une falaise, nuit d'orage. Un éclair révèle la silhouette du bâtiment. | Tonnerre, vent. |
+| 3 | Plan large | Un glisseur arrive dans la pluie, phares balayant la route, se pose devant l'entrée. | Moteur électrique qui décroît. |
+| 4 | Gros plan | La main d'Élias sur un lecteur biométrique ; le lecteur passe au vert. | Bip, sas pneumatique. |
+| 5 | Plan moyen, profil | Élias traverse un couloir éclairé par intermittence. | Pas sur métal, néons qui grésillent. |
+| 6 | Insert | Sur le bureau, une photo : Élias et son collègue Marek, qui porte un pendentif en spirale. Élias la regarde un instant. | Silence relatif, ventilation. |
+| 7 | Gros plan | Les mains sur le terminal ; courbes et pictogrammes à l'écran (aucun texte). | Clics, bips montants, **début du thème d'intro**. |
+| 8 | Contre-plongée | L'anneau du portail s'allume, lueur verte, arcs électriques. | Bourdonnement qui monte en tension. |
+| 9 | Plan extérieur | La foudre frappe le bâtiment ; l'énergie descend le long des câbles vers le sous-sol (plan rapide). | Impact énorme, puis grondement. |
+| 10 | Très gros plan | Les yeux d'Élias se lèvent vers le portail. | **Coupure brutale : silence total.** |
+| 11 | Flash blanc → labo vide | Fumée, la photo tombe au sol. Fondu au noir, titre **PARADOXE**. | Souffle grave, puis silence ; le titre apparaît sans musique. |
+
+Le jeu commence ensuite à l'écran 2 (arrivée). La cinématique est **passable** et
+**rejouable** depuis le menu principal ; le mode chrono la saute automatiquement.
+
 ---
 
 ## 6. Plan audio
@@ -479,8 +520,8 @@ Accessible depuis le menu principal :
   filtre). Or ces effets sont au cœur du projet. Choix : **mode *Stream*** sur le Web, avec
   l'export **multithread** (latence faible) rendu possible sur GitHub Pages grâce à l'option
   PWA de Godot qui ajoute les en-têtes d'isolation. Solution de repli si ça pose problème :
-  export monothread en mode *Stream* (un peu plus de latence). Décision validée en J1 par un
-  test réel dans Chromium.
+  export monothread en mode *Stream* (un peu plus de latence). **Validé en J1** dans Chromium :
+  isolation dès la première visite, son mesuré en sortie, effets actifs (voir JOURNAL J1).
 
 ---
 
@@ -512,7 +553,7 @@ Accessible depuis le menu principal :
 
 | Déclencheur | Travail |
 |---|---|
-| Toute Pull Request et tout push | Installer Godot 4.7.2 (en cache), importer le projet, lancer les tests |
+| Toute Pull Request et tout push sur `main` | Installer Godot 4.7.2 (en cache), importer le projet, lancer les tests, vérifier le générateur de sons |
 | Push sur `main` | + exporter la version Web → **GitHub Pages** |
 | Tag `v*` (ex. `v0.1`) | + exporter **Windows** (`.exe` unique, PCK intégré) et **Linux** → **GitHub Release** |
 
@@ -539,8 +580,8 @@ tester / quoi écouter / reste à faire / 1–2 concepts Godot expliqués).
 | **J4** Temps | Rembobinage, mode classique (première version) | Rembobinage fiable (tests de restauration), limite par checkpoint | v0.4 |
 | **J5** Son | Générateur Python, bibliothèque de sons, ambiances par zone, Foley, acoustique par salle, banc d'écoute, `SOUND_DESIGN.md` | Banc d'écoute complet sur le Web ; chaque action du joueur a son son | v0.5 |
 | **J6** Infiltration | Perception lumière + son branchée sur l'`AudioManager`, lampes destructibles, pierre à lancer, « voir les sons » | Tests de perception ; salle d'infiltration jouable | v0.6 |
-| **J7** Compagnon | Compagnon et ordres, capture et évasion, énigme à deux, terminaux, ascenseurs, objets | Écrans 4–5 jouables de bout en bout | v0.7 |
-| **J8** Mise en scène | Musique adaptative, intro scénarisée, poursuite, plan de fin, assemblage des 8 écrans | Prototype jouable du début à la fin | v0.8 |
+| **J7** Compagnon | Compagnon et ordres, capture et évasion, énigme à deux, terminaux, ascenseurs, objets, **système de cinématiques** (lecteur, bandes noires, passage) avec les cinématiques de capture et de rencontre | Écrans 4–5 jouables de bout en bout | v0.7 |
+| **J8** Mise en scène | Musique adaptative, **cinématique d'ouverture** (11 plans), poursuite, cinématique de fin, assemblage des 8 écrans | Prototype jouable du début à la fin, intro comprise | v0.8 |
 | **J9** Finitions | Bracelet, menus, options, remappage, manette, accessibilité, chrono + fantôme, polish | Tous les livrables, prototype complet | v0.9 (puis v1.0 si tu valides) |
 
 ---
@@ -553,6 +594,7 @@ tester / quoi écouter / reste à faire / 1–2 concepts Godot expliqués).
 | Service worker PWA (1er chargement qui se recharge ; navigation privée Firefox sans service worker) | Page Web qui ne démarre pas pour certains | Message d'explication dans la page ; bascule monothread possible en changeant une option |
 | Éclairage 2D en mode Compatibility (limite de lumières par objet, performances WebGL) | Rendu différent ou lent sur le Web | Peu de lumières par salle, ombres seulement où elles comptent, captures d'écran Web à chaque jalon |
 | Animations sans graphiste | Personnage raide | Poses soignées, interface `CharacterVisual` prête pour la rotoscopie |
+| Cinématiques sans graphiste | Intro peu convaincante | Cadrages forts plutôt que détails, lumière et son pour porter l'émotion, plans courts ; chaque plan est remplaçable séparément |
 | Rembobinage et physique (état non restauré exactement) | Bugs difficiles | Chaque objet déclare explicitement son état ; tests de restauration ; projectiles effacés |
 | IA de compagnon (déplacements dans un décor vertical) | Compagnon coincé | Points de passage placés à la main dans les salles où il est présent |
 | Pas d'écoute ni d'écran pour moi | Sons mal dosés, décor illisible | Banc d'écoute, captures d'écran, indications « quoi écouter » dans le journal ; tes retours |
@@ -562,13 +604,11 @@ tester / quoi écouter / reste à faire / 1–2 concepts Godot expliqués).
 
 ---
 
-## 11. Ce dont j'ai besoin de ta part
+## 11. Décisions validées (25/09/2026)
 
-1. **Valider ce plan** (ou me dire ce qu'il faut changer).
-2. **Branche `main`** : le dépôt est vide. Les Pull Requests et la publication Web ont besoin
-   d'une branche principale `main`. Je te demande l'autorisation de la créer à partir du
-   premier commit.
-3. **Activer GitHub Pages** une fois : *Settings → Pages → Build and deployment → Source :
-   GitHub Actions*. (Je ne peux pas le faire moi-même.)
-4. Les noms internes (Marek Solen, Sentinelles, Traqueur) et le motif du **pendentif en
-   spirale** comme fil rouge du twist te conviennent-ils ?
+- Plan validé.
+- Branche `main` créée ; chaque jalon arrive par Pull Request vers `main`.
+- GitHub Pages activé (source : GitHub Actions).
+- Ajout demandé : une **cinématique d'ouverture** dans l'esprit des jeux d'origine (§5.12).
+- Noms internes : Élias Varenne, Marek Solen, Sentinelles, Traqueur ; fil rouge du
+  pendentif en spirale.

@@ -1,0 +1,69 @@
+; Fichier de configuration du projet Godot.
+; Il peut être modifié via l'éditeur (Projet > Paramètres du projet) ou à la main.
+; Les commentaires commençant par « ; » sont conservés tant qu'on édite à la main,
+; mais l'éditeur de Godot peut les supprimer quand il réenregistre ce fichier.
+
+config_version=5
+
+[application]
+
+config/name="PARADOXE"
+config/description="Prototype de jeu de plateforme cinématique 2D (Godot 4)."
+config/version="0.1.0"
+run/main_scene="res://scenes/ui/title_screen.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0, 0, 0, 1)
+boot_splash/show_image=false
+
+[audio]
+
+; Sur le Web, Godot joue les sons en mode « Sample » par défaut, qui ne gère
+; aucun effet de bus (ni réverbération, ni filtre). 0 = « Stream » : tous les
+; effets fonctionnent, comme sur ordinateur. Voir docs/PLAN.md §6.10.
+general/default_playback_type.web=0
+
+[autoload]
+
+; Singletons chargés au démarrage, accessibles partout par leur nom.
+; L'ordre compte : un autoload peut utiliser ceux qui sont au-dessus de lui.
+Events="*res://scripts/autoload/events.gd"
+Settings="*res://scripts/autoload/settings.gd"
+GameState="*res://scripts/autoload/game_state.gd"
+AudioManager="*res://scripts/autoload/audio_manager.gd"
+RewindManager="*res://scripts/autoload/rewind_manager.gd"
+SceneTransition="*res://scripts/autoload/scene_transition.gd"
+
+[debug]
+
+; Avertit (dans l'éditeur) quand une variable ou une fonction n'est pas typée.
+; Équivalent de « Option Explicit » en VBA : on déclare toujours le type.
+gdscript/warnings/untyped_declaration=1
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+
+[importer_defaults]
+
+; Compression « Quite OK Audio » : fichiers 4 à 5 fois plus légers, qualité
+; quasi transparente, décodage peu coûteux (même sur le Web).
+wav={
+"compress/mode": 2
+}
+
+[physics]
+
+common/physics_ticks_per_second=60
+
+[rendering]
+
+; « Compatibility » (OpenGL 3 / WebGL 2) : seul moteur de rendu disponible
+; sur le Web. On l'utilise partout pour un rendu identique sur toutes les cibles.
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=1
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)

@@ -1,0 +1,146 @@
+# =============================================================================
+# Intégration et publication continues de PARADOXE
+#
+#  - À chaque Pull Request et à chaque push sur main : installation de Godot,
+#    tests automatisés, vérification du générateur de sons.
+#  - Push sur main : export Web publié sur GitHub Pages.
+#  - Tag de version (v0.1, v0.2…) : exécutables Windows et Linux (et une archive
+#    de la version Web) publiés dans une GitHub Release.
+#
+# La version de Godot vient de setup.sh (GODOT_VERSION) : une seule source de vérité.
+# =============================================================================
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+# Un nouveau push annule le build précédent de la même branche (sauf pour les tags).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  test:
+    name: Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Cache de Godot et des modèles d'export
+        uses: actions/cache@v6
+        with:
+          path: ~/.local/share/godot
+          key: godot-${{ runner.os }}-${{ hashFiles('setup.sh') }}
+
+      - name: Installation de Godot (setup.sh)
+        run: ./setup.sh --no-import
+
+      - name: Tests automatisés (headless)
+        run: ./tools/run_tests.sh
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Le générateur de sons fonctionne
+        run: |
+          python -m pip install --quiet -r tools/audio/requirements.txt
+          python tools/audio/generate_sounds.py --out "$RUNNER_TEMP/sounds"
+
+  # ---------------------------------------------------------------------------
+  web:
+    name: Export Web
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.local/share/godot
+          key: godot-${{ runner.os }}-${{ hashFiles('setup.sh') }}
+
+      - run: ./setup.sh --no-import
+
+      - name: Export Web
+        run: |
+          base="$(sed -n 's/^config\/version="\(.*\)"/\1/p' project.godot)"
+          GAME_VERSION="${base}+${GITHUB_SHA::7}" ./tools/export.sh web
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: build/web
+
+  pages:
+    name: Publication GitHub Pages
+    needs: web
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+
+  # ---------------------------------------------------------------------------
+  release:
+    name: Release (Windows, Linux, Web)
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.local/share/godot
+          key: godot-${{ runner.os }}-${{ hashFiles('setup.sh') }}
+
+      - run: ./setup.sh --no-import
+
+      - name: Exports Windows, Linux et Web
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # v0.1 -> 0.1.0 (format X.Y.Z attendu par les métadonnées Windows)
+          if [[ "$version" =~ ^[0-9]+\.[0-9]+$ ]]; then version="${version}.0"; fi
+          GAME_VERSION="$version" ./tools/export.sh all
+
+      - name: Préparation des fichiers
+        run: |
+          tag="$GITHUB_REF_NAME"
+          mkdir -p dist
+          cp build/windows/Paradoxe.exe "dist/Paradoxe-${tag}-windows.exe"
+          # zip conserve le droit d'exécution du binaire Linux
+          (cd build/linux && zip -q "../../dist/Paradoxe-${tag}-linux.zip" Paradoxe.x86_64)
+          (cd build/web && zip -q -r "../../dist/Paradoxe-${tag}-web.zip" .)
+          ls -la dist
+          ./tools/release_notes.sh "$tag" > dist/NOTES.md
+          cat dist/NOTES.md
+
+      - name: Publication de la Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="$GITHUB_REF_NAME"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/Paradoxe-* --clobber
+          else
+            gh release create "$tag" dist/Paradoxe-* --title "PARADOXE $tag" --notes-file dist/NOTES.md
+          fi
