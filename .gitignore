@@ -1,0 +1,22 @@
+# --- Godot ---
+# Cache d'import régénéré automatiquement (ne jamais versionner).
+.godot/
+# Identifiants d'export (mots de passe de signature, etc.).
+export_credentials.cfg
+
+# --- Exports locaux ---
+build/
+
+# --- Python ---
+__pycache__/
+*.pyc
+.venv/
+
+# --- Divers ---
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# --- Outils Node ---
+node_modules/
