@@ -121,6 +121,104 @@ def portal_hum_loop(rng: np.random.Generator) -> np.ndarray:
 
 
 # =============================================================================
+# Foley provisoire du déplacement (J2) — remplacé par la bibliothèque J5
+# =============================================================================
+
+def _thump(rng: np.random.Generator, duration: float, body_hz: float, body_decay: float,
+           click_cutoff: float, grit: float) -> np.ndarray:
+    """Impact de pas : corps grave amorti + petit claquement filtré + grain."""
+    body = dsp.sine(body_hz * rng.uniform(0.9, 1.1), duration) * dsp.exp_decay(duration, body_decay)
+    click = dsp.lowpass(dsp.white_noise(duration, rng), click_cutoff) * dsp.exp_decay(duration, 0.03)
+    sand = dsp.bandpass(dsp.white_noise(duration, rng), 1500, 6000) * dsp.exp_decay(duration, 0.06) * grit
+    return dsp.fade(dsp.normalize(0.7 * body + click + sand, 0.9), 0.001, 0.02)
+
+
+def _register_step_variants() -> None:
+    for i in range(1, 5):
+        def build(rng: np.random.Generator, i: int = i) -> np.ndarray:
+            # --- Paramètres ---
+            duration = 0.22
+            body_hz = 95.0 + 12.0 * i      # chaque variante a sa hauteur propre
+            # ------------------
+            return _thump(rng, duration, body_hz, 0.08, 2200.0, 0.35)
+        sound(f"foley_step_stone_{i:02d}", "foley",
+              description=f"Pas sur pierre, variante {i} (provisoire J2).")(build)
+
+
+_register_step_variants()
+
+
+@sound("foley_land", "foley", description="Réception légère : double impact pieds (provisoire J2).")
+def foley_land(rng: np.random.Generator) -> np.ndarray:
+    a = _thump(rng, 0.3, 85.0, 0.1, 1800.0, 0.5)
+    b = _thump(rng, 0.3, 90.0, 0.1, 1800.0, 0.4)
+    return dsp.normalize(dsp.mix(a, np.concatenate([np.zeros(dsp.n_samples(0.035)), 0.8 * b])), 0.9)
+
+
+@sound("foley_land_heavy", "foley", description="Réception lourde : impact grave + souffle (provisoire J2).")
+def foley_land_heavy(rng: np.random.Generator) -> np.ndarray:
+    hit = _thump(rng, 0.6, 60.0, 0.22, 1200.0, 0.8)
+    grunt = dsp.bandpass(dsp.white_noise(0.6, rng), 300, 1200) * dsp.adsr(0.6, 0.02, 0.1, 0.3, 0.3) * 0.25
+    return dsp.normalize(hit + grunt, 0.95)
+
+
+@sound("foley_jump", "foley", description="Impulsion d'un saut : frottement de tissu rapide (provisoire J2).")
+def foley_jump(rng: np.random.Generator) -> np.ndarray:
+    d = 0.28
+    swish = dsp.bandpass(dsp.pink_noise(d, rng), 900, 5000) * dsp.adsr(d, 0.05, 0.08, 0.4, 0.15)
+    push = _thump(rng, d, 80.0, 0.05, 1500.0, 0.2) * 0.6
+    return dsp.fade(dsp.normalize(swish + push, 0.7))
+
+
+@sound("foley_roll", "foley", description="Roulade : frottements de tissu et d'épaule au sol (provisoire J2).")
+def foley_roll(rng: np.random.Generator) -> np.ndarray:
+    d = 0.55
+    t = dsp.time_axis(d)
+    rustle = dsp.bandpass(dsp.pink_noise(d, rng), 400, 3500) * (0.5 + 0.5 * np.sin(2 * np.pi * 9 * t) ** 2)
+    rustle *= dsp.adsr(d, 0.03, 0.1, 0.7, 0.2)
+    thud = np.concatenate([np.zeros(dsp.n_samples(0.08)), _thump(rng, 0.3, 70.0, 0.1, 900.0, 0.3)])
+    return dsp.fade(dsp.normalize(dsp.mix(0.8 * rustle, 0.7 * thud), 0.8))
+
+
+@sound("foley_slide", "foley", description="Glissade : raclement qui s'éteint (provisoire J2).")
+def foley_slide(rng: np.random.Generator) -> np.ndarray:
+    d = 0.7
+    scrape = dsp.bandpass(dsp.white_noise(d, rng), 600, 4000) * dsp.ramp(d, 1.0, 0.0, 0.7)
+    grit = dsp.bandpass(dsp.crackle(d, rng, 120.0), 2000, 8000, order=1) * dsp.ramp(d, 1.0, 0.0, 0.5)
+    return dsp.fade(dsp.normalize(scrape + 0.6 * dsp.normalize(grit), 0.7), 0.01, 0.1)
+
+
+@sound("foley_skid", "foley", description="Dérapage : semelles qui frottent (provisoire J2).")
+def foley_skid(rng: np.random.Generator) -> np.ndarray:
+    d = 0.32
+    squeak = dsp.bandpass(dsp.white_noise(d, rng), 1200, 3500) * dsp.adsr(d, 0.01, 0.1, 0.5, 0.15)
+    return dsp.fade(dsp.normalize(squeak, 0.55))
+
+
+@sound("foley_grab", "foley", description="Mains qui agrippent un rebord (provisoire J2).")
+def foley_grab(rng: np.random.Generator) -> np.ndarray:
+    d = 0.2
+    slap = dsp.bandpass(dsp.white_noise(d, rng), 800, 5000) * dsp.exp_decay(d, 0.04)
+    knock = dsp.sine(160.0, d) * dsp.exp_decay(d, 0.05) * 0.5
+    return dsp.fade(dsp.normalize(slap + knock, 0.8), 0.0005, 0.02)
+
+
+@sound("foley_climb", "foley", description="Effort pour se hisser : frottement + souffle (provisoire J2).")
+def foley_climb(rng: np.random.Generator) -> np.ndarray:
+    d = 0.6
+    effort = dsp.bandpass(dsp.white_noise(d, rng), 400, 1600) * dsp.adsr(d, 0.15, 0.2, 0.4, 0.2) * 0.4
+    cloth = dsp.bandpass(dsp.pink_noise(d, rng), 1000, 5000) * dsp.adsr(d, 0.05, 0.3, 0.3, 0.2)
+    return dsp.fade(dsp.normalize(effort + cloth, 0.6))
+
+
+@sound("foley_body_fall", "foley", description="Corps qui s'effondre au sol (provisoire J2).")
+def foley_body_fall(rng: np.random.Generator) -> np.ndarray:
+    first = _thump(rng, 0.5, 55.0, 0.2, 900.0, 0.6)
+    second = _thump(rng, 0.4, 70.0, 0.12, 1100.0, 0.4) * 0.6
+    return dsp.normalize(dsp.mix(first, np.concatenate([np.zeros(dsp.n_samples(0.12)), second])), 0.95)
+
+
+# =============================================================================
 # Programme principal
 # =============================================================================
 

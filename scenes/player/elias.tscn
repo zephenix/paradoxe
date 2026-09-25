@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/player/visual/elias_visual.gd" id="2_visual"]
 [ext_resource type="Script" path="res://scripts/core/state_machine.gd" id="3_machine"]
+[ext_resource type="Script" path="res://scripts/player/player_foley.gd" id="4_foley"]
 [ext_resource type="Script" path="res://scripts/player/states/idle.gd" id="s0_idle"]
 [ext_resource type="Script" path="res://scripts/player/states/walk.gd" id="s1_walk"]
 [ext_resource type="Script" path="res://scripts/player/states/run.gd" id="s2_run"]
@@ -27,6 +28,9 @@ script = ExtResource("1_player")
 
 [node name="Visual" type="Node2D" parent="."]
 script = ExtResource("2_visual")
+
+[node name="Foley" type="Node" parent="."]
+script = ExtResource("4_foley")
 
 [node name="StateMachine" type="Node" parent="."]
 script = ExtResource("3_machine")

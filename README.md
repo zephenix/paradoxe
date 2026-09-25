@@ -12,9 +12,10 @@ plan. Le tout est modernisé avec du parkour, un rembobinage temporel limité, u
 de l'infiltration par la lumière et le son, et une interface intégrée au personnage.
 Tous les éléments du jeu (images, sons, musique) sont originaux ou générés par du code.
 
-> **État actuel : jalon J1 (v0.1), les fondations.** On y trouve l'écran titre et un banc de
-> test audio qui valide toute la chaîne technique (installation, tests, exports, publication).
-> Le gameplay arrive à partir du jalon J2. Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
+> **État actuel : jalon J2 (v0.2), les déplacements.** Depuis l'écran titre, une **salle de
+> test** de cinq écrans permet d'essayer tous les mouvements d'Élias : marche, course,
+> sauts, rebords, roulade, glissade, chutes. Elle montre aussi les transitions de caméra
+> d'une salle à l'autre. Le combat arrive en J3. Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
 > avancement : [`docs/JOURNAL.md`](docs/JOURNAL.md).
 
 ---
@@ -81,9 +82,10 @@ touches notées « WASD » (clavier QWERTY) correspondent à **ZQSD** sur un cla
 | Pause | Échap ou P | Start / Menu | J9 |
 | Passer une cinématique (maintenir) | Échap ou Espace | Start ou A | J7 |
 
-Dans la version actuelle (J1), n'importe quelle touche ou un clic active le son, puis on
-navigue dans le banc de test audio à la souris, au clavier (flèches, Entrée) ou à la
-manette.
+Dans la version actuelle (J2), n'importe quelle touche ou un clic active le son. On choisit
+ensuite « Salle de test : déplacements » au clavier (flèches, Entrée), à la souris ou à la
+manette. Dans la salle de test, **Haut** (ou Espace à l'arrêt) sert aussi à sauter sur place
+et à se hisser, et **Échap** ramène à l'écran titre.
 
 ---
 

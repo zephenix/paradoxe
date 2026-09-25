@@ -47,6 +47,8 @@ Il est jouable sur le Web (GitHub Pages) et en exécutables Windows/Linux (GitHu
 GAME_VERSION=0.2.0 ./tools/export.sh all     # export avec un numéro de version
 ./tools/screenshot.sh res://scenes/ui/title_screen.tscn build/shots/x.png 90 [appui_à_l_image]
 ./tools/web/check_web.sh        # après un export Web : vérifie isolation, JS, son réel dans Chromium
+./tools/screenshot.sh res://tools/godot/pose_sheet.tscn build/shots/poses.png 10   # planche de toutes les poses d'Élias
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 -s res://tools/godot/level_tour.gd -- build/shots   # visite guidée de la salle de test (captures)
 python3 tools/audio/generate_sounds.py       # régénère les sons (puis réimport Godot)
 godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régénère la table de mixage
 ```
@@ -87,6 +89,10 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
 - Police par défaut (Open Sans) : certains symboles (→, ▸…) sont absents sur le Web. Rester
   en ASCII ou choisir une police dédiée.
 - `project.godot` : l'éditeur peut réécrire le fichier et supprimer les commentaires `;`.
+- Un script lancé avec `-s` (outils de `tools/godot/`, lanceur de tests) est compilé **avant**
+  les autoloads : il ne doit pas typer statiquement une classe qui utilise un autoload
+  (`Player`, `CameraDirector`…), sous peine d'« Identifier not found: GameState ». Utiliser
+  `Node` et des appels dynamiques ; les fichiers de test, chargés plus tard, n'ont pas ce souci.
 - Vérifier le **site publié** (`node tools/web/check_web.js https://zephenix.github.io/paradoxe/ build/shots`)
   dans une session cloud : Chromium doit faire confiance à l'autorité du proxy HTTPS. Si
   `ERR_CERT_AUTHORITY_INVALID`, ajouter les certificats « Anthropic » de

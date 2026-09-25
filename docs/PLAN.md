@@ -268,6 +268,11 @@ humanoïdes, appelés **Sentinelles** dans le code ; le prédateur, **Traqueur**
   Aucune annotation manuelle des rebords : les salles restent simples à construire.
 - Mode classique : pas de glissade ni de rattrapage automatique (il faut maintenir la
   touche « haut »), roulade sans invulnérabilité.
+- *Précisions de J2* : « Haut » (ou saut sans direction) fait un saut sur place qui
+  s'accroche aux rebords, comme dans les jeux d'origine. Un rebord à hauteur de mains se
+  franchit directement. Un **garde-bord** (assistance, désactivé en mode classique) arrête
+  la marche devant un vide dangereux. Accroupi, Élias mesure 1,2 bloc : les passages bas
+  font 1,5 bloc.
 
 ### 5.2 Arme, énergie, bouclier (J3)
 - Une **jauge unique** (`EnergyPool`) : le tir coûte 1 unité, le bouclier consomme en
