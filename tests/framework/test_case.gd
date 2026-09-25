@@ -22,6 +22,7 @@ var catcher: ErrorCatcher
 var _failures: PackedStringArray = []
 var _assertion_count: int = 0
 var _nodes_to_free: Array[Node] = []
+var _expected_warnings: PackedStringArray = []
 
 
 # --- À redéfinir si besoin ----------------------------------------------------
@@ -98,10 +99,21 @@ func wait_frames(count: int = 1) -> void:
 		await tree.process_frame
 
 
-## Attend « count » pas de physique (60 par seconde).
+## Attend « count » pas de physique (60 par seconde dans ce projet).
 func wait_physics(count: int = 1) -> void:
 	for i in count:
 		await tree.physics_frame
+
+
+## Attend « seconds » secondes de physique (convertit en nombre de pas).
+func wait_physics_seconds(seconds: float) -> void:
+	await wait_physics(roundi(seconds * Engine.physics_ticks_per_second))
+
+
+## Annonce qu'un avertissement du moteur contenant « fragment » est ATTENDU
+## pendant ce test (sinon, tout avertissement fait échouer le test).
+func expect_warning(fragment: String) -> void:
+	_expected_warnings.append(fragment)
 
 
 ## Attend « seconds » secondes de temps de jeu.
@@ -124,6 +136,14 @@ func clear_engine_errors() -> void:
 func _reset_results() -> void:
 	_failures.clear()
 	_assertion_count = 0
+	_expected_warnings.clear()
+
+
+func _is_expected_warning(warning: String) -> bool:
+	for fragment in _expected_warnings:
+		if warning.contains(fragment):
+			return true
+	return false
 
 
 func _free_nodes() -> void:

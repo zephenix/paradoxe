@@ -102,9 +102,15 @@ Colonnes : **rayon** = distance (pixels) à laquelle les ennemis entendent le so
 
 ### Foley provisoire du déplacement (J2)
 
-Ces sons sont déclenchés par les **évènements d'animation** d'Élias : le pied qui touche le
-sol, les mains qui agrippent… Le script `scripts/player/player_foley.gd` fait la
-correspondance entre évènement et son. Chaque lecture passe par un `AudioStreamRandomizer`,
+Ces sons sont déclenchés par des **évènements** d'Élias, de deux sources :
+- les **animations**, pour ce qui doit tomber à l'image près : le pied qui touche le sol,
+  le corps qui s'effondre ;
+- les **états**, pour les actions : saut, réception, roulade, glissade, prise, hissage.
+
+Le script `scripts/player/player_foley.gd` fait la correspondance entre évènement et son.
+Un évènement sans son déclenche un avertissement, sauf s'il est déclaré volontairement
+muet : c'est le cas de `death_<cause>` (le cri et la musique de mort viendront plus
+tard). Un test vérifie la correspondance dans les deux sens. Chaque lecture passe par un `AudioStreamRandomizer`,
 qui tire une variante au hasard et fait varier hauteur et volume. **Provisoires** : J5 les
 remplacera par des sons selon la surface, avec respiration et rayons de bruit.
 

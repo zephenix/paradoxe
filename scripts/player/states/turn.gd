@@ -15,6 +15,9 @@ func is_committed() -> bool:
 
 func physics_update(delta: float) -> void:
 	var p: Player = player
+	if p.lost_ground():
+		machine.transition_to(&"Fall")
+		return
 	p.move_on_ground(0.0, delta)
 	if not _flipped and time_in_state >= p.config.turn_duration * 0.5:
 		_flipped = true

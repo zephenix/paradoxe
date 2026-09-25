@@ -19,9 +19,12 @@ extends RefCounted
 const RIG_Y: float = -24.0
 const HIPS_Y: float = -22.0
 
-## Articulations : [propriété animée, signe à appliquer, valeur de base].
-## Les membres « pendants » (bras, jambes, pans) tournent en sens inverse du
-## buste et de la tête pour aller vers l'avant, d'où le signe -1.
+## Articulations : [nœud, propriété animée, signe, valeur de base].
+##   - nœud : nom du pivot dans le squelette (voir EliasVisual) ;
+##   - signe : les membres « pendants » (bras, jambes, pans) tournent en sens
+##     inverse du buste et de la tête pour aller vers l'avant, d'où -1 ;
+##   - valeur de base : ajoutée aux positions (pixels). Ignorée pour les angles,
+##     dont la valeur de repos est toujours 0°.
 const JOINTS: Dictionary = {
 	"rig_rot": ["rig", "rotation", 1.0, 0.0],
 	"rig_y": ["rig", "position:y", 1.0, RIG_Y],

@@ -13,6 +13,9 @@ extends Node
 ## Utilisation :
 ##     machine.setup(joueur)              # une fois, au démarrage
 ##     machine.physics_update(delta)      # à chaque pas de physique
+##
+## Les états ne reçoivent pas les évènements clavier : ils lisent les intentions
+## du personnage (PlayerInput pour Élias), mises à jour une fois par pas de physique.
 ##     machine.transition_to(&"Jump", {"kind": &"running"})
 
 ## Émis à chaque changement d'état (utile pour le débogage et les tests).
@@ -29,6 +32,11 @@ var current_name: StringName = &""
 var previous_name: StringName = &""
 
 var _states: Dictionary = {}  # nom -> State
+## Vrai pendant un changement d'état (exit / enter en cours).
+var _in_transition: bool = false
+## Changements demandés PENDANT un autre changement (par exemple depuis enter()) :
+## ils sont exécutés juste après, dans l'ordre, pour que les signaux restent justes.
+var _pending: Array[Array] = []
 
 
 ## Relie les états à l'objet contrôlé et entre dans l'état initial.
@@ -51,26 +59,19 @@ func transition_to(target: StringName, data: Dictionary = {}) -> void:
 	if not _states.has(target):
 		push_error("StateMachine : état inconnu « %s »" % target)
 		return
-	var from: StringName = current_name
-	if current:
-		current.exit()
-	previous_name = from
-	current = _states[target]
-	current_name = target
-	current.time_in_state = 0.0
-	current.enter(from, data)
-	state_changed.emit(from, target)
+	if _in_transition:
+		_pending.append([target, data])
+		return
+	_switch(target, data)
+	while not _pending.is_empty():
+		var next: Array = _pending.pop_front()
+		_switch(next[0], next[1])
 
 
 func physics_update(delta: float) -> void:
 	if current:
 		current.time_in_state += delta
 		current.physics_update(delta)
-
-
-func handle_input(event: InputEvent) -> void:
-	if current:
-		current.handle_input(event)
 
 
 func has_state(state_name: StringName) -> bool:
@@ -81,6 +82,23 @@ func is_in(state_name: StringName) -> bool:
 	return current_name == state_name
 
 
-## Vrai si l'état actif est engagé (voir State.is_committed).
+## Vrai si l'état actif est engagé (voir State.is_committed). Servira aux
+## systèmes qui voudraient interrompre le personnage (dégâts, cinématiques…).
 func is_committed() -> bool:
 	return current != null and current.is_committed()
+
+
+## Effectue un changement d'état : sortie de l'ancien, entrée dans le nouveau,
+## puis signal. Un changement demandé pendant ce temps est mis en file.
+func _switch(target: StringName, data: Dictionary) -> void:
+	_in_transition = true
+	var from: StringName = current_name
+	if current:
+		current.exit()
+	previous_name = from
+	current = _states[target]
+	current_name = target
+	current.time_in_state = 0.0
+	current.enter(from, data)
+	state_changed.emit(from, target)
+	_in_transition = false

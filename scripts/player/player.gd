@@ -33,6 +33,8 @@ var input := PlayerInput.new()
 ## Invulnérable (roulade d'esquive, J3).
 var is_invulnerable: bool = false
 ## Plus haut point atteint depuis qu'Élias a quitté le sol (y le plus petit).
+## Au sol, il suit la position des pieds : une chute se mesure toujours depuis
+## le dernier sol touché ou le sommet du saut.
 var air_top_y: float = 0.0
 ## Temps écoulé depuis le dernier contact avec le sol.
 var time_since_grounded: float = 0.0
@@ -42,6 +44,7 @@ var grab_cooldown: float = 0.0
 var kill_y: float = INF
 ## Vrai une fois mort (jusqu'à la réapparition).
 var is_dead: bool = false
+## Vrai quand la boîte de collision est basse (accroupi, roulade, glissade).
 var is_crouched: bool = false
 
 @onready var visual: CharacterVisual = $Visual
@@ -68,6 +71,7 @@ func _physics_process(delta: float) -> void:
 	grab_cooldown = maxf(grab_cooldown - delta, 0.0)
 	if is_on_floor():
 		time_since_grounded = 0.0
+		air_top_y = global_position.y
 	else:
 		time_since_grounded += delta
 		air_top_y = minf(air_top_y, global_position.y)
@@ -80,20 +84,35 @@ func _physics_process(delta: float) -> void:
 # Règles générales
 # --------------------------------------------------------------------------
 
-## Vrai sauf en mode classique : active glissade, rattrapage automatique,
-## esquive, tampon d'entrée et « temps du coyote » (évolution 1 du plan).
+## Vrai sauf en mode classique (évolution 1 du plan). Le mode moderne ajoute :
+## glissade, rattrapage automatique des rebords, invulnérabilité pendant la
+## roulade d'esquive (la roulade elle-même existe dans les deux modes), tampon
+## d'entrée, « temps du coyote » et garde-bord.
 func modern() -> bool:
 	return not GameState.is_classic_mode()
 
 
 ## Fenêtre du tampon d'entrée (quasi nulle en mode classique).
 func buffer_window() -> float:
-	return config.input_buffer_time if modern() else 0.02
+	return config.input_buffer_time if modern() else config.classic_input_window
 
 
 ## Vrai si « action » a été pressée récemment (et consomme l'appui).
 func wants(action: StringName) -> bool:
 	return input.consume(action, buffer_window())
+
+
+## Vrai si Élias n'a plus de sol sous les pieds depuis plus longtemps que la
+## tolérance (environ une image) : un état « au sol » doit alors passer en chute.
+func lost_ground() -> bool:
+	return not is_on_floor() and time_since_grounded > config.ground_tolerance
+
+
+## Vrai si Élias a de l'élan : nécessaire pour un saut avec élan, une glissade
+## ou un dérapage (sinon, au premier instant d'une course, on sauterait 4 blocs
+## sans avoir couru).
+func has_momentum() -> bool:
+	return absf(velocity.x) >= config.momentum_speed()
 
 
 # --------------------------------------------------------------------------
@@ -122,7 +141,7 @@ func move_in_air(delta: float) -> void:
 ## Le joueur vient de toucher le sol : choisit la réception selon la hauteur
 ## de chute (sans conséquence, lourde, roulade obligatoire, mortelle).
 func land() -> void:
-	var fall_blocks: float = (global_position.y - air_top_y) / config.block_size
+	var fall_blocks: float = (global_position.y - air_top_y) / GameUnits.BLOCK
 	air_top_y = global_position.y
 	landed.emit(fall_blocks)
 	if fall_blocks > config.deadly_fall_blocks:
@@ -136,16 +155,17 @@ func land() -> void:
 
 
 ## Démarre un saut. kind : &"vertical", &"standing" ou &"running".
-func start_jump(kind: StringName) -> void:
-	machine.transition_to(&"Jump", {"kind": kind})
+## instant : décolle sans l'impulsion des genoux (saut lancé alors qu'Élias
+## vient de quitter le sol, « temps du coyote »).
+func start_jump(kind: StringName, instant: bool = false) -> void:
+	machine.transition_to(&"Jump", {"kind": kind, "instant": instant})
 
 
 ## Appui sur « haut » : se hisser si un rebord est à portée de main, sinon
 ## sauter à la verticale (en se raccrochant au rebord s'il y en a un plus haut).
 func climb_or_jump_up() -> void:
-	var reach: float = config.hang_hand_height + config.grab_tolerance
-	var ledge: Dictionary = find_ledge(8.0, reach)
-	if not ledge.is_empty() and ledge["can_stand"]:
+	var ledge: Dictionary = find_ledge(config.step_min_height, config.blocks(config.step_climb_max_blocks))
+	if not ledge.is_empty() and ledge["can_climb"]:
 		machine.transition_to(&"LedgeClimb", {"ledge": ledge})
 	else:
 		start_jump(&"vertical")
@@ -193,7 +213,11 @@ func can_stand() -> bool:
 
 ## Cherche, devant Élias, un rebord dont le dessus est entre min_height et
 ## max_height pixels au-dessus des pieds.
-## Renvoie {} si rien, sinon {"point": coin du rebord, "can_stand": bool}.
+## Renvoie {} si rien, sinon un dictionnaire :
+##   "point"     : coin du rebord (x de la face du mur, y du dessus) ;
+##   "can_stand" : il y a la place de se tenir debout sur le rebord ;
+##   "can_climb" : on peut s'y hisser (place en haut ET pas de surplomb sur le
+##                 trajet, qui monte d'abord à la verticale puis avance).
 func find_ledge(min_height: float, max_height: float) -> Dictionary:
 	var feet: Vector2 = global_position
 	var half: float = config.body_width * 0.5
@@ -211,8 +235,14 @@ func find_ledge(min_height: float, max_height: float) -> Dictionary:
 	# 3) Juste au-dessus du rebord, il faut du vide (sinon ce n'est pas un rebord).
 	if not _ray(Vector2(feet.x, top_y - 6.0), Vector2(wall_x + facing * 10.0, top_y - 6.0)).is_empty():
 		return {}
-	var stand_spot := Vector2(wall_x + facing * (half + 4.0), top_y)
-	return {"point": Vector2(wall_x, top_y), "can_stand": is_space_free(stand_spot, config.stand_height)}
+	var can_stand_on_top: bool = is_space_free(climb_end_for(Vector2(wall_x, top_y)), config.stand_height)
+	var path_clear: bool = is_space_free(Vector2(feet.x, top_y), config.stand_height)
+	return {"point": Vector2(wall_x, top_y), "can_stand": can_stand_on_top, "can_climb": can_stand_on_top and path_clear}
+
+
+## Position des pieds une fois hissé sur le rebord « point » (un peu en retrait du bord).
+func climb_end_for(point: Vector2) -> Vector2:
+	return Vector2(point.x + facing * (config.body_width * 0.5 + 4.0), point.y)
 
 
 ## Profondeur du vide à « offset » pixels devant les pieds (INF si pas de sol
@@ -232,11 +262,23 @@ func find_edge_ahead() -> Dictionary:
 	var step: float = 2.0
 	var offset: float = -half
 	while offset <= half + 12.0:
-		if drop_depth_ahead(offset, config.block_size * 0.5 + 8.0) > config.block_size * 0.5:
+		if drop_depth_ahead(offset, GameUnits.BLOCK * 0.5 + 8.0) > GameUnits.BLOCK * 0.5:
 			var edge_x: float = global_position.x + facing * (offset - step * 0.5)
 			return {"edge_x": edge_x}
 		offset += step
 	return {}
+
+
+## Position de suspension quand on descend du bord « edge_x » (Élias passe de
+## l'autre côté du bord, face au mur, les mains au niveau du sol qu'il quitte).
+func descend_hang_position(edge_x: float) -> Vector2:
+	var edge_side := Vector2(edge_x + facing * (config.body_width * 0.5 + 1.0), global_position.y)
+	return edge_side + Vector2(0.0, config.hang_hand_height)
+
+
+## Vrai si Élias peut descendre du bord « edge_x » : il faut de la place dessous.
+func can_descend(edge_x: float) -> bool:
+	return is_space_free(descend_hang_position(edge_x), config.stand_height)
 
 
 ## Vrai si une boîte de la taille d'Élias (pieds en « feet ») ne touche aucun décor.
@@ -273,6 +315,7 @@ func kill(cause: StringName) -> void:
 func respawn(at: Vector2, new_facing: int = 1) -> void:
 	global_position = at
 	velocity = Vector2.ZERO
+	time_since_grounded = 0.0
 	is_dead = false
 	is_invulnerable = false
 	grab_cooldown = 0.0

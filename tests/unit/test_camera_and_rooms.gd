@@ -1,5 +1,9 @@
 extends TestCase
 ## Tests des salles et de la caméra « écran par écran ».
+##
+## Décor : salle A (x 0 à 1280) et salle B (x 1280 à 2560), d'un écran chacune ;
+## une grande salle (x 2560 à 5120, 960 de haut) où la caméra recule (zoom 0,75).
+## Le centre d'une salle d'un écran est donc à x = 640 (A) ou 1920 (B).
 
 var world: Node2D
 var camera: CameraDirector
@@ -81,3 +85,39 @@ func test_room_spawn_point() -> void:
 	marker.position = Vector2(100, 500)
 	room_b.add_child(marker)
 	assert_eq(room_b.spawn_point(), Vector2(1380, 500))
+
+
+func test_zoom_changes_progressively_during_slide() -> void:
+	target.position = Vector2(2600, 900)  # entre dans la grande salle
+	await wait_physics(4)
+	assert_true(camera.zoom.x < 1.0 and camera.zoom.x > 0.75, "zoom en cours de transition (%.2f)" % camera.zoom.x)
+	await wait_physics(40)
+	assert_almost_eq(camera.zoom.x, 0.75, 0.001, "zoom final de la salle")
+
+
+func test_room_entered_event_is_emitted_once() -> void:
+	var entered: Array[Node] = []
+	var on_entered := func(room: Node) -> void: entered.append(room)
+	Events.room_entered.connect(on_entered)
+	target.position = Vector2(1400, 600)
+	await wait_physics(3)
+	camera.snap_to_target()  # réapparition dans la même salle : pas de nouvel évènement
+	Events.room_entered.disconnect(on_entered)
+	assert_eq(entered, [room_b] as Array[Node])
+
+
+func test_follows_vertically_in_tall_room() -> void:
+	# Salle haute : y de 800 à 2800. La caméra (720 de haut) peut aller de
+	# 800 + 360 = 1160 à 2800 - 360 = 2440.
+	var tall: Room = _room(Vector2(0, 800), Vector2(1280, 2000), 1.0)
+	target.position = Vector2(600, 2000)
+	camera.snap_to_target()
+	assert_eq(camera.current_room, tall)
+	assert_almost_eq(camera.global_position.y, 2000.0 - camera.target_height, 0.5, "suit Élias verticalement")
+	target.position = Vector2(600, 2790)
+	await wait_physics(2)
+	assert_almost_eq(camera.global_position.y, 2800.0 - 360.0, 0.5, "sans montrer le dessous de la salle")
+
+
+func test_spawn_point_without_marker() -> void:
+	assert_eq(room_a.spawn_point(), Vector2(96, 720 - 96), "coin bas-gauche par défaut")

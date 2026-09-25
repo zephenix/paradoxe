@@ -14,7 +14,8 @@ func enter(previous: StringName, _data: Dictionary) -> void:
 func physics_update(delta: float) -> void:
 	var p: Player = player
 	if _coyote_allowed and time_in_state <= p.config.coyote_time and p.wants(&"jump"):
-		p.start_jump(&"running" if absf(p.velocity.x) > p.config.walk_speed * 1.2 else &"standing")
+		# Déjà en l'air : on décolle tout de suite, sans plier les genoux.
+		p.start_jump(&"running" if p.has_momentum() else &"standing", true)
 		return
 	if p.is_crouched and p.can_stand():
 		p.set_crouched(false)

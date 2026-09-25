@@ -18,7 +18,7 @@ func physics_update(delta: float) -> void:
 	var p: Player = player
 	p.velocity.x = move_toward(p.velocity.x, 0.0, p.config.slide_friction * delta)
 	p.move_in_air(delta)
-	if not p.is_on_floor() and p.time_since_grounded > 0.08:
+	if p.lost_ground():
 		machine.transition_to(&"Fall")
 		return
 	if time_in_state < p.config.slide_min_duration:

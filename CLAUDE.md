@@ -48,7 +48,7 @@ GAME_VERSION=0.2.0 ./tools/export.sh all     # export avec un numéro de version
 ./tools/screenshot.sh res://scenes/ui/title_screen.tscn build/shots/x.png 90 [appui_à_l_image]
 ./tools/web/check_web.sh        # après un export Web : vérifie isolation, JS, son réel dans Chromium
 ./tools/screenshot.sh res://tools/godot/pose_sheet.tscn build/shots/poses.png 10   # planche de toutes les poses d'Élias
-xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 -s res://tools/godot/level_tour.gd -- build/shots   # visite guidée de la salle de test (captures)
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/level_tour.gd -- build/shots   # visite guidée (captures)
 python3 tools/audio/generate_sounds.py       # régénère les sons (puis réimport Godot)
 godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régénère la table de mixage
 ```
@@ -62,12 +62,23 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
 
 ## Tests
 
-- Lanceur maison : `tests/run_tests.gd`. Chaque fichier `tests/unit/**/test_*.gd` hérite de
-  `TestCase`, et chaque fonction `test_*` est un test. Fonctions disponibles : `assert_eq`,
-  `assert_true`, `assert_almost_eq`, `add_node`, `await wait_frames(n)`,
-  `await wait_seconds(s)`.
-- **Toute erreur du moteur pendant un test le fait échouer** (un `Logger` intercepte
-  `push_error`, les erreurs de script, les ressources manquantes).
+- Lanceur maison : `tests/run_tests.gd`, lancé avec `--fixed-fps 60` (simulation image par
+  image, rapide et reproductible). Chaque fichier `tests/unit/**/test_*.gd` hérite de
+  `TestCase`, et chaque fonction `test_*` est un test.
+- Fonctions de `TestCase` : `assert_true`, `assert_false`, `assert_eq`, `assert_ne`,
+  `assert_almost_eq`, `assert_null`, `assert_not_null`, `fail`, `add_node`,
+  `await wait_frames(n)`, `await wait_physics(n)`, `await wait_physics_seconds(s)`,
+  `await wait_seconds(s)`, `expect_warning(fragment)`, `engine_errors()`,
+  `clear_engine_errors()`.
+- **Un test échoue** s'il a une vérification fausse, si le moteur signale une erreur
+  (`push_error`, erreur de script, ressource manquante) ou un avertissement non annoncé par
+  `expect_warning`, s'il ne vérifie rien, ou s'il dépasse le délai maximum (2 min simulées).
+- Les déclarations non typées sont des **erreurs** (`untyped_declaration=2`) :
+  `test_every_script_compiles` impose la règle.
+- Déplacement d'Élias : piloter ses intentions (`player.input.from_devices = false`, puis
+  `input.move`, `input.press(&"jump")`…) et retirer son nœud `Foley` dans les tests.
+- Après un changement de gameplay, réintroduire une erreur dans le code et vérifier qu'un
+  test la détecte : c'est le contrôle par mutation de l'audit J2.
 - `test_scenes_smoke.gd` instancie **toutes** les scènes de `scenes/` et charge **tous** les
   scripts : une nouvelle scène est testée automatiquement.
 - Les autoloads sont chargés pendant les tests ; si un test modifie leur état, il doit le

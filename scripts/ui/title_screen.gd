@@ -133,6 +133,7 @@ func _update_diagnostics() -> void:
 # --- Banc de test ----------------------------------------------------------
 
 func _on_level_pressed() -> void:
+	_level_button.disabled = true  # un double clic ne lance pas deux transitions
 	AudioManager.play_stream(SOUND_CONFIRM, AudioBuses.UI)
 	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
 	SceneTransition.change_scene(TEST_LEVEL)

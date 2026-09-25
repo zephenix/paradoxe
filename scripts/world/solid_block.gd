@@ -1,14 +1,14 @@
 @tool
 class_name SolidBlock
 extends StaticBody2D
-## Bloc de décor solide (sol, mur, plafond, plate-forme), mesuré en blocs de 48 px.
+## Bloc de décor solide (sol, mur, plafond, plate-forme), mesuré en blocs
+## (GameUnits.BLOCK = 48 px, la même unité que les réglages de déplacement).
 ##
 ## « @tool » : ce script s'exécute aussi dans l'éditeur, si bien que changer la
 ## taille dans l'inspecteur redessine le bloc immédiatement. La forme de
 ## collision et le dessin (aplats façon « polygones ») sont générés ici.
 ## L'origine du nœud est le coin HAUT-GAUCHE du bloc.
 
-const BLOCK: float = 48.0
 
 ## Taille en blocs (on peut utiliser des demi-blocs : 2.5, 0.5…).
 @export var size_blocks: Vector2 = Vector2(4, 1):
@@ -32,7 +32,7 @@ func _ready() -> void:
 
 ## Taille en pixels.
 func pixel_size() -> Vector2:
-	return size_blocks * BLOCK
+	return size_blocks * GameUnits.BLOCK
 
 
 func _rebuild() -> void:

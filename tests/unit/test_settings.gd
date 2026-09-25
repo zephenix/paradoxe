@@ -40,6 +40,7 @@ func test_volume_is_clamped() -> void:
 
 
 func test_unknown_bus_is_ignored() -> void:
+	expect_warning("bus inconnu")
 	Settings.set_volume(&"BusQuiNExistePas", 0.3)
 	assert_false(Settings.volumes.has(&"BusQuiNExistePas"))
 

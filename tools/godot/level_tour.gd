@@ -2,7 +2,10 @@ extends SceneTree
 ## Visite guidée de la salle de test avec captures d'écran (vérification du
 ## rendu sans écran). Élias est piloté par ses intentions, comme dans les tests.
 ##   xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 \
-##       -s res://tools/godot/level_tour.gd -- build/shots
+##       --fixed-fps 60 -s res://tools/godot/level_tour.gd -- build/shots
+## (--fixed-fps 60 : les captures tombent toujours au même instant du jeu.)
+## Les téléportations d'une salle à l'autre ne vérifient PAS que le niveau se
+## parcourt : c'est le rôle de tests/unit/test_test_level.gd.
 
 var _out: String = "build/shots"
 var _level: Node
@@ -16,6 +19,10 @@ func _initialize() -> void:
 	if args.size() > 0:
 		_out = args[0]
 	DirAccess.make_dir_recursive_absolute(_out)
+	# build/ ne doit pas être importé par Godot (sinon les captures deviennent
+	# des ressources du projet) : un fichier .gdignore l'en empêche.
+	if _out.begins_with("build") and not FileAccess.file_exists("build/.gdignore"):
+		FileAccess.open("build/.gdignore", FileAccess.WRITE).close()
 	_level = load("res://scenes/levels/test_level.tscn").instantiate()
 	root.add_child(_level)
 	_tour.call_deferred()
@@ -26,13 +33,13 @@ func _tour() -> void:
 	_player.input.from_devices = false
 	await _frames(20)
 	# 1) Salle A : accroupi dans le tunnel.
-	_teleport(Vector2(19 * 48, 13 * 48))
+	await _teleport(Vector2(19 * 48, 13 * 48))
 	_player.input.down = true
 	await _frames(30)
 	await _shot("tour_1_tunnel")
 	_player.input.down = false
 	# 2) Salle B : saut avec élan au-dessus du grand trou.
-	_teleport(Vector2(1280 + 8.5 * 48, 11 * 48))
+	await _teleport(Vector2(1280 + 8.5 * 48, 11 * 48))
 	_player.input.move = 1
 	_player.input.run = true
 	await _frames(40)
@@ -43,7 +50,7 @@ func _tour() -> void:
 	_player.input.run = false
 	await _frames(60)
 	# 3) Salle C : suspendu au mur de 3 blocs.
-	_teleport(Vector2(2560 + 9 * 48 - 13, 11 * 48))
+	await _teleport(Vector2(2560 + 9 * 48 - 13, 11 * 48))
 	_player.input.press(&"move_up")
 	await _frames(45)
 	await _shot("tour_3_hang")
@@ -52,7 +59,7 @@ func _tour() -> void:
 	await _shot("tour_4_climb")
 	await _frames(40)
 	# 4) Passage de C vers E : glissement de caméra (capture à mi-chemin).
-	_teleport(Vector2(2560 + 25.5 * 48, 11 * 48))
+	await _teleport(Vector2(2560 + 25.5 * 48, 11 * 48))
 	await _frames(10)
 	_player.input.move = 1
 	_player.input.run = true
@@ -66,6 +73,7 @@ func _tour() -> void:
 func _teleport(feet: Vector2) -> void:
 	_player.respawn(feet, 1)
 	_level.get_node("CameraDirector").snap_to_target()
+	await _frames(5)  # laisse Élias se poser avant de lui donner des ordres
 
 
 func _frames(count: int) -> void:

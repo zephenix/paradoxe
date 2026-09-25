@@ -85,7 +85,7 @@ size_blocks = Vector2(3, 2)
 [node name="Block4" type="StaticBody2D" parent="RoomA"]
 position = Vector2(864, 288)
 script = ExtResource("3_block")
-size_blocks = Vector2(6, 5.5)
+size_blocks = Vector2(5, 5.5)
 
 [node name="Block5" type="StaticBody2D" parent="RoomA"]
 position = Vector2(1152, 528)
@@ -123,22 +123,22 @@ size_blocks = Vector2(6, 4)
 [node name="Block1" type="StaticBody2D" parent="RoomB"]
 position = Vector2(288, 672)
 script = ExtResource("3_block")
-size_blocks = Vector2(2, 1)
+size_blocks = Vector2(1.5, 1)
 
 [node name="Block2" type="StaticBody2D" parent="RoomB"]
-position = Vector2(384, 528)
+position = Vector2(360, 528)
 script = ExtResource("3_block")
-size_blocks = Vector2(5, 4)
+size_blocks = Vector2(5.5, 4)
 
 [node name="Block3" type="StaticBody2D" parent="RoomB"]
 position = Vector2(624, 672)
 script = ExtResource("3_block")
-size_blocks = Vector2(4, 1)
+size_blocks = Vector2(3.5, 1)
 
 [node name="Block4" type="StaticBody2D" parent="RoomB"]
-position = Vector2(816, 528)
+position = Vector2(792, 528)
 script = ExtResource("3_block")
-size_blocks = Vector2(10, 4)
+size_blocks = Vector2(10.5, 4)
 
 [node name="Block5" type="StaticBody2D" parent="RoomB"]
 position = Vector2(960, 192)
@@ -153,8 +153,8 @@ offset_bottom = 197.6
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "SALLE B : SAUTS
-Espace en marchant : saut sans élan (2 blocs)
-Espace en courant : saut avec élan (4 blocs)
+Espace en marchant : saut sans élan (2 blocs ; le premier trou en fait 1,5)
+Espace en courant, avec de l'élan : saut avec élan (4 blocs ; le grand trou en fait 3,5)
 Espace ou Haut à l'arrêt : saut sur place (s'accroche aux rebords)
 En courant, Bas : glissade sous l'obstacle"
 
@@ -194,9 +194,9 @@ script = ExtResource("3_block")
 size_blocks = Vector2(3, 4)
 
 [node name="Block5" type="StaticBody2D" parent="RoomC"]
-position = Vector2(1104, 528)
+position = Vector2(1080, 528)
 script = ExtResource("3_block")
-size_blocks = Vector2(4, 4)
+size_blocks = Vector2(4.5, 4)
 
 [node name="Hint" type="Label" parent="RoomC"]
 offset_left = 24.0
@@ -209,6 +209,7 @@ text = "SALLE C : REBORDS ET CHUTES
 Contre un mur haut : Haut ou Espace pour sauter et s'accrocher, Haut pour se hisser
 Suspendu : Bas pour lâcher     Au bord d'un vide : Bas pour descendre et s'accrocher
 Chute de 3 blocs : sans danger ; 4 à 5 blocs : roulade ; au-delà : mortelle
+Depuis la tour : se laisser tomber (roulade). Un saut avec élan porte trop loin : mortel
 Attention : le puits à droite est mortel"
 
 [node name="RoomD" type="Node2D" parent="."]
@@ -216,7 +217,8 @@ position = Vector2(2560, 720)
 script = ExtResource("2_room")
 room_size = Vector2(1280, 720)
 camera_zoom = 1.0
-title = "D - Puits"
+title = "D - Le puits"
+transition = 1
 
 [node name="Spawn" type="Marker2D" parent="RoomD"]
 position = Vector2(48, 624)
@@ -232,9 +234,9 @@ script = ExtResource("3_block")
 size_blocks = Vector2(2, 13)
 
 [node name="Block2" type="StaticBody2D" parent="RoomD"]
-position = Vector2(1104, 0)
+position = Vector2(1080, 0)
 script = ExtResource("3_block")
-size_blocks = Vector2(2, 13)
+size_blocks = Vector2(2.5, 13)
 
 [node name="Hint" type="Label" parent="RoomD"]
 offset_left = 48
@@ -244,7 +246,7 @@ offset_bottom = 236
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "LE PUITS
-(chute mortelle : retour au début de la salle précédente)"
+(chute mortelle : Élias réapparaît au début de la salle C)"
 
 [node name="RoomE" type="Node2D" parent="."]
 position = Vector2(3840, -240)

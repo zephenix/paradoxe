@@ -36,9 +36,9 @@ SceneTransition="*res://scripts/autoload/scene_transition.gd"
 
 [debug]
 
-; Avertit (dans l'éditeur) quand une variable ou une fonction n'est pas typée.
+; Refuse (erreur) toute variable ou fonction non typée : c'est la règle du projet.
 ; Équivalent de « Option Explicit » en VBA : on déclare toujours le type.
-gdscript/warnings/untyped_declaration=1
+gdscript/warnings/untyped_declaration=2
 
 [display]
 
@@ -54,6 +54,17 @@ window/stretch/aspect="keep"
 wav={
 "compress/mode": 2
 }
+
+[layer_names]
+
+; Noms des couches de collision (voir scripts/core/physics_layers.gd), affichés
+; dans l'inspecteur à la place de simples numéros.
+2d_physics/layer_1="decor"
+2d_physics/layer_2="joueur"
+2d_physics/layer_3="ennemis"
+2d_physics/layer_4="compagnon"
+2d_physics/layer_5="projectiles"
+2d_physics/layer_6="declencheurs"
 
 [physics]
 

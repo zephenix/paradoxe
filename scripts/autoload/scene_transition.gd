@@ -11,6 +11,13 @@ extends CanvasLayer
 
 ## Émis quand un changement de scène est terminé (rideau rouvert).
 signal scene_changed
+## Émis quand le fondu en cours se termine OU est interrompu par un autre :
+## ainsi, une coroutine qui attendait un fondu ne reste jamais bloquée.
+signal _fade_ended
+
+## Vrai pendant un changement de scène : les autres demandes (fondus d'un
+## niveau, second clic sur un bouton…) sont alors ignorées.
+var is_changing_scene: bool = false
 
 var _curtain: ColorRect
 var _tween: Tween
@@ -29,19 +36,23 @@ func _ready() -> void:
 
 
 ## Ferme le rideau (l'écran devient noir) en « duration » secondes.
+## Sans effet pendant un changement de scène (qui gère lui-même le rideau).
 func fade_out(duration: float = 0.5) -> void:
+	if is_changing_scene:
+		return
 	await _fade_to(1.0, duration)
 
 
 ## Ouvre le rideau (l'image réapparaît) en « duration » secondes.
 func fade_in(duration: float = 0.5) -> void:
+	if is_changing_scene:
+		return
 	await _fade_to(0.0, duration)
 
 
 ## Noir immédiat (coupure franche de cinéma).
 func cut_to_black() -> void:
-	if _tween:
-		_tween.kill()
+	_stop_current_fade()
 	_curtain.modulate.a = 1.0
 
 
@@ -51,23 +62,37 @@ func is_covering() -> bool:
 
 
 ## Change de scène derrière le rideau : fondu au noir, chargement, fondu retour.
+## Une seconde demande pendant un changement en cours est ignorée.
 func change_scene(path: String, fade_duration: float = 0.5) -> void:
-	await fade_out(fade_duration)
+	if is_changing_scene:
+		return
+	is_changing_scene = true
+	await _fade_to(1.0, fade_duration)
 	var err: Error = get_tree().change_scene_to_file(path)
 	if err != OK:
 		push_error("SceneTransition : impossible de charger %s (erreur %d)" % [path, err])
 	# On attend une image pour laisser la nouvelle scène s'installer.
 	await get_tree().process_frame
-	await fade_in(fade_duration)
+	await _fade_to(0.0, fade_duration)
+	is_changing_scene = false
 	scene_changed.emit()
 
 
 func _fade_to(alpha: float, duration: float) -> void:
-	if _tween:
-		_tween.kill()
+	_stop_current_fade()
 	if duration <= 0.0:
 		_curtain.modulate.a = alpha
 		return
 	_tween = create_tween()
 	_tween.tween_property(_curtain, "modulate:a", alpha, duration)
-	await _tween.finished
+	_tween.finished.connect(_fade_ended.emit)
+	await _fade_ended
+
+
+## Interrompt le fondu en cours. Tween.kill() n'émet pas « finished » : on émet
+## donc _fade_ended nous-mêmes, pour libérer la coroutine qui attendait ce fondu.
+func _stop_current_fade() -> void:
+	if _tween and _tween.is_valid():
+		_tween.kill()
+		_tween = null
+		_fade_ended.emit()

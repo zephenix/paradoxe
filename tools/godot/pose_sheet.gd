@@ -18,7 +18,7 @@ func _ready() -> void:
 	var index: int = 0
 	for anim_name: String in EliasPoses.ANIMATIONS:
 		for fraction in SAMPLES:
-			var cell := Vector2(index % COLUMNS, index / COLUMNS)
+			var cell := Vector2(index % COLUMNS, floori(float(index) / COLUMNS))
 			var origin: Vector2 = cell * CELL + Vector2(CELL.x * 0.5, CELL.y - 22)
 			var ground := ColorRect.new()
 			ground.color = Color("1c2127")
