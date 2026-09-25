@@ -28,9 +28,9 @@ func physics_update(delta: float) -> void:
 	var k: float = time_in_state / p.config.roll_duration
 	var window: Vector2 = p.config.roll_invulnerable_window
 	p.is_invulnerable = p.modern() and not _landing and k >= window.x and k <= window.y
-	p.velocity.x = p.facing * p.config.roll_speed() * (1.0 - 0.4 * k)
+	p.velocity.x = p.facing * p.config.roll_speed() * (1.0 - p.config.roll_slowdown * k)
 	p.move_in_air(delta)
-	if not p.is_on_floor() and p.time_since_grounded > 0.08:
+	if p.lost_ground():
 		machine.transition_to(&"Fall")
 		return
 	if time_in_state >= p.config.roll_duration:

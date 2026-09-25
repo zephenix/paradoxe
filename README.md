@@ -122,7 +122,9 @@ Autres outils : [`CLAUDE.md`](CLAUDE.md) (commandes, conventions, création d'un
 
 ```
 scenes/      scènes Godot (.tscn) : écrans, personnages, objets, salles
-scripts/     code GDScript (autoload/ = systèmes globaux, audio/, input/, ui/, fx/)
+scripts/     code GDScript : autoload/ (systèmes globaux), core/ (machine à états, unités),
+             player/ (Élias : états, visuel, réglages), world/ (salles, caméra, niveau),
+             audio/, input/, ui/, fx/
 assets/      sons générés, polices, textures
 resources/   réglages de gameplay (fichiers .tres modifiables sans toucher au code)
 tests/       lanceur de tests maison et tests automatisés

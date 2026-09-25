@@ -18,7 +18,7 @@ func physics_update(delta: float) -> void:
 	var rate: float = absf(p.velocity.x) / maxf(p.config.skid_duration - time_in_state, 0.02)
 	p.velocity.x = move_toward(p.velocity.x, 0.0, rate * delta)
 	p.move_in_air(delta)
-	if not p.is_on_floor() and p.time_since_grounded > 0.05:
+	if p.lost_ground():
 		machine.transition_to(&"Fall")
 		return
 	if time_in_state >= p.config.skid_duration:

@@ -55,16 +55,20 @@ func _physics_process(delta: float) -> void:
 		zoom = Vector2(zoom_goal, zoom_goal)
 
 
-## Recadre immédiatement (début de niveau, réapparition).
+## Recadre immédiatement (début de niveau, réapparition). N'annonce une entrée
+## de salle (signaux) que si la salle a vraiment changé : une réapparition dans
+## la même salle ne doit pas, par exemple, relancer son ambiance sonore (J5).
 func snap_to_target() -> void:
 	if target == null:
 		return
+	var previous: Room = current_room
 	current_room = room_at(_target_point())
 	if current_room:
 		zoom = Vector2(current_room.camera_zoom, current_room.camera_zoom)
 		global_position = framing_for(current_room, _target_point(), current_room.camera_zoom)
-		room_changed.emit(current_room)
-		Events.room_entered.emit(current_room)
+		if current_room != previous:
+			room_changed.emit(current_room)
+			Events.room_entered.emit(current_room)
 	_transition_time = -1.0
 
 

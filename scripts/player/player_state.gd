@@ -9,19 +9,17 @@ var player: Player:
 		return actor as Player
 
 
-## Temps sans sol au-delà duquel un état « au sol » passe en chute (secondes).
-const AIR_TOLERANCE: float = 0.05
-
-
-## Réactions communes aux états « debout au sol » (arrêt, marche, course).
+## Réactions communes aux états « debout au sol » (arrêt, marche).
 ## Renvoie vrai si une transition a eu lieu.
 func handle_ground_actions() -> bool:
 	var p: Player = player
-	# Petite tolérance : on ne « tombe » qu'après quelques centièmes de seconde
-	# sans sol (évite les faux départs, et laisse le temps d'un saut de coyote).
-	if not p.is_on_floor() and p.time_since_grounded > AIR_TOLERANCE:
+	if p.lost_ground():
 		machine.transition_to(&"Fall")
 		return true
+	# Pendant la tolérance d'une image sans sol, le mode classique n'accepte
+	# aucune action (pas de « temps du coyote » en classique).
+	if not p.is_on_floor() and not p.modern():
+		return false
 	if p.wants(&"roll"):
 		machine.transition_to(&"Roll", {"landing": false})
 		return true
@@ -37,7 +35,7 @@ func handle_ground_actions() -> bool:
 		return true
 	if p.input.down:
 		var edge: Dictionary = p.find_edge_ahead()
-		if not edge.is_empty() and p.input.move == 0:
+		if not edge.is_empty() and p.input.move == 0 and p.can_descend(edge["edge_x"]):
 			machine.transition_to(&"LedgeDescend", edge)
 		else:
 			machine.transition_to(&"Crouch")
@@ -45,10 +43,12 @@ func handle_ground_actions() -> bool:
 	return false
 
 
-## Garde-bord : en marchant, Élias s'arrête devant un vide dangereux.
+## Garde-bord : en marchant, Élias s'arrête devant un vide dangereux (plus
+## profond qu'une chute sans conséquence). Désactivé en mode classique.
 func edge_guard_stops() -> bool:
 	var p: Player = player
 	if not (p.modern() and p.config.edge_guard):
 		return false
 	var danger: float = p.config.blocks(p.config.safe_fall_blocks)
-	return p.drop_depth_ahead(p.config.body_width * 0.5 + 6.0, danger + 4.0) > danger
+	var lookahead: float = p.config.body_width * 0.5 + p.config.edge_guard_lookahead
+	return p.drop_depth_ahead(lookahead, danger + 4.0) > danger

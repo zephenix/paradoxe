@@ -1,7 +1,9 @@
 class_name PlayerFoley
 extends Node
-## Bruitages provisoires d'Élias (J2), déclenchés par les évènements
-## d'animation (pied qui touche le sol, mains qui agrippent…).
+## Bruitages provisoires d'Élias (J2). Deux sources d'évènements :
+##   - les pistes d'évènements des ANIMATIONS, pour ce qui doit tomber à l'image
+##     près (pied qui touche le sol, corps qui s'effondre) ;
+##   - les ÉTATS, pour les actions (saut, réception, prise d'un rebord…).
 ##
 ## J5 remplacera ce tableau par la bibliothèque de sons centrale (sons selon la
 ## surface, respiration, rayon de bruit pour les ennemis). Le principe restera :
@@ -27,6 +29,11 @@ const EVENTS: Dictionary = {
 	&"body_fall": [["foley_body_fall"], -3.0, 1.0],
 }
 
+## Évènements volontairement muets (par préfixe). « death_<cause> » : le corps
+## qui tombe est déjà joué par l'animation ; le cri et la musique de mort
+## viendront en J3/J5.
+const SILENT_PREFIXES: Array[String] = ["death_"]
+
 var _streams: Dictionary = {}  # évènement -> AudioStreamRandomizer
 
 
@@ -47,6 +54,15 @@ func _ready() -> void:
 
 
 func _on_anim_event(event_name: StringName) -> void:
-	if not _streams.has(event_name):
-		return
-	AudioManager.play_stream(_streams[event_name], AudioBuses.SFX, EVENTS[event_name][1])
+	if _streams.has(event_name):
+		AudioManager.play_stream(_streams[event_name], AudioBuses.SFX, EVENTS[event_name][1])
+	elif not is_silent(event_name):
+		push_warning("PlayerFoley : aucun son pour l'évènement « %s »" % event_name)
+
+
+## Vrai si l'évènement est volontairement sans son.
+static func is_silent(event_name: StringName) -> bool:
+	for prefix in SILENT_PREFIXES:
+		if String(event_name).begins_with(prefix):
+			return true
+	return false

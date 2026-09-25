@@ -34,3 +34,13 @@ func test_autoloads_are_present_in_order() -> void:
 	var children: Array[Node] = tree.root.get_children()
 	for i in expected.size():
 		assert_eq(children[i].name, expected[i], "autoload n°%d" % i)
+
+
+func test_physics_runs_at_sixty_ticks() -> void:
+	# Les tests comptent le temps en pas de physique (60 par seconde).
+	assert_eq(Engine.physics_ticks_per_second, 60)
+
+
+func test_untyped_declarations_are_errors() -> void:
+	# Règle du projet « GDScript typé », imposée par le moteur : 2 = erreur.
+	assert_eq(ProjectSettings.get_setting("debug/gdscript/warnings/untyped_declaration"), 2)

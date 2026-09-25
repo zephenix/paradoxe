@@ -2,21 +2,30 @@ extends SceneTree
 ## Lanceur de tests maison (sans dépendance externe).
 ##
 ## Lancement (depuis la racine du dépôt) :
-##     godot --headless --path . -s res://tests/run_tests.gd
-##     godot --headless --path . -s res://tests/run_tests.gd -- audio settings   # filtre par nom de fichier
+##     godot --headless --path . --fixed-fps 60 -s res://tests/run_tests.gd
+##     godot --headless --path . --fixed-fps 60 -s res://tests/run_tests.gd -- audio settings   # filtre
 ## ou plus simplement : ./tools/run_tests.sh
+## (--fixed-fps 60 : la simulation avance d'exactement 1/60 s par image, aussi vite
+## que possible ; sans cette option, les tests passent mais en temps réel.)
 ##
 ## Fonctionnement :
 ##   1. cherche tous les fichiers tests/unit/**/test_*.gd ;
 ##   2. pour chacun, exécute toutes les fonctions « test_* » (voir TestCase) ;
-##   3. un test échoue si une vérification échoue OU si le moteur signale une
-##      erreur pendant son exécution (erreur de script, ressource manquante…) ;
+##   3. un test échoue si une vérification échoue, si le moteur signale une
+##      erreur ou un avertissement non annoncé (voir TestCase.expect_warning),
+##      s'il ne fait aucune vérification, ou s'il dépasse le délai maximum ;
 ##   4. quitte avec le code 0 si tout passe, 1 sinon (la CI s'en sert).
 ##
 ## « extends SceneTree » : ce script remplace la boucle principale du jeu.
 ## Les autoloads (AudioManager, Settings…) sont quand même chargés.
 
 const TEST_DIR: String = "res://tests/unit"
+## Délai maximum d'un test, en images (2 minutes de temps simulé à 60 images/s).
+## Au-delà, le test est déclaré en échec et la suite continue.
+const MAX_TEST_FRAMES: int = 60 * 120
+## Images laissées au moteur après chaque test pour libérer les nœuds et
+## remonter les erreurs tardives, avant de passer au test suivant.
+const SETTLE_FRAMES: int = 3
 
 var _catcher: ErrorCatcher
 
@@ -64,18 +73,25 @@ func _run() -> void:
 		for method in _test_methods(script):
 			_catcher.clear()
 			suite._reset_results()
-			await suite.before_each()
-			await suite.call(method)
-			await suite.after_each()
+			var finished: bool = await _call_with_timeout(suite, &"before_each")
+			finished = finished and await _call_with_timeout(suite, method)
+			finished = await _call_with_timeout(suite, &"after_each") and finished
 			suite._free_nodes()
-			await process_frame  # laisse les nœuds se libérer proprement
+			for i in SETTLE_FRAMES:
+				await process_frame  # libère les nœuds, laisse remonter les erreurs tardives
+			if not finished:
+				suite._failures.append("délai dépassé (%d images) : un « await » ne s'est jamais terminé" % MAX_TEST_FRAMES)
 			for error in _catcher.errors():
 				suite._failures.append("erreur moteur : %s" % error)
+			for warning in _catcher.warnings():
+				if not suite._is_expected_warning(warning):
+					suite._failures.append("avertissement moteur imprévu : %s" % warning)
+			if suite._assertion_count == 0 and finished:
+				suite._failures.append("aucune vérification : ce test ne vérifie rien")
 			assertions += suite._assertion_count
 			if suite._failures.is_empty():
 				passed += 1
-				var note: String = "" if suite._assertion_count > 0 else "  (aucune vérification !)"
-				print("  ✔ %s%s" % [method, note])
+				print("  ✔ %s" % method)
 			else:
 				failed += 1
 				failed_names.append("%s › %s" % [path.get_file(), method])
@@ -94,6 +110,21 @@ func _run() -> void:
 		failed = 1
 	OS.remove_logger(_catcher)
 	quit(1 if failed > 0 else 0)
+
+
+## Appelle target.method() (éventuellement une coroutine) et attend sa fin, au
+## plus MAX_TEST_FRAMES images. Renvoie faux si le délai est dépassé.
+func _call_with_timeout(target: Object, method: StringName) -> bool:
+	var state: Dictionary = {"done": false}
+	var runner := func() -> void:
+		await target.call(method)
+		state["done"] = true
+	runner.call()
+	var frames: int = 0
+	while not state["done"] and frames < MAX_TEST_FRAMES:
+		await process_frame
+		frames += 1
+	return state["done"]
 
 
 ## Liste récursive des fichiers test_*.gd, triée par nom.

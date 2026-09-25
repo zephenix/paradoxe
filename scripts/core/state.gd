@@ -11,8 +11,10 @@ extends Node
 ##   enter(previous, data)     à l'entrée dans l'état
 ##   exit()                    à la sortie
 ##   physics_update(delta)     à chaque pas de physique (60 fois par seconde)
-##   handle_input(event)       à chaque évènement d'entrée (touche, bouton…)
 ##   is_committed()            vrai si l'état est « engagé » (non interruptible)
+##
+## Si enter() demande lui-même un autre état, ce changement est exécuté juste
+## après (voir StateMachine) : l'ordre des évènements reste correct.
 
 ## Machine qui possède cet état (renseignée par la machine au démarrage).
 var machine: StateMachine
@@ -31,10 +33,6 @@ func exit() -> void:
 
 
 func physics_update(_delta: float) -> void:
-	pass
-
-
-func handle_input(_event: InputEvent) -> void:
 	pass
 
 

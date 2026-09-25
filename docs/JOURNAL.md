@@ -202,18 +202,20 @@ donne accès à un effet pour modifier ses réglages en direct (c'est ce que fai
 - **Monde** :
   - blocs de décor dessinés et dimensionnés dans l'éditeur (`SolidBlock`, script `@tool`) ;
   - salles (`Room`) et caméra « écran par écran » (`CameraDirector`), qui glisse d'une salle
-    à l'autre (ou coupe net), recule dans les grandes salles et suit Élias sans montrer
-    l'extérieur ;
+    à l'autre (ou coupe net, comme à l'entrée du puits), recule dans les grandes salles et
+    suit Élias sans montrer l'extérieur ;
   - fonds de ville en **parallaxe** (`Parallax2D`), dessinés par code.
 - **Salle de test** (`scenes/levels/test_level.tscn`) : 5 salles avec panneaux d'aide.
   Elle est accessible depuis l'écran titre. À la mort, Élias réapparaît au début de la
-  salle, en attendant les vrais checkpoints de J3.
+  dernière salle où il avait les pieds au sol, en attendant les vrais checkpoints de J3.
 - **Bruitages provisoires** : 13 sons générés (pas, saut, réceptions, roulade, glissade,
-  prise de rebord…), déclenchés par les évènements d'animation.
-- **Tests** : 74 au total, dont 21 sur le déplacement, joués dans des décors construits par
-  les tests eux-mêmes. S'y ajoutent des tests sur la caméra, les salles et la machine à
-  états. La simulation avance image par image (`--fixed-fps 60`) : les tests sont
-  reproductibles et rapides (moins d'une seconde pour tout).
+  prise de rebord…). Les pas et la chute du corps sont déclenchés par les animations ; les
+  actions (saut, réception, prise…) par les états.
+- **Tests** : 115 au total après l'audit (voir plus bas), dont 43 sur le déplacement, joués
+  dans des décors construits par les tests eux-mêmes. S'y ajoutent des tests sur la
+  caméra, les salles, la machine à états, les bruitages et le parcours réel de la salle de
+  test. La simulation avance image par image (`--fixed-fps 60`) : les tests sont
+  reproductibles et rapides (moins de 2 secondes pour tout).
 
 ### Comment tester
 
@@ -224,13 +226,15 @@ donne accès à un effet pour modifier ses réglages en direct (c'est ce que fai
 | Salle | À essayer |
 |---|---|
 | **A - Les bases** | Marcher, courir (Maj), demi-tour, **Haut** devant la marche et devant le mur (se hisser), **Bas** puis avancer dans le tunnel, **C** pour la roulade |
-| **B - Sauts** | Espace **en marchant** (2 blocs), Espace **en courant** (4 blocs, pour le grand trou), **Bas en courant** pour glisser sous le bloc suspendu. Tomber dans un trou (3 blocs) puis en ressortir (Haut contre la paroi) |
-| **C - Rebords et chutes** | Haut contre le mur de 3 blocs (saut, prise, puis Haut pour se hisser), deuxième mur, puis sauter de la tour (4 blocs : roulade). Au bord d'un vide : **Bas** pour descendre et s'accrocher |
-| **D - Le puits** | Tomber dans le puits de la salle C : caméra qui descend, chute mortelle, réapparition |
+| **B - Sauts** | Espace **en marchant** (saut de 2 blocs, trou de 1,5), Espace **en courant, après avoir pris de l'élan** (saut de 4 blocs, trou de 3,5), **Bas en courant** pour glisser sous le bloc suspendu. Tomber dans un trou (3 blocs) puis en ressortir (Haut contre la paroi) |
+| **C - Rebords et chutes** | Haut contre le mur de 3 blocs (saut, prise, puis Haut pour se hisser), deuxième mur, puis **se laisser tomber** de la tour (4 blocs : roulade) ; un saut avec élan depuis la tour est mortel (plus de 5 blocs). Au bord d'un vide : **Bas** (maintenu ou non) pour descendre et s'accrocher, un nouvel appui sur Bas pour lâcher |
+| **D - Le puits** | Tomber dans le puits de la salle C : coupure franche vers le puits, chute mortelle, réapparition au début de la salle C |
 | **E - Grand hall** | La caméra recule (zoom) et suit Élias. Terrain libre |
 
 3. **Échap** ramène à l'écran titre. Le **mode classique** n'a pas encore d'option dans
-   l'interface (J9) : il est vérifié par les tests automatisés.
+   l'interface (J9) : ses six différences (glissade, rattrapage des rebords, invulnérabilité
+   de l'esquive, tampon d'entrée, temps du coyote, garde-bord) sont vérifiées par les tests
+   automatisés.
 
 ### Ce qu'il faut écouter
 
@@ -273,9 +277,8 @@ son. Les vrais bruitages (selon la surface, avec la respiration) arrivent en J5.
 
 ### Vérifications effectuées
 
-- 74 tests automatisés au vert, dont les distances de saut mesurées :
-  - saut sans élan : entre 1,7 et 2,9 blocs ;
-  - saut avec élan : entre 3,7 et 5 blocs.
+- 115 tests automatisés au vert, dont les distances de saut mesurées (à ±0,25 bloc du
+  réglage) : saut sans élan ≈ 2 blocs, saut avec élan ≈ 4 blocs, roulade ≈ 2,5 blocs.
 - Planche de poses (19 animations) et « visite guidée » de la salle de test
   (`tools/godot/level_tour.gd`). J'ai regardé les captures : accroupi dans le tunnel, saut,
   suspension, hissage, glissement de caméra entre deux salles, recul de caméra dans le
@@ -288,6 +291,67 @@ son. Les vrais bruitages (selon la surface, avec la respiration) arrivent en J5.
   `resources/player/player_movement.tres`.
 - Pas encore de sons selon la surface ni de respiration (J5), pas de rayon de bruit (J6).
 - Jalon suivant : **J3, arme, énergie, ennemis, mort et checkpoints**.
+
+### Correctif après l'audit (avant le tag v0.2)
+
+Avant de publier v0.2, un audit du code en trois volets parallèles a été mené, en lecture
+seule : joueur ; monde et outils ; tests et documentation. Tout ce qu'il a trouvé a été
+corrigé, sauf ses simples suggestions.
+
+**Blocages de la salle de test (critiques)**
+- La sortie du tunnel de la salle A butait sur le mur suivant : impossible de se relever,
+  donc d'atteindre la salle B. Le tunnel fait maintenant 5 blocs. La visite guidée ne
+  l'avait pas vu, car elle téléportait Élias. Un test parcourt désormais la salle A
+  jusqu'à la salle B, avec un pilote automatique.
+- Mourir dans le puits faisait réapparaître Élias dans le puits lui-même, une poche fermée.
+  La salle de réapparition est maintenant la dernière salle où il avait les pieds au sol.
+
+**Défauts de comportement (majeurs)**
+- **Descente de rebord** : Élias lâchait prise aussitôt si Bas restait maintenu. Il faut
+  maintenant un nouvel appui pour lâcher.
+- **Élan** : le saut avec élan, la glissade et le dérapage étaient possibles dès le premier
+  instant d'une course. Il faut maintenant avoir atteint 75 % de la vitesse de course
+  (réglage `momentum_threshold`).
+- **Hauteurs de chute** : elles pouvaient se cumuler d'un étage à l'autre. La référence
+  suit maintenant le sol à chaque image.
+- **Accroupi au bord d'un vide** : l'état changeait à chaque image, et la silhouette
+  tremblait.
+- **Échap pendant une réapparition** était ignoré : un fondu interrompu laissait une
+  attente bloquée. `SceneTransition` refuse maintenant les demandes concurrentes.
+- **Réglage sans effet** : `step_climb_max_blocks` n'était pas utilisé. Il vaut 2,6 blocs :
+  au-delà, Haut fait un saut sur place.
+
+**Défauts mineurs**
+- Retour en arrière visible en fin de roulade.
+- Faux atterrissage à la réapparition.
+- Hissage à travers un surplomb.
+- Saut « coyote » qui rejouait l'impulsion en l'air.
+- Roulade à 80 % de sa distance réglée.
+- Glissade d'environ 1 bloc à la réception d'un saut avec élan.
+- Trous de la salle de test sans marge (ils font maintenant 1,5 et 3,5 blocs).
+- Tour de la salle C mortelle en saut avec élan : c'est désormais signalé sur le panneau.
+
+**Code et documentation**
+- Toutes les valeurs de réglage passent dans les Resources (`player_movement.tres`, nouveau
+  `respawn.tres`), et la taille du bloc n'est définie qu'à un endroit (`GameUnits.BLOCK`).
+- Une transition demandée pendant une autre est mise en file : les signaux restent dans
+  l'ordre.
+- Les couches de collision ont des noms dans l'éditeur.
+- Commentaires trompeurs corrigés, notamment celui du `.tres` (voir le concept 2 ci-dessous).
+
+**Tests renforcés**
+- Le lanceur impose un délai maximum par test. Un avertissement imprévu ou un test sans
+  vérification font maintenant échouer.
+- Les déclarations non typées sont désormais des **erreurs** (règle « GDScript typé »).
+- 41 tests ajoutés.
+- **Contrôle par mutation** : j'ai réintroduit une à une 20 erreurs dans le code du joueur
+  (marche immobile, gravité à 80 %, coyote supprimé…), et **les 20 sont détectées**. Avant
+  l'audit, 16 d'entre elles passaient inaperçues.
+
+**Point ouvert** : un `AudioStreamRandomizer` joué par l'`AudioManager` provoque des
+messages de fuite mémoire à la sortie du lanceur de tests. Je ne le reproduis dans aucun
+autre contexte, et ces messages sont sans effet sur le jeu. Les tests de déplacement
+coupent donc le Foley. La cause sera examinée en J5, avec la bibliothèque de sons.
 
 ### Concepts Godot expliqués
 
@@ -315,9 +379,13 @@ aux ennemis (J3) et au compagnon (J7).
 
 Une *Resource* est un objet de données enregistré dans un fichier. Le script
 `player_movement_config.gd` déclare les réglages avec `@export` (vitesses, hauteurs de
-saut, seuils de chute…), et `resources/player/player_movement.tres` en contient les valeurs.
-Double-clique sur ce fichier dans l'éditeur : l'inspecteur affiche tous les réglages,
-groupés et commentés, comme une feuille de paramètres Excel. Change « Running Jump Distance
+saut, seuils de chute…) et leurs **valeurs par défaut**. Le fichier
+`resources/player/player_movement.tres` est une « instance » de ces réglages. Double-clique
+dessus dans l'éditeur : l'inspecteur affiche tous les réglages, groupés et commentés, comme
+une feuille de paramètres Excel. Attention, Godot n'enregistre dans le `.tres` que les
+valeurs **modifiées** : tant qu'on n'a rien changé, le fichier est presque vide, ce qui veut
+dire « tout aux valeurs par défaut ». Il faut donc régler dans l'inspecteur, pas en ouvrant
+le `.tres` dans un éditeur de texte. Change « Running Jump Distance
 Blocks » de 4 à 5 : le saut avec élan ira plus loin. Le code, lui, recalcule seul la vitesse
 nécessaire (`jump_velocity()`, avec les formules de la chute libre). Les ennemis, l'énergie
 et la perception auront chacun leur fichier de réglages.

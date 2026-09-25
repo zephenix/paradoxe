@@ -9,7 +9,7 @@ func enter(_previous: StringName, _data: Dictionary) -> void:
 
 func physics_update(delta: float) -> void:
 	var p: Player = player
-	if not p.is_on_floor() and p.time_since_grounded > 0.05:
+	if p.lost_ground():
 		machine.transition_to(&"Fall")
 		return
 	if p.wants(&"roll"):
@@ -20,6 +20,9 @@ func physics_update(delta: float) -> void:
 		return
 	if p.input.move != 0:
 		p.facing = p.input.move
-		machine.transition_to(&"CrouchWalk")
-		return
+		# Le garde-bord empêche aussi d'avancer accroupi vers un vide dangereux :
+		# on reste accroupi (sinon on alternerait avec CrouchWalk à chaque image).
+		if not edge_guard_stops():
+			machine.transition_to(&"CrouchWalk")
+			return
 	p.move_on_ground(0.0, delta)

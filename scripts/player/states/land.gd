@@ -16,6 +16,12 @@ func is_committed() -> bool:
 
 
 func physics_update(delta: float) -> void:
-	player.move_on_ground(0.0, delta)
+	var p: Player = player
+	if p.lost_ground():
+		machine.transition_to(&"Fall")
+		return
+	# Freinage fort : après un saut avec élan, Élias s'arrête en une vingtaine de pixels.
+	p.velocity.x = move_toward(p.velocity.x, 0.0, p.config.land_friction * delta)
+	p.move_in_air(delta)
 	if time_in_state >= _duration:
 		machine.transition_to(&"Idle")

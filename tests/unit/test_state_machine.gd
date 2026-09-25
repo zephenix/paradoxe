@@ -1,12 +1,15 @@
 extends TestCase
 ## Tests de la machine à états générique (indépendamment du joueur).
 
-## État de test qui note ce qui lui arrive.
+## État de test qui note ce qui lui arrive. S'il reçoit {"redirect": nom}, il
+## demande lui-même un autre état depuis enter() (cas de LedgeDescend).
 class Probe extends State:
 	var log: Array[String] = []
 
 	func enter(previous: StringName, data: Dictionary) -> void:
 		log.append("enter %s from %s %s" % [name, previous, data.get("tag", "")])
+		if data.has("redirect"):
+			machine.transition_to(data["redirect"])
 
 	func exit() -> void:
 		log.append("exit %s" % name)
@@ -36,7 +39,7 @@ func test_starts_in_initial_state() -> void:
 
 
 func test_transition_calls_exit_then_enter_with_data() -> void:
-	var changes: Array = []
+	var changes: Array[Array] = []
 	machine.state_changed.connect(func(from: StringName, to: StringName) -> void: changes.append([from, to]))
 	machine.transition_to(&"B", {"tag": "x"})
 	assert_eq(a.log.back(), "exit A")
@@ -61,6 +64,19 @@ func test_every_player_state_has_a_script_and_animation() -> void:
 		assert_true(child is PlayerState, "%s hérite de PlayerState" % child.name)
 	elias.free()
 	# Toutes les animations demandées par les états existent dans les tables.
-	for anim_name in ["idle", "walk", "run", "skid", "turn", "crouch", "crouch_walk", "jump_windup", "jump",
+	for anim_name: String in ["idle", "walk", "run", "skid", "turn", "crouch", "crouch_walk", "jump_windup", "jump",
 			"leap", "fall", "land", "land_heavy", "roll", "slide", "hang", "climb", "descend", "death"]:
 		assert_true(EliasPoses.ANIMATIONS.has(anim_name), "animation %s" % anim_name)
+
+
+func test_transition_requested_from_enter_keeps_signal_order() -> void:
+	var c := Probe.new()
+	c.name = "C"
+	machine.add_child(c)
+	machine.setup(machine)
+	var changes: Array[Array] = []
+	machine.state_changed.connect(func(from: StringName, to: StringName) -> void: changes.append([from, to]))
+	machine.transition_to(&"B", {"redirect": &"C"})
+	assert_eq(machine.current_name, &"C", "l'état demandé depuis enter() est bien appliqué")
+	assert_eq(changes, [[&"A", &"B"], [&"B", &"C"]], "signaux dans l'ordre réel")
+	assert_eq(machine.previous_name, &"B")

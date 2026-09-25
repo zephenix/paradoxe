@@ -22,6 +22,8 @@ const SKIN := Color("d6a387")
 const HAIR := Color("241d1f")
 ## Assombrissement des membres « arrière » (effet de profondeur).
 const BACK_DARKEN := 0.72
+## Durée du fondu entre deux animations (secondes).
+const BLEND_TIME: float = 0.06
 
 var _flip: Node2D
 var _rig: Node2D
@@ -45,8 +47,12 @@ func play(animation: StringName, duration: float = -1.0) -> void:
 		return
 	var length: float = _player.get_animation(animation).length
 	_player.speed_scale = length / duration if duration > 0.0 else 1.0
+	# 0,06 s de fondu entre deux animations, sauf en sortant d'une roulade : son
+	# corps a fait un tour complet (360°) et un fondu vers 0° le ferait tourner
+	# à l'envers pendant deux images.
+	var blend: float = 0.0 if current == &"roll" else BLEND_TIME
 	current = animation
-	_player.play(animation, 0.06)  # 0,06 s de fondu entre deux animations
+	_player.play(animation, blend)
 	_player.advance(0.0)
 
 

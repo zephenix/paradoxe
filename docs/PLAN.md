@@ -104,14 +104,16 @@ côte dans l'espace, comme une planche de BD. Chaque salle (`Room`) définit :
 - son **éclairage ambiant**, utilisé à la fois par le rendu et par la perception ennemie.
 
 Quand Élias franchit la limite d'une salle, le `CameraDirector` fait glisser la caméra
-vers la salle suivante (0,4 s, avec un léger décalage des plans de parallaxe), et
+vers la salle suivante (0,45 s, avec un léger décalage des plans de parallaxe), et
 l'`AudioManager` bascule en fondu vers la nouvelle acoustique.
 
 Pourquoi une seule scène plutôt qu'une scène par écran ? Avec 8 écrans, tout tient
 en mémoire ; les transitions deviennent de simples mouvements de caméra (fluides, sans
 temps de chargement), et les ennemis d'un écran voisin peuvent entendre un bruit à
-travers une porte. Les salles restent des scènes séparées (`scenes/rooms/room_03.tscn`)
-instanciées dans le niveau : on peut donc les éditer une par une.
+travers une porte. *État en J2 :* les salles de la salle de test sont décrites directement
+dans `scenes/levels/test_level.tscn`. Pour le niveau du prototype (J7-J8), chaque salle
+pourra devenir une scène séparée (`scenes/rooms/…`) instanciée dans le niveau, afin de les
+éditer une par une.
 
 ### 3.4 Le personnage : machine à états explicite
 
@@ -122,16 +124,19 @@ stateDiagram-v2
     Walk --> Run
     Idle --> Crouch
     Crouch --> CrouchWalk
-    Idle --> JumpStanding
-    Run --> JumpRunning
+    Idle --> Turn : demi-tour
+    Run --> Skid : arrêt ou demi-tour avec élan
+    Idle --> Jump : sur place / sans élan
+    Run --> Jump : avec élan
     Run --> Slide
-    JumpRunning --> Fall
-    JumpStanding --> Fall
+    Jump --> LedgeHang : rebord à portée
+    Jump --> Land
     Fall --> LedgeHang : rebord à portée
+    Idle --> LedgeClimb : rebord à hauteur de mains
     LedgeHang --> LedgeClimb
     LedgeHang --> Fall : lâcher
-    Idle --> LedgeDrop : descendre d'un rebord
-    LedgeDrop --> LedgeHang
+    Idle --> LedgeDescend : descendre d'un rebord
+    LedgeDescend --> LedgeHang
     Fall --> Land
     Fall --> Roll : chute moyenne
     Fall --> Dead : chute trop haute
@@ -143,22 +148,26 @@ stateDiagram-v2
     Idle --> Interact
 ```
 
-- **Un script par état** (`scripts/player/states/state_run.gd`…), tous héritant d'une classe
-  `State` avec quatre fonctions : `enter()`, `exit()`, `physics_update(delta)`,
-  `handle_input(event)`. La `StateMachine` ne fait qu'appeler l'état courant.
+- **Un script par état** (`scripts/player/states/run.gd`…), tous héritant d'une classe
+  `State` avec trois fonctions : `enter()`, `exit()`, `physics_update(delta)`, plus
+  `is_committed()`. La `StateMachine` ne fait qu'appeler l'état courant. Les états ne lisent
+  pas le clavier : ils interrogent les intentions du personnage (`PlayerInput`). Les états
+  de combat (Aim, Shoot…) du diagramme arrivent en J3.
 - **Mouvements engagés** : chaque état indique s'il est *interruptible*. Un saut, une
   roulade, un hissage vont à leur terme. Les commandes pressées pendant ce temps sont
   **mémorisées** (tampon de 0,2 s) et exécutées à la fin : c'est ce qui donne des
   enchaînements fluides sans rendre le personnage « flottant ».
 - **Seule la mort interrompt tout.**
 - **Visuel séparé de la logique** : les états ne parlent jamais au dessin directement,
-  ils appellent un nœud `CharacterVisual` (`play("run")`, signal `animation_finished`,
-  signal `anim_event("footstep")`). Aujourd'hui ce nœud anime une silhouette en
+  ils appellent un nœud `CharacterVisual` (`play("run", durée)`, signal
+  `anim_event("footstep")`). Les durées viennent des réglages, pas du dessin : le visuel
+  adapte la vitesse de l'animation à la durée demandée. Aujourd'hui ce nœud anime une silhouette en
   polygones via un `AnimationPlayer` ; demain il pourra être remplacé par un
   `AnimatedSprite2D` rotoscopé qui respecte la même interface, sans toucher aux états.
-- Les pas, atterrissages, bruits de tissu sont déclenchés par des **événements
-  d'animation** (piste d'appel de méthode de l'`AnimationPlayer`) : le son tombe
-  exactement au moment où le pied touche le sol.
+- Les sons qui doivent tomber à l'image près (pas, corps qui s'effondre) sont déclenchés
+  par des **événements d'animation** (piste d'appel de méthode de l'`AnimationPlayer`) ;
+  les actions (saut, réception, prise d'un rebord) par les états eux-mêmes. Les deux
+  passent par le même signal `anim_event`.
 
 ### 3.5 Données de réglage (Resources)
 
@@ -357,7 +366,8 @@ stateDiagram-v2
   `user://ghost_best.res` et rejoué sous forme de silhouette translucide.
 
 ### 5.9 Mode classique (J4, complété en J6)
-Un interrupteur unique `GameState.classic_mode`, lu par : le parkour (5.1), le rembobinage
+Un interrupteur unique, `Settings.classic_mode` (réglage du joueur, lu via
+`GameState.is_classic_mode()`), lu par : le parkour (5.1), le rembobinage
 (5.5) et la perception (5.4). Il est testé automatiquement.
 
 ### 5.10 Interface diégétique : le bracelet (J9)
@@ -544,7 +554,7 @@ Accessible depuis le menu principal :
 | Compagnon | ordres suivre/attendre/activer, plaque de pression tenue |
 | Audio | les 6 bus existent, chaque son de la bibliothèque a un fichier, émission de bruit liée au son |
 | Options | sauvegarde/lecture des touches et volumes |
-| **Tests de fumée** | chaque scène de `/scenes` s'instancie et tourne 120 images sans erreur |
+| **Tests de fumée** | chaque scène de `/scenes` s'instancie et tourne 60 images sans erreur |
 
 ### 7.2 Vérifications visuelles et Web
 - Je ne vois pas l'écran et n'entends rien : je lance le jeu sous **Xvfb** (écran virtuel,

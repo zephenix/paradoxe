@@ -9,7 +9,7 @@ func enter(_previous: StringName, _data: Dictionary) -> void:
 
 func physics_update(delta: float) -> void:
 	var p: Player = player
-	if not p.is_on_floor() and p.time_since_grounded > 0.05:
+	if p.lost_ground():
 		machine.transition_to(&"Fall")
 		return
 	if not p.input.down and p.can_stand():

@@ -1,5 +1,7 @@
 extends PlayerState
-## Course. On ne s'arrête ni ne se retourne d'un coup : on dérape (état Skid).
+## Course. On ne s'arrête ni ne se retourne d'un coup : avec de l'élan, on
+## dérape (état Skid). Le saut avec élan et la glissade demandent eux aussi
+## d'avoir pris de la vitesse (voir Player.has_momentum).
 
 
 func enter(_previous: StringName, _data: Dictionary) -> void:
@@ -9,23 +11,32 @@ func enter(_previous: StringName, _data: Dictionary) -> void:
 
 func physics_update(delta: float) -> void:
 	var p: Player = player
-	if not p.is_on_floor() and p.time_since_grounded > AIR_TOLERANCE:
+	if p.lost_ground():
 		machine.transition_to(&"Fall")
 		return
-	if p.wants(&"jump"):
-		p.start_jump(&"running")
+	# En mode classique, aucune action pendant l'image de tolérance sans sol.
+	var can_act: bool = p.is_on_floor() or p.modern()
+	if can_act and p.wants(&"jump"):
+		p.start_jump(&"running" if p.has_momentum() else &"standing")
 		return
-	if p.wants(&"roll"):
+	if can_act and p.wants(&"roll"):
 		machine.transition_to(&"Roll", {"landing": false})
 		return
-	if p.input.down and p.modern():
-		machine.transition_to(&"Slide")
+	if p.input.down:
+		# Glissade avec de l'élan (mode moderne) ; sinon, on s'accroupit.
+		machine.transition_to(&"Slide" if p.modern() and p.has_momentum() else &"Crouch")
 		return
 	if p.input.move == 0:
-		machine.transition_to(&"Skid", {"turn": false})
+		if p.has_momentum():
+			machine.transition_to(&"Skid", {"turn": false})
+		else:
+			machine.transition_to(&"Idle")
 		return
 	if p.input.move != p.facing:
-		machine.transition_to(&"Skid", {"turn": true})
+		if p.has_momentum():
+			machine.transition_to(&"Skid", {"turn": true})
+		else:
+			machine.transition_to(&"Turn")
 		return
 	if not p.input.run:
 		machine.transition_to(&"Walk")
