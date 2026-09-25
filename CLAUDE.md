@@ -56,6 +56,7 @@ xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3
 python3 tools/audio/generate_sounds.py       # régénère les sons + catalog.json (puis réimport Godot)
 godot --headless --path . --import           # réimporte les sons
 godot --headless --path . -s res://tools/godot/build_sound_library.gd   # ajoute les nouveaux sons à la bibliothèque
+python3 tools/audio/measure_levels.py        # vérifie l'équilibre des niveaux (familles de sons ; lancé par la CI)
 godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régénère la table de mixage
 ```
 

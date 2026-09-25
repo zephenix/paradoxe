@@ -2,6 +2,10 @@ extends TestCase
 ## Tests des ambiances et de l'acoustique par zone (J5) : AmbiencePlayer,
 ## AudioManager.set_zone, zones de resources/audio/zones/.
 
+## Écho maximal d'une zone (0 à 1). Au-delà, les sons « résonnent » trop : les
+## ambiances contiennent déjà leur propre espace, et l'écho s'y ajoute.
+const MAX_REVERB_WET: float = 0.3
+
 
 func after_each() -> void:
 	AudioManager.set_zone(&"", 0.0)
@@ -17,6 +21,7 @@ func test_every_zone_is_valid() -> void:
 		assert_false(zone.layers.is_empty(), "%s a au moins une couche" % id)
 		assert_false(zone.events.is_empty(), "%s a des évènements ponctuels" % id)
 		assert_true(zone.event_interval_min <= zone.event_interval_max, "%s : intervalle" % id)
+		assert_true(zone.reverb_wet <= MAX_REVERB_WET, "%s : écho %.2f (max %.2f)" % [id, zone.reverb_wet, MAX_REVERB_WET])
 		for sound_id: StringName in zone.layers + zone.events:
 			assert_true(AudioManager.library.has(sound_id), "%s : son %s" % [id, sound_id])
 		for sound_id: StringName in zone.layers:

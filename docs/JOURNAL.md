@@ -882,3 +882,51 @@ anciennes vers 0, puis supprime ces dernières (signal `finished`). À chaque im
 volume réel est recalculé : volume de base + facteur (en dB) + houle. C'est comme une
 colonne Excel calculée à partir de trois autres, dont l'une glisse doucement d'une valeur
 à l'autre.
+
+---
+
+## J5.1 — Premier équilibrage du son (v0.5.1)
+
+### Ce qui a été fait
+
+Un réglage **objectif** : je n'entends pas les sons, mais je peux les mesurer.
+
+- **Un outil de mesure** : `tools/audio/measure_levels.py` calcule le niveau réel de chaque
+  son (fichier + volume de la bibliothèque) et le compare à la cible de sa famille : tous
+  les pas au même niveau, tous les tirs, toutes les voix… La CI le lance désormais à chaque
+  Pull Request.
+- **22 sons recalés** (sur 57). Les plus gros écarts :
+  - la couche « grésillement électrique » était 21 dB trop faible, donc inaudible ;
+  - les pas dans la végétation, 11 dB trop faibles ;
+  - rengainer (-10 dB), demi-tour (-9 dB), gravats (-8 dB) ;
+  - le bouclier qui se lève était 7,5 dB trop fort ;
+  - le tir des Sentinelles, 5 dB plus fort que celui d'Élias.
+- **Moins de résonance** : l'écho des zones est divisé par deux environ (grand hall 50 %
+  -> 24 %, puits 42 % -> 20 %, laboratoire 18 % -> 7 %, ruines 8 % -> 4 %), avec des aigus
+  plus amortis. Un test plafonne désormais l'écho à 30 %. L'interrupteur « Réverbération
+  grand hall » de l'écran titre reprend les nouvelles valeurs du hall.
+
+### Comment tester
+
+Traverser la salle de test au casque, puis comparer au banc d'écoute :
+- les pas sur pierre (salle A), métal (D) et végétation (bas de C) doivent sonner à peu
+  près aussi fort ;
+- dans le hall (E) et le puits (D), l'écho doit rester présent mais ne plus « baver » ;
+- tirer près d'une Sentinelle : son tir et celui d'Élias ont le même poids ;
+- demi-tour, s'accroupir, rengainer : discrets mais audibles.
+
+### Ce qu'il reste à régler à l'oreille
+
+Le timbre (un son « métallique », « creux », « agressif ») et la sonie perçue ne se
+mesurent pas bien. Au banc d'écoute : régler, « Enregistrer », puis « Copier les valeurs »
+et me coller le texte, ou me décrire ce qui gêne. Le mixage final, avec la musique, se fera
+en J9.
+
+### Concept expliqué : le décibel, une échelle de rapports
+
+Le décibel (dB) compare deux niveaux : +6 dB, c'est à peu près une amplitude doublée ;
+-20 dB, une amplitude divisée par 10. Additionner des dB revient à **multiplier** des
+volumes. C'est pourquoi le niveau effectif d'un son est simplement « niveau du fichier +
+volume de la bibliothèque » : un fichier mesuré à -25 dB, joué avec un volume de +3 dB,
+sonne à -22 dB. Dans Excel, ce serait une colonne en `=20*LOG10(amplitude)`, où les
+multiplications deviennent des additions.
