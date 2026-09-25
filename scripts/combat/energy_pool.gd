@@ -73,6 +73,16 @@ func refill() -> void:
 	_set_value(config.capacity)
 
 
+## Photo pour le rembobinage (J4).
+func capture_state() -> Dictionary:
+	return {"value": value, "idle_time": idle_time}
+
+
+func apply_state(state: Dictionary) -> void:
+	idle_time = state["idle_time"]
+	_set_value(state["value"])
+
+
 ## Remplissage de 0 (vide) à 1 (pleine).
 func ratio() -> float:
 	return value / config.capacity if config.capacity > 0.0 else 0.0

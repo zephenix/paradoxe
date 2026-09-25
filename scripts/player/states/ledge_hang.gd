@@ -20,7 +20,12 @@ func enter(_previous: StringName, data: Dictionary) -> void:
 	# Oublie un appui sur Bas antérieur à la prise (celui qui a lancé la descente).
 	p.input.consume(&"move_down", INF)
 	p.visual.play(&"hang")
-	p.anim_event.emit(&"grab")
+	if not data.get("resumed", false):
+		p.anim_event.emit(&"grab")  # pas de bruit de prise en reprenant après un rembobinage
+
+
+func snapshot() -> Dictionary:
+	return {"ledge": _ledge}
 
 
 func physics_update(_delta: float) -> void:

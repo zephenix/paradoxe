@@ -73,6 +73,7 @@ const VOICES: Dictionary = {
 
 func _ready() -> void:
 	add_to_group(&"enemies")
+	add_to_group(RewindManager.GROUP)  # enregistrée pour le rembobinage (J4)
 	collision_layer = PhysicsLayers.ENEMIES
 	collision_mask = PhysicsLayers.WORLD
 	floor_snap_length = 6.0
@@ -253,6 +254,45 @@ func reset_to_start() -> void:
 	energy.refill()
 	weapon.reset()
 	machine.transition_to(&"Patrol")
+
+
+# --------------------------------------------------------------------------
+# Rembobinage (J4) : voir RewindManager
+# --------------------------------------------------------------------------
+
+func capture_state() -> Dictionary:
+	return {
+		"position": global_position, "velocity": velocity, "facing": facing, "dead": is_dead,
+		"sees": sees_target, "last_seen": last_seen_position, "since_seen": time_since_seen,
+		"rng": rng.state, "state": machine.current_name,
+		"state_data": machine.current.snapshot() if machine.current else {},
+		"energy": energy.capture_state(), "shield_broken": weapon.shield.broken_timer,
+		"pose": visual.capture_pose(),
+	}
+
+
+## Replace la Sentinelle (une Sentinelle tuée pendant les secondes remontées
+## se relève : sa mort « n'a pas encore eu lieu »).
+func apply_state(state: Dictionary) -> void:
+	global_position = state["position"]
+	velocity = state["velocity"]
+	facing = state["facing"]
+	is_dead = state["dead"]
+	collision_layer = 0 if is_dead else PhysicsLayers.ENEMIES
+	sees_target = state["sees"]
+	last_seen_position = state["last_seen"]
+	time_since_seen = state["since_seen"]
+	rng.state = state["rng"]  # le hasard repart du même point : même décision de bouclier
+	energy.apply_state(state["energy"])
+	weapon.reset()
+	weapon.shield.broken_timer = state["shield_broken"]
+	visual.restore_pose(state["pose"])
+
+
+func resume_state(state: Dictionary) -> void:
+	var data: Dictionary = (state["state_data"] as Dictionary).duplicate()
+	data["resumed"] = true
+	machine.transition_to(state["state"], data)
 
 
 func _on_checkpoint_reached(_checkpoint_id: StringName) -> void:

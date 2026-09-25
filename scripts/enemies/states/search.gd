@@ -14,7 +14,12 @@ func enter(_previous: StringName, data: Dictionary) -> void:
 	_clue = data.get("clue", s.global_position)
 	_arrived = false
 	_look_timer = s.config.search_look_interval
-	s.say(&"search")
+	if not data.get("resumed", false):
+		s.say(&"search")
+
+
+func snapshot() -> Dictionary:
+	return {"clue": _clue}
 
 
 func physics_update(delta: float) -> void:

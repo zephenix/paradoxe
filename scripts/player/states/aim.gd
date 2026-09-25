@@ -36,7 +36,7 @@ func enter(previous: StringName, data: Dictionary) -> void:
 	_shield_locked = data.get("shield_locked", false)
 	_turned = false
 	# Au retour d'un tir, d'une charge ou du bouclier, l'arme est déjà en main.
-	_drawn = previous in [&"Shoot", &"Charge", &"Shield"]
+	_drawn = previous in [&"Shoot", &"Charge", &"Shield"] or data.get("resumed", false)
 	if not _drawn:
 		p.weapon.play_draw_sound()
 	p.visual.play(&"aim")

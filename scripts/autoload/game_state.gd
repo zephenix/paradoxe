@@ -14,6 +14,8 @@ var checkpoint_position: Vector2 = Vector2.ZERO
 var checkpoint_facing: int = 1
 
 ## Nombre de rembobinages encore disponibles depuis le dernier checkpoint (J4).
+## Remis au maximum (rewind.tres) à chaque nouveau checkpoint, à chaque
+## réapparition et en début de partie.
 var rewinds_left: int = 0
 
 ## Objets possédés, par identifiant (J7).
@@ -49,8 +51,14 @@ func reach_checkpoint(id: StringName, at: Vector2, facing: int) -> bool:
 	checkpoint_id = id
 	checkpoint_position = at
 	checkpoint_facing = 1 if facing >= 0 else -1
+	reset_rewinds()
 	Events.checkpoint_reached.emit(id)
 	return true
+
+
+## Rend toutes les utilisations du rembobinage (voir resources/rewind.tres).
+func reset_rewinds() -> void:
+	rewinds_left = RewindManager.config.uses_per_checkpoint
 
 
 ## Remet l'état à zéro pour une nouvelle partie.
@@ -58,5 +66,5 @@ func new_game() -> void:
 	checkpoint_id = &""
 	checkpoint_position = Vector2.ZERO
 	checkpoint_facing = 1
-	rewinds_left = 0
+	reset_rewinds()
 	inventory.clear()

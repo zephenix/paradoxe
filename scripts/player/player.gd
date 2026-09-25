@@ -58,9 +58,19 @@ var is_crouched: bool = false
 
 var _shape := RectangleShape2D.new()
 
+## Rembobinage (J4) : états dont on peut repartir, et l'état dans lequel on
+## repart. Les autres (hissage, roulade, réception, tir…) sont des gestes en
+## cours : on ne reprend pas au milieu, mais à la dernière photo « stable ».
+const RESUME_AS: Dictionary = {
+	&"Idle": &"Idle", &"Walk": &"Walk", &"Run": &"Run", &"Crouch": &"Crouch",
+	&"CrouchWalk": &"CrouchWalk", &"Fall": &"Fall", &"Jump": &"Fall", &"Aim": &"Aim",
+	&"LedgeHang": &"LedgeHang",
+}
+
 
 func _ready() -> void:
 	add_to_group(&"player")  # les ennemis trouvent Élias par ce groupe
+	add_to_group(RewindManager.GROUP)  # enregistré pour le rembobinage (J4)
 	collision_layer = PhysicsLayers.PLAYER
 	collision_mask = PhysicsLayers.WORLD
 	weapon.energy = energy
@@ -332,6 +342,54 @@ func kill(cause: StringName) -> void:
 	machine.transition_to(&"Dead", {"cause": cause})
 	died.emit(cause)
 	Events.player_died.emit(cause)
+
+
+# --------------------------------------------------------------------------
+# Rembobinage (J4) : voir RewindManager
+# --------------------------------------------------------------------------
+
+## Photo d'Élias : tout ce qu'il faut pour le replacer exactement.
+func capture_state() -> Dictionary:
+	var state_data: Dictionary = machine.current.snapshot() if machine.current else {}
+	var state: StringName = machine.current_name
+	# Un saut n'est une posture stable qu'une fois en l'air (pas pendant l'impulsion).
+	var stable: bool = RESUME_AS.has(state) and not is_dead and (state != &"Jump" or state_data.get("airborne", false))
+	return {
+		"position": global_position, "velocity": velocity, "facing": facing,
+		"crouched": is_crouched, "dead": is_dead, "air_top_y": air_top_y,
+		"time_since_grounded": time_since_grounded, "grab_cooldown": grab_cooldown,
+		"state": state, "state_data": state_data, "stable": stable,
+		"energy": energy.capture_state(), "shield_broken": weapon.shield.broken_timer,
+		"pose": visual.capture_pose(),
+	}
+
+
+## Replace Élias tel qu'il était (pendant le défilement arrière, jeu en pause).
+## Il reste « mort » (is_dead) tant que le joueur n'a pas repris la main :
+## c'est resume_state qui le fait revivre.
+func apply_state(state: Dictionary) -> void:
+	global_position = state["position"]
+	velocity = state["velocity"]
+	facing = state["facing"]
+	set_crouched(state["crouched"])
+	is_invulnerable = false
+	air_top_y = state["air_top_y"]
+	time_since_grounded = state["time_since_grounded"]
+	grab_cooldown = state["grab_cooldown"]
+	energy.apply_state(state["energy"])
+	weapon.reset()
+	weapon.shield.broken_timer = state["shield_broken"]
+	visual.restore_pose(state["pose"])
+
+
+## Repart de cette photo : la machine à états reprend dans l'état enregistré
+## (ou son équivalent stable, voir RESUME_AS), sans rejouer ses sons d'entrée.
+func resume_state(state: Dictionary) -> void:
+	is_dead = state["dead"]  # toujours faux : une photo stable n'est jamais prise mort
+	input.clear()
+	var data: Dictionary = (state["state_data"] as Dictionary).duplicate()
+	data["resumed"] = true
+	machine.transition_to(RESUME_AS.get(state["state"], &"Idle"), data)
 
 
 ## Réapparition (au dernier checkpoint, voir Level) : jauge pleine, arme au repos.

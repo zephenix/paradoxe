@@ -12,6 +12,7 @@ extends Node
 ##   exit()                    à la sortie
 ##   physics_update(delta)     à chaque pas de physique (60 fois par seconde)
 ##   is_committed()            vrai si l'état est « engagé » (non interruptible)
+##   snapshot()                données à retenir pour le rembobinage (J4)
 ##
 ## Si enter() demande lui-même un autre état, ce changement est exécuté juste
 ## après (voir StateMachine) : l'ordre des évènements reste correct.
@@ -40,3 +41,10 @@ func physics_update(_delta: float) -> void:
 ## systèmes (dégâts mis à part) ne doivent pas l'interrompre.
 func is_committed() -> bool:
 	return false
+
+
+## Données internes à retenir dans une photo du rembobinage (J4), pour pouvoir
+## revenir dans cet état : par exemple le rebord tenu, ou l'indice recherché.
+## Elles sont repassées à enter() dans « data », avec "resumed": true.
+func snapshot() -> Dictionary:
+	return {}

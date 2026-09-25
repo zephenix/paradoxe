@@ -19,6 +19,7 @@ fichiers (pas de modification inutile dans Git), sauf si on change --seed.
 
 J1 : trois sons de test pour valider la chaîne audio (bus, effets, Web).
 J3 : sons provisoires du combat (arme, bouclier, impacts, voix des Sentinelles).
+J4 : sons du rembobinage.
 J5 : bibliothèque complète (Foley, ambiances, arme, créatures, musique).
 """
 
@@ -447,6 +448,43 @@ def checkpoint_on(rng: np.random.Generator) -> np.ndarray:
         start = dsp.n_samples(step * i)
         out[start:start + len(tone)] += tone[: len(out) - start]
     return dsp.fade(dsp.normalize(out, 0.5))
+
+
+# =============================================================================
+# Rembobinage (J4)
+# =============================================================================
+
+@sound("rewind_loop", "sfx", loop=True,
+       description="Défilement arrière du temps : souffles inversés et sifflement de bande qui ondule (boucle, provisoire J4).")
+def rewind_loop(rng: np.random.Generator) -> np.ndarray:
+    # --- Paramètres ---
+    loop_length = 2.0
+    crossfade = 0.3
+    swell_rate = 4.0                      # souffles « à l'envers » par seconde
+    whirr_hz = 520.0                      # sifflement de bande
+    # ------------------
+    d = loop_length + crossfade
+    t = dsp.time_axis(d)
+    # Un souffle qui décline, joué à l'envers, devient une « aspiration » qui monte.
+    swell = np.zeros(dsp.n_samples(d))
+    step = dsp.n_samples(1.0 / swell_rate)
+    for start in range(0, len(swell), step):
+        burst = dsp.reverse(dsp.bandpass(dsp.pink_noise(1.0 / swell_rate, rng), 300, 5000)
+                            * dsp.exp_decay(1.0 / swell_rate, 0.2))
+        swell[start:start + len(burst)] += burst[: len(swell) - start]
+    wobble = whirr_hz * (1.0 + 0.08 * np.sin(2 * np.pi * 7.0 * t))
+    whirr = dsp.sine(wobble, d) * 0.25 + 0.1 * dsp.sine(wobble * 1.5, d)
+    out = 0.8 * dsp.normalize(swell) + whirr
+    return dsp.normalize(dsp.make_seamless_loop(out, crossfade), 0.6)
+
+
+@sound("rewind_release", "sfx", description="Reprise après un rembobinage : souffle vers l'avant et coup sourd (provisoire J4).")
+def rewind_release(rng: np.random.Generator) -> np.ndarray:
+    d = 0.6
+    whoosh = dsp.bandpass(dsp.pink_noise(d, rng), 400, 6000) * dsp.adsr(d, 0.01, 0.1, 0.4, 0.4)
+    drop = dsp.sine(dsp.ramp(d, 900.0, 120.0, 0.5), d) * dsp.exp_decay(d, 0.4) * 0.5
+    thump = dsp.sine(60.0, d) * dsp.exp_decay(d, 0.2)
+    return dsp.fade(dsp.normalize(whoosh + drop + 0.7 * thump, 0.8), 0.002, 0.05)
 
 
 # =============================================================================

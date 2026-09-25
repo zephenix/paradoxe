@@ -46,7 +46,18 @@ func _process(_delta: float) -> bool:
 	DirAccess.make_dir_recursive_absolute(_out_path.get_base_dir())
 	var err: Error = image.save_png(_out_path)
 	print("Capture %s (%dx%d) : %s" % [_out_path, image.get_width(), image.get_height(), error_string(err)])
+	_silence_audio()
 	return true  # « true » demande à Godot de quitter
+
+
+## Arrête les sons et laisse au moteur le temps de les libérer (sinon « fuite »
+## affichée à la sortie ; même raison que dans tests/run_tests.gd).
+func _silence_audio() -> void:
+	for node in root.find_children("*", "AudioStreamPlayer", true, false):
+		(node as AudioStreamPlayer).stop()
+	for node in root.find_children("*", "AudioStreamPlayer2D", true, false):
+		(node as AudioStreamPlayer2D).stop()
+	OS.delay_msec(250)
 
 
 func _tap_key(keycode: Key) -> void:

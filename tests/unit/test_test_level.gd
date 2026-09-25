@@ -20,6 +20,7 @@ func before_each() -> void:
 	add_node(level)
 	player = level.player
 	player.input.from_devices = false
+	level.death.input_from_devices = false
 	await wait_physics(3)
 
 
@@ -64,8 +65,7 @@ func test_death_in_the_shaft_respawns_at_room_c_checkpoint() -> void:
 	player.air_top_y = player.global_position.y
 	player.machine.transition_to(&"Fall")
 	assert_true(await _wait_until(func() -> bool: return player.is_dead, 300), "chute mortelle dans le puits")
-	var total: float = level.respawn.total_time()
-	await wait_physics_seconds(total + 0.3)
+	await die_and_respawn()
 	assert_false(player.is_dead, "réapparu")
 	assert_almost_eq(player.global_position.x, checkpoint.global_position.x, 1.0, "au checkpoint de C")
 	await wait_physics(10)
@@ -134,7 +134,7 @@ func test_combat_room_can_be_won() -> void:
 			break
 		if player.is_dead:
 			deaths += 1
-			await wait_physics_seconds(level.respawn.total_time() + 0.1)
+			await die_and_respawn()
 			continue
 		var input: PlayerInput = player.input
 		var fighting: bool = alive.any(func(s: Sentinel) -> bool: return s.sees_target)
@@ -180,6 +180,20 @@ func _incoming_threat() -> bool:
 		if signf(dx) == p.direction and absf(dx) < p.speed * 0.5:
 			return true
 	return false
+
+
+## Fait mourir Élias puis, si le choix « rembobiner / checkpoint » apparaît,
+## choisit le checkpoint ; attend la fin de la réapparition.
+func die_and_respawn(cause: StringName = &"shot") -> void:
+	if not player.is_dead:
+		player.kill(cause)
+	for i in 120:
+		if level.death.phase == &"choice" or not player.is_dead:
+			break
+		await wait_physics(1)
+	if level.death.phase == &"choice":
+		level.death.request_checkpoint()
+	await wait_physics_seconds(level.respawn.total_time() + 0.1)
 
 
 func _wait_until(condition: Callable, max_frames: int) -> bool:

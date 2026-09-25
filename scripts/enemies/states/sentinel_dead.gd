@@ -4,9 +4,11 @@ extends SentinelState
 ## mort (voir Sentinel.reset_to_start).
 
 
-func enter(_previous: StringName, _data: Dictionary) -> void:
+func enter(_previous: StringName, data: Dictionary) -> void:
 	sentinel.velocity.x = 0.0
-	sentinel.visual.play(&"death")
+	# En reprenant après un rembobinage, le corps est déjà au sol (pose restaurée).
+	if not data.get("resumed", false):
+		sentinel.visual.play(&"death")
 
 
 func physics_update(delta: float) -> void:

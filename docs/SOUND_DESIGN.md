@@ -74,7 +74,7 @@ On peut ensuite ajuster les réglages fins (taille de pièce, amortissement…) 
 | `play_sfx(id, position, source)` | Son de la bibliothèque : variations aléatoires, position, rayon de bruit | J5 |
 | `set_zone(zone)` | Ambiance et acoustique d'une zone, en fondu | J5 |
 | `set_tension(0..1)`, `play_stinger(id)` | Musique adaptative | J8 |
-| `set_rewind_effect(actif)` | Effet complet de rembobinage (étouffement, aspiration, sons inversés) | J4/J5 |
+| `set_rewind_effect(actif)` | Effet complet de rembobinage (étouffement, aspiration, sons inversés) | J4 : fait par `RewindManager` (étouffement + boucle) ; J5 : ambiance inversée |
 
 ### Particularités du Web
 
@@ -170,6 +170,18 @@ trois résonateurs placés sur les formants d'une voyelle. **L'intonation porte 
 | `creature_calm` | Descendante | Retour au calme : la recherche n'a rien donné | Voix |
 
 Leurs pas reprennent un son de pas d'Élias, plus grave et plus discret.
+
+### Rembobinage (J4)
+
+Pendant le défilement arrière, tout le son passe dans le filtre passe-bas du Master
+(étouffement à 75 %, en 0,25 s), et une boucle joue par-dessus. Au relâchement, le filtre
+s'ouvre en 0,2 s et un « relâchement » marque la reprise. C'est `RewindManager` qui pilote
+ces effets.
+
+| Fichier (`sfx/`) | Rôle | Déclencheur | Bus |
+|---|---|---|---|
+| `rewind_loop` | Souffles joués à l'envers (des « aspirations ») et sifflement de bande qui ondule (boucle de 2 s) | Tant que « Rembobiner » est maintenu | UI |
+| `rewind_release` | Souffle vers l'avant, fréquence qui plonge, coup sourd | Reprise après un rembobinage | UI |
 
 *Les ambiances de zones et la musique seront ajoutées en J5 et J8 (voir PLAN §6.4 à
 §6.8).*

@@ -109,7 +109,13 @@ text = "PARADOXE - prototype"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Salle de test : mouvement et combat (J3)"
+text = "Salle de test : mouvement, combat, temps (J4)"
+
+[node name="ClassicToggle" type="CheckButton" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Comme les jeux d'origine : pas de rembobinage, pas de glissade, pas de rattrapage automatique des rebords, pas d'aides."
+text = "Mode classique (sans rembobinage ni aides)"
 
 [node name="Separator" type="HSeparator" parent="TestPanel/Items"]
 layout_mode = 2
