@@ -78,6 +78,12 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   `test_every_script_compiles` impose la règle.
 - Déplacement d'Élias : piloter ses intentions (`player.input.from_devices = false`, puis
   `input.move`, `input.press(&"jump")`…) et retirer son nœud `Foley` dans les tests.
+  Combat : `input.press(&"fire")` + `input.fire = true` pour charger, `input.shield = true`
+  pour le bouclier. Un tir ennemi se crée directement (`Projectile.new()` puis `setup()`).
+- `player.respawn()` émet `Events.player_respawned`, qui remet les Sentinelles à leur poste :
+  pour seulement déplacer Élias dans un test, changer `global_position`.
+- Le lanceur arrête tous les sons et attend 250 ms (temps réel) avant de quitter : sans
+  cela, les sons encore en cours apparaissent comme des « fuites mémoire » à la sortie.
 - Après un changement de gameplay, réintroduire une erreur dans le code et vérifier qu'un
   test la détecte : c'est le contrôle par mutation de l'audit J2.
 - `test_scenes_smoke.gd` instancie **toutes** les scènes de `scenes/` et charge **tous** les
@@ -100,6 +106,12 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   worker, puis rechargement). Après toute modification de ce script ou de la version de
   Godot : `./tools/web/check_update.sh`. Juste après la toute première installation du
   service worker, Chromium met les recherches de mise à jour en attente environ 60 s.
+- **Tirs** : un projectile ne se déplace pas avec une zone de collision (il traverserait les
+  murs fins) mais lance un rayon à chaque pas de physique (`Projectile.step`). Un bouclier
+  baissé quitte la couche `SHIELDS` au lieu d'être désactivé (changer une forme pendant un
+  calcul physique est interdit).
+- Les Sentinelles trouvent Élias par le groupe `player` et les tirs par le groupe
+  `projectiles`.
 - Les fichiers `*.uid` (scripts) et `*.import` (sons, images) **se versionnent**. Le
   dossier `.godot/` ne se versionne pas.
 - `build/` contient un `.gdignore` (créé par `tools/export.sh`), et `tools/web/` et

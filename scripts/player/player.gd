@@ -10,7 +10,7 @@ extends CharacterBody2D
 ## Repère : l'origine du nœud est AUX PIEDS d'Élias, au milieu. En 2D dans
 ## Godot, x va vers la droite et y vers le BAS (donc « monter » = y diminue).
 
-## Émis quand Élias meurt (cause : &"fall", &"hazard"…).
+## Émis quand Élias meurt (cause : &"fall", &"shot", &"hazard"…).
 signal died(cause: StringName)
 ## Émis à chaque atterrissage, avec la hauteur de chute en blocs.
 signal landed(fall_blocks: float)
@@ -28,9 +28,11 @@ var facing: int = 1:
 		facing = 1 if value >= 0 else -1
 		if visual:
 			visual.set_facing(facing)
+		if weapon:
+			weapon.facing = facing
 ## Intentions du joueur (clavier, manette, ou tests).
 var input := PlayerInput.new()
-## Invulnérable (roulade d'esquive, J3).
+## Invulnérable aux tirs (roulade d'esquive).
 var is_invulnerable: bool = false
 ## Plus haut point atteint depuis qu'Élias a quitté le sol (y le plus petit).
 ## Au sol, il suit la position des pieds : une chute se mesure toujours depuis
@@ -49,14 +51,24 @@ var is_crouched: bool = false
 
 @onready var visual: CharacterVisual = $Visual
 @onready var machine: StateMachine = $StateMachine
+## Jauge d'énergie (tir, bouclier, tir chargé) et arme.
+@onready var energy: EnergyPool = $Energy
+@onready var weapon: Weapon = $Weapon
 @onready var _shape_node: CollisionShape2D = $CollisionShape2D
 
 var _shape := RectangleShape2D.new()
 
 
 func _ready() -> void:
+	add_to_group(&"player")  # les ennemis trouvent Élias par ce groupe
 	collision_layer = PhysicsLayers.PLAYER
 	collision_mask = PhysicsLayers.WORLD
+	weapon.energy = energy
+	weapon.team = Projectile.TEAM_PLAYER
+	energy.changed.connect(func(value: float, capacity: float) -> void: visual.set_energy(value / capacity))
+	var gauge: EnergyGauge = get_node_or_null(^"EnergyGauge") as EnergyGauge
+	if gauge:
+		gauge.watch(energy)
 	floor_snap_length = 6.0
 	_shape_node.shape = _shape
 	set_crouched(false)
@@ -302,16 +314,27 @@ func _ray(from: Vector2, to: Vector2) -> Dictionary:
 # Vie et mort
 # --------------------------------------------------------------------------
 
+## Appelé par un projectile adverse qui touche le corps d'Élias. Renvoie vrai si
+## le tir l'a touché (il meurt : un seul tir suffit, comme dans les jeux
+## d'origine), faux s'il passe à travers (roulade d'esquive, déjà mort).
+func take_hit(_projectile: Projectile) -> bool:
+	if is_dead or is_invulnerable:
+		return false
+	kill(&"shot")
+	return true
+
+
 func kill(cause: StringName) -> void:
 	if is_dead:
 		return
 	is_dead = true
+	weapon.reset()
 	machine.transition_to(&"Dead", {"cause": cause})
 	died.emit(cause)
 	Events.player_died.emit(cause)
 
 
-## Réapparition (au checkpoint en J3 ; au début de la salle en J2).
+## Réapparition (au dernier checkpoint, voir Level) : jauge pleine, arme au repos.
 func respawn(at: Vector2, new_facing: int = 1) -> void:
 	global_position = at
 	velocity = Vector2.ZERO
@@ -322,6 +345,8 @@ func respawn(at: Vector2, new_facing: int = 1) -> void:
 	air_top_y = at.y
 	input.clear()
 	set_crouched(false)
+	weapon.reset()
+	energy.refill()
 	facing = new_facing
 	machine.transition_to(&"Idle")
 	Events.player_respawned.emit()

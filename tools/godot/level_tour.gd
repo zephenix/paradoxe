@@ -67,6 +67,26 @@ func _tour() -> void:
 	await _shot("tour_5_transition")
 	await _frames(40)
 	await _shot("tour_6_hall")
+	_player.input.move = 0
+	_player.input.run = false
+	# 5) Salle F : combat. Élias entre, se met à couvert, tire, se protège.
+	await _teleport(Vector2(6400 + 96, 528))
+	_player.input.move = 1
+	await _frames(40)
+	_player.input.move = 0
+	await _frames(10)
+	await _shot("tour_7_combat_room")
+	_player.input.press(&"fire")
+	await _frames(14)
+	await _shot("tour_8_shot")
+	await _frames(20)
+	_player.input.shield = true
+	await _frames(60)
+	await _shot("tour_9_shield")
+	_player.input.shield = false
+	_player.input.down = true
+	await _frames(50)
+	await _shot("tour_10_cover")
 	quit()
 
 

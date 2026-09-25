@@ -12,6 +12,9 @@ func physics_update(delta: float) -> void:
 	if p.lost_ground():
 		machine.transition_to(&"Fall")
 		return
+	# Tirer ou se protéger : Élias se relève pour dégainer (s'il y a la place).
+	if handle_combat_actions():
+		return
 	if p.wants(&"roll"):
 		machine.transition_to(&"Roll", {"landing": false})
 		return

@@ -7,8 +7,11 @@ extends Node
 ##
 ## J1 : squelette. Les champs se remplissent au fil des jalons.
 
-## Identifiant du dernier checkpoint atteint (J3).
+## Dernier checkpoint atteint (J3) : identifiant, position des pieds d'Élias à
+## la réapparition, et sens du regard. Identifiant vide = aucun checkpoint.
 var checkpoint_id: StringName = &""
+var checkpoint_position: Vector2 = Vector2.ZERO
+var checkpoint_facing: int = 1
 
 ## Nombre de rembobinages encore disponibles depuis le dernier checkpoint (J4).
 var rewinds_left: int = 0
@@ -32,8 +35,28 @@ func is_classic_mode() -> bool:
 	return Settings.classic_mode
 
 
+## Vrai si un checkpoint a été atteint depuis le début de la partie.
+func has_checkpoint() -> bool:
+	return checkpoint_id != &""
+
+
+## Enregistre un checkpoint. Renvoie vrai (et émet Events.checkpoint_reached)
+## seulement s'il est nouveau : repasser sur le checkpoint actif ne fait rien.
+## (J4 : c'est aussi ici que les rembobinages disponibles seront remis à 3.)
+func reach_checkpoint(id: StringName, at: Vector2, facing: int) -> bool:
+	if id == checkpoint_id:
+		return false
+	checkpoint_id = id
+	checkpoint_position = at
+	checkpoint_facing = 1 if facing >= 0 else -1
+	Events.checkpoint_reached.emit(id)
+	return true
+
+
 ## Remet l'état à zéro pour une nouvelle partie.
 func new_game() -> void:
 	checkpoint_id = &""
+	checkpoint_position = Vector2.ZERO
+	checkpoint_facing = 1
 	rewinds_left = 0
 	inventory.clear()

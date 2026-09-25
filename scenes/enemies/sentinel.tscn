@@ -1,0 +1,54 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/sentinel.gd" id="1_sentinel"]
+[ext_resource type="Script" path="res://scripts/enemies/sentinel_visual.gd" id="2_visual"]
+[ext_resource type="Script" path="res://scripts/core/state_machine.gd" id="3_machine"]
+[ext_resource type="Script" path="res://scripts/combat/energy_pool.gd" id="4_energy"]
+[ext_resource type="Script" path="res://scripts/combat/weapon.gd" id="5_weapon"]
+[ext_resource type="Resource" path="res://resources/enemies/sentinel_energy.tres" id="6_energy_cfg"]
+[ext_resource type="Resource" path="res://resources/weapons/sentinel_gun.tres" id="7_gun"]
+[ext_resource type="Script" path="res://scripts/enemies/states/patrol.gd" id="s0_patrol"]
+[ext_resource type="Script" path="res://scripts/enemies/states/suspicious.gd" id="s1_suspicious"]
+[ext_resource type="Script" path="res://scripts/enemies/states/search.gd" id="s2_search"]
+[ext_resource type="Script" path="res://scripts/enemies/states/combat.gd" id="s3_combat"]
+[ext_resource type="Script" path="res://scripts/enemies/states/chase.gd" id="s4_chase"]
+[ext_resource type="Script" path="res://scripts/enemies/states/sentinel_dead.gd" id="s5_dead"]
+
+[node name="Sentinel" type="CharacterBody2D"]
+script = ExtResource("1_sentinel")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("2_visual")
+
+[node name="Energy" type="Node" parent="."]
+script = ExtResource("4_energy")
+config = ExtResource("6_energy_cfg")
+
+[node name="Weapon" type="Node2D" parent="."]
+script = ExtResource("5_weapon")
+config = ExtResource("7_gun")
+team = &"enemy"
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("3_machine")
+initial_state = &"Patrol"
+
+[node name="Patrol" type="Node" parent="StateMachine"]
+script = ExtResource("s0_patrol")
+
+[node name="Suspicious" type="Node" parent="StateMachine"]
+script = ExtResource("s1_suspicious")
+
+[node name="Search" type="Node" parent="StateMachine"]
+script = ExtResource("s2_search")
+
+[node name="Combat" type="Node" parent="StateMachine"]
+script = ExtResource("s3_combat")
+
+[node name="Chase" type="Node" parent="StateMachine"]
+script = ExtResource("s4_chase")
+
+[node name="Dead" type="Node" parent="StateMachine"]
+script = ExtResource("s5_dead")

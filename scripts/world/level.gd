@@ -2,27 +2,39 @@ class_name Level
 extends Node2D
 ## Script d'un niveau : relie Élias, la caméra et les salles, et gère la mort.
 ##
-## J2 : à la mort, Élias réapparaît au point de départ de la dernière salle où
-## il s'est tenu debout (les vrais checkpoints arrivent en J3). « Pause » ramène
-## à l'écran titre (le menu pause arrive en J9).
+## Mort et réapparition (J3) : après un court délai (on voit Élias tomber), un
+## fondu au noir ; pendant le noir, les tirs en vol sont effacés et Élias
+## réapparaît au DERNIER CHECKPOINT atteint (ou à son point de départ s'il n'en
+## a touché aucun), jauge d'énergie pleine. Sa réapparition prévient les
+## ennemis (Events.player_respawned), qui reprennent leur poste. Le tout prend
+## moins de 2 secondes (PLAN §5.7 ; réglages dans resources/world/respawn.tres).
+## J4 ajoutera le choix « rembobiner » avant ce retour au checkpoint.
+##
+## « Pause » ramène à l'écran titre (le menu pause arrive en J9).
 
 ## Réglages de la réapparition (délai, fondus, vide sans fond).
 @export var respawn: RespawnConfig = preload("res://resources/world/respawn.tres")
+## Commencer une nouvelle partie en chargeant ce niveau (oublie les checkpoints
+## d'une partie précédente, gardés par l'autoload GameState).
+@export var new_game_on_start: bool = true
 
 @onready var player: Player = $Elias
 @onready var camera: CameraDirector = $CameraDirector
 
-## Salle où Élias réapparaîtra. On ne la retient que lorsqu'il a les pieds sur
-## un sol sûr : traverser une salle en tombant (le puits) ne compte pas.
-var _respawn_room: Room
+## Point de départ d'Élias (réapparition tant qu'aucun checkpoint n'est atteint).
+var _start_position: Vector2
+var _start_facing: int = 1
 
 
 func _ready() -> void:
+	if new_game_on_start:
+		GameState.new_game()
+	_start_position = player.global_position
+	_start_facing = player.facing
 	camera.target = player
 	player.died.connect(_on_player_died)
 	player.kill_y = _lowest_room_bottom() + respawn.kill_margin
 	camera.snap_to_target()
-	_respawn_room = camera.current_room
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -31,19 +43,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		SceneTransition.change_scene("res://scenes/ui/title_screen.tscn")
 
 
-## Salle dont la réapparition est la plus récente (pour les tests).
-func respawn_room() -> Room:
-	return _respawn_room
-
-
-func _physics_process(_delta: float) -> void:
-	# À chaque image où Élias a les pieds au sol (vivant), la salle qui le
-	# contient devient la salle de réapparition. Traverser une salle en tombant
-	# (le puits) ne la change donc pas.
-	if player.is_on_floor() and not player.is_dead:
-		var room: Room = camera.room_at(player.global_position + Vector2(0, -camera.target_height))
-		if room:
-			_respawn_room = room
+## Où Élias réapparaîtra s'il meurt maintenant : [position des pieds, sens du regard].
+func respawn_point() -> Array:
+	if GameState.has_checkpoint():
+		return [GameState.checkpoint_position, GameState.checkpoint_facing]
+	return [_start_position, _start_facing]
 
 
 func _on_player_died(_cause: StringName) -> void:
@@ -54,11 +58,17 @@ func _on_player_died(_cause: StringName) -> void:
 	await SceneTransition.fade_out(respawn.fade_out)
 	if SceneTransition.is_changing_scene or not is_inside_tree():
 		return
-	var room: Room = _respawn_room if _respawn_room else camera.current_room
-	if room:
-		player.respawn(room.spawn_point(), 1)
+	clear_projectiles()
+	var point: Array = respawn_point()
+	player.respawn(point[0], point[1])
 	camera.snap_to_target()
 	await SceneTransition.fade_in(respawn.fade_in)
+
+
+## Efface tous les tirs en vol (réapparition ; le rembobinage de J4 aussi).
+func clear_projectiles() -> void:
+	for node in get_tree().get_nodes_in_group(&"projectiles"):
+		node.queue_free()
 
 
 func _lowest_room_bottom() -> float:

@@ -22,6 +22,9 @@ func physics_update(delta: float) -> void:
 	if can_act and p.wants(&"roll"):
 		machine.transition_to(&"Roll", {"landing": false})
 		return
+	# Tirer ou se protéger en courant : Élias s'arrête net en dégainant.
+	if handle_combat_actions():
+		return
 	if p.input.down:
 		# Glissade avec de l'élan (mode moderne) ; sinon, on s'accroupit.
 		machine.transition_to(&"Slide" if p.modern() and p.has_momentum() else &"Crouch")

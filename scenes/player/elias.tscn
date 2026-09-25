@@ -20,6 +20,13 @@
 [ext_resource type="Script" path="res://scripts/player/states/ledge_climb.gd" id="s13_ledge_climb"]
 [ext_resource type="Script" path="res://scripts/player/states/ledge_descend.gd" id="s14_ledge_descend"]
 [ext_resource type="Script" path="res://scripts/player/states/dead.gd" id="s15_dead"]
+[ext_resource type="Script" path="res://scripts/player/states/aim.gd" id="s16_aim"]
+[ext_resource type="Script" path="res://scripts/player/states/shoot.gd" id="s17_shoot"]
+[ext_resource type="Script" path="res://scripts/player/states/charge.gd" id="s18_charge"]
+[ext_resource type="Script" path="res://scripts/player/states/shield.gd" id="s19_shield"]
+[ext_resource type="Script" path="res://scripts/combat/energy_pool.gd" id="5_energy"]
+[ext_resource type="Script" path="res://scripts/combat/weapon.gd" id="6_weapon"]
+[ext_resource type="Script" path="res://scripts/player/energy_gauge.gd" id="7_gauge"]
 
 [node name="Elias" type="CharacterBody2D"]
 script = ExtResource("1_player")
@@ -31,6 +38,15 @@ script = ExtResource("2_visual")
 
 [node name="Foley" type="Node" parent="."]
 script = ExtResource("4_foley")
+
+[node name="Energy" type="Node" parent="."]
+script = ExtResource("5_energy")
+
+[node name="Weapon" type="Node2D" parent="."]
+script = ExtResource("6_weapon")
+
+[node name="EnergyGauge" type="Node2D" parent="."]
+script = ExtResource("7_gauge")
 
 [node name="StateMachine" type="Node" parent="."]
 script = ExtResource("3_machine")
@@ -82,3 +98,15 @@ script = ExtResource("s14_ledge_descend")
 
 [node name="Dead" type="Node" parent="StateMachine"]
 script = ExtResource("s15_dead")
+
+[node name="Aim" type="Node" parent="StateMachine"]
+script = ExtResource("s16_aim")
+
+[node name="Shoot" type="Node" parent="StateMachine"]
+script = ExtResource("s17_shoot")
+
+[node name="Charge" type="Node" parent="StateMachine"]
+script = ExtResource("s18_charge")
+
+[node name="Shield" type="Node" parent="StateMachine"]
+script = ExtResource("s19_shield")

@@ -40,7 +40,11 @@ var drama_gain_db: float = 0.0:
 		drama_gain_db = clampf(value, SILENT_DB, 12.0)
 		_apply_drama_gain()
 
+## Distance (pixels) au-delà de laquelle un son positionné n'est plus audible.
+const POSITIONAL_MAX_DISTANCE: float = 2200.0
+
 var _pool: Array[AudioStreamPlayer] = []
+var _pool_2d: Array[AudioStreamPlayer2D] = []
 var _loops: Dictionary = {}  # identifiant -> AudioStreamPlayer
 var _muffle_tween: Tween
 var _gain_tween: Tween
@@ -88,6 +92,28 @@ func play_stream(stream: AudioStream, bus: StringName = AudioBuses.SFX, volume_d
 	player.bus = bus
 	player.volume_db = volume_db
 	player.pitch_scale = pitch
+	player.play()
+	return player
+
+
+## Joue un son court POSITIONNÉ dans le monde (plus faible et décalé à gauche
+## ou à droite selon sa place par rapport à la caméra). Si « noise_radius » est
+## positif, les ennemis sont prévenus par le signal noise_emitted : ils
+## « entendent » ce son dans ce rayon (J3 : tirs ; J6 : pas, chutes, pierres…).
+## (J5 : play_sfx(id, position) lira volume et rayon dans la bibliothèque de sons.)
+func play_stream_2d(stream: AudioStream, world_position: Vector2, bus: StringName = AudioBuses.SFX,
+		volume_db: float = 0.0, pitch: float = 1.0, noise_radius: float = 0.0,
+		source: Node = null) -> AudioStreamPlayer2D:
+	emit_noise(world_position, noise_radius, source)
+	if stream == null:
+		push_warning("AudioManager.play_stream_2d : aucun son fourni")
+		return null
+	var player: AudioStreamPlayer2D = _free_player_2d()
+	player.stream = stream
+	player.bus = bus
+	player.volume_db = volume_db
+	player.pitch_scale = pitch
+	player.global_position = world_position
 	player.play()
 	return player
 
@@ -227,6 +253,19 @@ func _free_player() -> AudioStreamPlayer:
 			return player
 	var extra: AudioStreamPlayer = _make_player()
 	_pool.append(extra)
+	return extra
+
+
+## Même principe pour les sons positionnés. Ces lecteurs sont des enfants de
+## l'autoload : leur position est donnée directement dans le monde du jeu.
+func _free_player_2d() -> AudioStreamPlayer2D:
+	for player in _pool_2d:
+		if not player.playing:
+			return player
+	var extra := AudioStreamPlayer2D.new()
+	extra.max_distance = POSITIONAL_MAX_DISTANCE
+	add_child(extra)
+	_pool_2d.append(extra)
 	return extra
 
 

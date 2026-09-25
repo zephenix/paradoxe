@@ -109,7 +109,22 @@ func _run() -> void:
 		print("Aucun test trouvé (filtre : %s)" % " ".join(filters))
 		failed = 1
 	OS.remove_logger(_catcher)
+	await _silence_audio()
 	quit(1 if failed > 0 else 0)
+
+
+## Arrête tous les sons avant de quitter. Le moteur mixe le son dans un fil
+## d'exécution à part, en temps RÉEL : un son arrêté n'est libéré qu'au passage
+## suivant de ce fil. Sans cette pause, les sons encore en cours au moment de
+## quitter apparaissent comme des « fuites mémoire » dans la console.
+func _silence_audio() -> void:
+	for node in root.find_children("*", "AudioStreamPlayer", true, false):
+		(node as AudioStreamPlayer).stop()
+	for node in root.find_children("*", "AudioStreamPlayer2D", true, false):
+		(node as AudioStreamPlayer2D).stop()
+	OS.delay_msec(250)
+	await process_frame
+	await process_frame
 
 
 ## Appelle target.method() (éventuellement une coroutine) et attend sa fin, au

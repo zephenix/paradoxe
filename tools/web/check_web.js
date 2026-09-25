@@ -97,9 +97,21 @@ function findChromium() {
   if (after.rms < 0.005) problems.push('aucun son mesuré après le clic');
   await page.screenshot({ path: path.join(outDir, 'web_after_click.png') });
 
+  // Salle de test : Entrée active le bouton « salle de test » (il a le focus),
+  // puis Élias tire (touche X) : on vérifie que le jeu tourne sans erreur.
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(4000);
+  await page.keyboard.down('KeyX');
+  await page.waitForTimeout(300);
+  await page.keyboard.up('KeyX');
+  await page.waitForTimeout(700);
+  await page.screenshot({ path: path.join(outDir, 'web_level.png') });
+
   // Le message « Service worker already exists » de Godot est attendu et sans conséquence.
   const realErrors = jsErrors.filter(e => !e.includes('Service worker already exists'));
   if (realErrors.length) problems.push('erreurs JavaScript : ' + realErrors.join(' | '));
+  const engineErrors = consoleLines.filter(l => l.startsWith('[error]') && !l.includes('Service worker already exists'));
+  if (engineErrors.length) problems.push('erreurs du moteur : ' + engineErrors.join(' | '));
 
   console.log('--- Console du navigateur ---');
   consoleLines.forEach(l => console.log(l));

@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://scripts/world/camera_director.gd" id="4_camera"]
 [ext_resource type="PackedScene" path="res://scenes/player/elias.tscn" id="5_elias"]
 [ext_resource type="Script" path="res://scripts/fx/skyline.gd" id="6_skyline"]
+[ext_resource type="PackedScene" path="res://scenes/props/checkpoint.tscn" id="7_checkpoint"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/sentinel.tscn" id="8_sentinel"]
 
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
@@ -103,7 +105,7 @@ text = "SALLE A : LES BASES
 Flèches ou ZQSD : marcher     Maj (maintenue) : courir
 Haut : se hisser sur la marche et sur le mur
 Bas : s'accroupir, puis avancer accroupi dans le tunnel
-C : roulade     Échap : retour au titre"
+C : roulade     J : tirer     K : bouclier (combat : salle F)     Échap : retour au titre"
 
 [node name="RoomB" type="Node2D" parent="."]
 position = Vector2(1280, 0)
@@ -111,6 +113,9 @@ script = ExtResource("2_room")
 room_size = Vector2(1280, 720)
 camera_zoom = 1.0
 title = "B - Sauts"
+
+[node name="Checkpoint" parent="RoomB" instance=ExtResource("7_checkpoint")]
+position = Vector2(96, 528)
 
 [node name="Spawn" type="Marker2D" parent="RoomB"]
 position = Vector2(48, 528)
@@ -164,6 +169,9 @@ script = ExtResource("2_room")
 room_size = Vector2(1280, 720)
 camera_zoom = 1.0
 title = "C - Rebords et chutes"
+
+[node name="Checkpoint" parent="RoomC" instance=ExtResource("7_checkpoint")]
+position = Vector2(96, 528)
 
 [node name="Spawn" type="Marker2D" parent="RoomC"]
 position = Vector2(48, 528)
@@ -255,6 +263,9 @@ room_size = Vector2(2560, 960)
 camera_zoom = 0.75
 title = "E - Grand hall"
 
+[node name="Checkpoint" parent="RoomE" instance=ExtResource("7_checkpoint")]
+position = Vector2(120, 768)
+
 [node name="Spawn" type="Marker2D" parent="RoomE"]
 position = Vector2(48, 768)
 
@@ -291,7 +302,7 @@ size_blocks = Vector2(3, 7)
 [node name="Block6" type="StaticBody2D" parent="RoomE"]
 position = Vector2(2544, 0)
 script = ExtResource("3_block")
-size_blocks = Vector2(1, 20)
+size_blocks = Vector2(1, 13)
 
 [node name="Hint" type="Label" parent="RoomE"]
 offset_left = 48
@@ -302,7 +313,66 @@ theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "SALLE E : GRAND HALL
 Salle plus grande que l'écran : la caméra recule et suit Élias
-Libre entraînement"
+Libre entraînement. Salle de combat : la porte à droite"
+
+[node name="RoomF" type="Node2D" parent="."]
+position = Vector2(6400, -144)
+script = ExtResource("2_room")
+room_size = Vector2(1920, 720)
+camera_zoom = 1.0
+title = "F - Combat"
+
+[node name="Checkpoint" parent="RoomF" instance=ExtResource("7_checkpoint")]
+position = Vector2(96, 672)
+
+[node name="Spawn" type="Marker2D" parent="RoomF"]
+position = Vector2(96, 672)
+
+[node name="Block0" type="StaticBody2D" parent="RoomF"]
+position = Vector2(0, 672)
+script = ExtResource("3_block")
+size_blocks = Vector2(40, 2)
+
+[node name="Cover1" type="StaticBody2D" parent="RoomF"]
+position = Vector2(432, 600)
+script = ExtResource("3_block")
+size_blocks = Vector2(1, 1.5)
+color = Color(0.33, 0.37, 0.42, 1)
+
+[node name="Cover2" type="StaticBody2D" parent="RoomF"]
+position = Vector2(1104, 600)
+script = ExtResource("3_block")
+size_blocks = Vector2(1, 1.5)
+color = Color(0.33, 0.37, 0.42, 1)
+
+[node name="Block1" type="StaticBody2D" parent="RoomF"]
+position = Vector2(1872, 0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1, 14)
+
+[node name="Sentinel1" parent="RoomF" instance=ExtResource("8_sentinel")]
+position = Vector2(816, 672)
+patrol_left_blocks = 2.0
+patrol_right_blocks = 2.0
+
+[node name="Sentinel2" parent="RoomF" instance=ExtResource("8_sentinel")]
+position = Vector2(1536, 672)
+patrol_left_blocks = 0.0
+patrol_right_blocks = 0.0
+rng_seed = 2
+
+[node name="Hint" type="Label" parent="RoomF"]
+offset_left = 48
+offset_top = 96
+offset_right = 1048
+offset_bottom = 276
+theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
+theme_override_font_sizes/font_size = 17
+text = "SALLE F : COMBAT
+J ou X : tirer (1 unité d'énergie). Maintenir après un tir : tir chargé, qui brise un bouclier
+K ou W (Z en QWERTY) : bouclier, tant que la touche est maintenue (il consomme de l'énergie)
+Bas : s'accroupir derrière un muret. Les tirs debout passent au-dessus, pas les tirs à genou
+C : roulade d'esquive. Un seul tir tue, Élias comme les Sentinelles"
 
 [node name="Elias" parent="." instance=ExtResource("5_elias")]
 position = Vector2(144, 624)
