@@ -14,12 +14,17 @@ var player: Player
 
 
 func before_each() -> void:
+	GameState.new_game()
 	level = LEVEL.instantiate()
 	level.get_node("Elias").get_node("Foley").free()  # parcours muet
 	add_node(level)
 	player = level.player
 	player.input.from_devices = false
 	await wait_physics(3)
+
+
+func after_each() -> void:
+	GameState.new_game()
 
 
 func test_room_a_leads_to_room_b() -> void:
@@ -47,25 +52,41 @@ func test_room_a_leads_to_room_b() -> void:
 	assert_false(player.is_dead)
 
 
-func test_death_in_the_shaft_respawns_in_room_c() -> void:
-	var room_c: Room = level.get_node("RoomC")
-	# Élias se tient d'abord sur le sol de C, juste avant le puits…
-	player.respawn(Vector2(2560 + 19.5 * B, 11 * B), 1)
+func test_death_in_the_shaft_respawns_at_room_c_checkpoint() -> void:
+	var checkpoint: Checkpoint = level.get_node("RoomC/Checkpoint")
+	# Élias passe sur le checkpoint à l'entrée de C…
+	player.respawn(checkpoint.global_position, 1)
 	level.camera.snap_to_target()
 	await wait_physics(5)
-	assert_eq(level.respawn_room(), room_c, "C est la salle de réapparition")
+	assert_eq(GameState.checkpoint_id, checkpoint.id(), "checkpoint de C atteint")
 	# … puis tombe dans le puits (x de 21 à 22,5 blocs dans C).
-	player.respawn(Vector2(2560 + 21.75 * B, 10 * B), 1)
+	player.global_position = Vector2(2560 + 21.75 * B, 10 * B)
 	player.air_top_y = player.global_position.y
 	player.machine.transition_to(&"Fall")
 	assert_true(await _wait_until(func() -> bool: return player.is_dead, 300), "chute mortelle dans le puits")
 	var total: float = level.respawn.total_time()
 	await wait_physics_seconds(total + 0.3)
 	assert_false(player.is_dead, "réapparu")
-	assert_eq(level.respawn_room(), room_c, "le puits (D) n'est pas devenu la salle de réapparition")
-	assert_true(room_c.world_rect().has_point(player.global_position + Vector2(0, -10)), "réapparaît dans la salle C")
+	assert_almost_eq(player.global_position.x, checkpoint.global_position.x, 1.0, "au checkpoint de C")
 	await wait_physics(10)
 	assert_true(player.is_on_floor(), "sur un sol")
+
+
+func test_every_screen_after_the_first_has_a_checkpoint() -> void:
+	for room_name: String in ["RoomB", "RoomC", "RoomE", "RoomF"]:
+		var checkpoint: Checkpoint = level.get_node_or_null(room_name + "/Checkpoint")
+		assert_not_null(checkpoint, "%s : checkpoint à l'entrée" % room_name)
+		if checkpoint:
+			var room: Room = level.get_node(room_name)
+			assert_true(room.world_rect().has_point(checkpoint.global_position + Vector2(0, -10)), "%s : dans la salle" % room_name)
+
+
+func test_combat_room_has_two_sentinels_and_low_cover() -> void:
+	var sentinels: Array[Node] = level.get_node("RoomF").find_children("*", "Sentinel", false, false)
+	assert_eq(sentinels.size(), 2, "deux Sentinelles")
+	for cover: String in ["RoomF/Cover1", "RoomF/Cover2"]:
+		var block: SolidBlock = level.get_node(cover)
+		assert_almost_eq(block.size_blocks.y, 1.5, 0.001, "%s : muret de 1,5 bloc" % cover)
 
 
 func test_respawn_takes_less_than_two_seconds() -> void:

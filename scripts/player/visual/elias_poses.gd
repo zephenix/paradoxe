@@ -103,7 +103,7 @@ const POSES: Dictionary = {
 	# Combat (J3). Bras avant à 90° : tendu à l'horizontale, pistolet au bout.
 	"aim": {"torso": 0, "head": -2, "hips_y": 1, "arm_f": 90, "fore_f": 0, "arm_b": 40, "fore_b": 70,
 		"thigh_f": 14, "shin_f": -6, "thigh_b": -12, "shin_b": -4, "coat": 2},
-	"recoil": {"torso": -5, "head": -6, "hips_y": 1, "arm_f": 104, "fore_f": 8, "arm_b": 34, "fore_b": 70,
+	"recoil": {"torso": -3, "head": -4, "hips_y": 1, "arm_f": 97, "fore_f": 3, "arm_b": 36, "fore_b": 70,
 		"thigh_f": 14, "shin_f": -6, "thigh_b": -12, "shin_b": -4, "coat": 6},
 	"charge": {"torso": 5, "head": 0, "hips_y": 4, "arm_f": 88, "fore_f": 0, "arm_b": 72, "fore_b": 25,
 		"thigh_f": 20, "shin_f": -18, "thigh_b": -16, "shin_b": -12, "coat": -2},
@@ -149,7 +149,7 @@ const ANIMATIONS: Dictionary = {
 	"descend": {"length": 0.5, "keys": [[0.0, "stand"], [0.18, "sit_edge"], [0.35, "pull"], [0.5, "hang"]]},
 	# Combat (J3). « shoot » dure fire_cooldown (réglage de l'arme).
 	"aim": {"length": 1.6, "loop": true, "keys": [[0.0, "aim"], [0.8, "aim", false, {"torso": 2, "hips_y": 2}], [1.6, "aim"]]},
-	"shoot": {"length": 0.28, "keys": [[0.0, "aim"], [0.05, "recoil"], [0.28, "aim"]]},
+	"shoot": {"length": 0.28, "keys": [[0.0, "aim"], [0.04, "recoil"], [0.14, "aim"], [0.28, "aim"]]},
 	"charge": {"length": 0.3, "loop": true, "keys": [[0.0, "charge"], [0.15, "charge", false, {"arm_f": 86, "hips_y": 5}], [0.3, "charge"]]},
 	"shield": {"length": 0.15, "keys": [[0.0, "aim"], [0.15, "guard"]]},
 	"kneel_aim": {"length": 0.2, "keys": [[0.0, "crouch"], [0.2, "kneel_aim"]]},
