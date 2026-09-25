@@ -24,6 +24,7 @@ const SHIFT_WHEN_PANEL_OPEN: float = -210.0
 @onready var _panel: Control = %TestPanel
 @onready var _diagnostics: Label = %Diagnostics
 @onready var _level_button: Button = %LevelButton
+@onready var _classic_toggle: CheckButton = %ClassicToggle
 @onready var _impact_button: Button = %ImpactButton
 @onready var _hum_toggle: CheckButton = %HumToggle
 @onready var _reverb_toggle: CheckButton = %ReverbToggle
@@ -46,6 +47,8 @@ func _ready() -> void:
 	blink.tween_property(_prompt, "modulate:a", 1.0, 1.1).set_trans(Tween.TRANS_SINE)
 
 	_level_button.pressed.connect(_on_level_pressed)
+	_classic_toggle.set_pressed_no_signal(Settings.classic_mode)
+	_classic_toggle.toggled.connect(_on_classic_toggled)
 	_impact_button.pressed.connect(_on_impact_pressed)
 	_hum_toggle.toggled.connect(_on_hum_toggled)
 	_reverb_toggle.toggled.connect(_on_reverb_toggled)
@@ -120,6 +123,8 @@ func _update_diagnostics() -> void:
 	var platform: String = OS.get_name()
 	if OS.has_feature("web"):
 		platform += " (%s)" % ("multithread" if OS.has_feature("threads") else "monothread")
+	if Settings.classic_mode:
+		platform += "  ·  mode classique"
 	_diagnostics.text = "PARADOXE v%s  ·  Godot %s  ·  %s  ·  rendu %s  ·  %d img/s\n%s" % [
 		ProjectSettings.get_setting("application/config/version"),
 		Engine.get_version_info().string,
@@ -137,6 +142,14 @@ func _on_level_pressed() -> void:
 	AudioManager.play_stream(SOUND_CONFIRM, AudioBuses.UI)
 	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
 	SceneTransition.change_scene(TEST_LEVEL)
+
+
+## Mode classique (PLAN §5.9) : réglage du joueur, sauvegardé. Le vrai menu
+## d'options arrive en J9 ; en attendant, l'interrupteur est ici.
+func _on_classic_toggled(enabled: bool) -> void:
+	Settings.classic_mode = enabled
+	Settings.save_settings()
+	Events.settings_changed.emit()
 
 
 func _on_impact_pressed() -> void:

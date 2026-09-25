@@ -189,12 +189,15 @@ func test_resume_in_the_air_keeps_falling() -> void:
 
 func test_resume_never_starts_in_the_middle_of_a_roll() -> void:
 	await wait_physics_seconds(1.0)
+	var x_before: float = player.global_position.x
 	player.input.press(&"roll")
-	await wait_physics(15)  # au milieu de la roulade
+	await wait_physics(24)  # 0,4 s de roulade (elle dure 0,5 s)
 	assert_eq(player.machine.current_name, &"Roll")
 	assert_true(await die_and_wait_for_choice())
-	await rewind_for(0.35 / cfg.rewind_speed)
+	# Remonter 0,32 s : le curseur tombe au milieu de la roulade.
+	await rewind_for(0.32 / cfg.rewind_speed)
 	assert_ne(player.machine.current_name, &"Roll", "on reprend avant le geste en cours")
+	assert_almost_eq(player.global_position.x, x_before, 0.5, "à l'endroit d'avant la roulade, pas au milieu")
 	assert_false(player.is_dead)
 
 
