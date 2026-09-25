@@ -108,6 +108,13 @@ func _tour() -> void:
 	death.rewind_held = false
 	await _frames(20)
 	await _shot("tour_13_resumed")
+	# Sons arrêtés avant de quitter (sinon « fuite » affichée, voir tests/run_tests.gd).
+	for node in root.find_children("*", "AudioStreamPlayer", true, false):
+		(node as AudioStreamPlayer).stop()
+	for node in root.find_children("*", "AudioStreamPlayer2D", true, false):
+		(node as AudioStreamPlayer2D).stop()
+	OS.delay_msec(250)
+	await _frames(2)
 	quit()
 
 

@@ -80,6 +80,12 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   `input.move`, `input.press(&"jump")`…) et retirer son nœud `Foley` dans les tests.
   Combat : `input.press(&"fire")` + `input.fire = true` pour charger, `input.shield = true`
   pour le bouclier. Un tir ennemi se crée directement (`Projectile.new()` puis `setup()`).
+- Mort d'Élias (J4) : en mode moderne, avec assez d'historique, la séquence de mort
+  (`level.death`, un `DeathController`) ralentit, **met le jeu en pause** et attend un choix.
+  Dans un test : `level.death.input_from_devices = false`, puis `rewind_held = true/false`
+  ou `request_checkpoint()`. Remettre `Engine.time_scale = 1.0` et `tree.paused = false`
+  dans `after_each()`. Un test qui s'arrête pendant un fondu laisse l'écran noir pour les
+  suivants : attendre la fin des fondus.
 - `player.respawn()` émet `Events.player_respawned`, qui remet les Sentinelles à leur poste :
   pour seulement déplacer Élias dans un test, changer `global_position`.
 - Le lanceur arrête tous les sons et attend 250 ms (temps réel) avant de quitter : sans
@@ -110,6 +116,11 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   murs fins) mais lance un rayon à chaque pas de physique (`Projectile.step`). Un bouclier
   baissé quitte la couche `SHIELDS` au lieu d'être désactivé (changer une forme pendant un
   calcul physique est interdit).
+- **Rembobinage** : un objet rembobinable rejoint le groupe `rewindable` et fournit
+  `capture_state()`, `apply_state(état)` (se replacer, jeu en pause) et
+  `resume_state(état)` (repartir). Un état de machine peut fournir `snapshot()` ; il reçoit
+  alors ces données dans `enter(…, data)` avec `"resumed": true` (ne pas rejouer ses sons
+  d'entrée). Une photo `"stable": false` n'est jamais un point de reprise.
 - Les Sentinelles trouvent Élias par le groupe `player` et les tirs par le groupe
   `projectiles`.
 - Les fichiers `*.uid` (scripts) et `*.import` (sons, images) **se versionnent**. Le

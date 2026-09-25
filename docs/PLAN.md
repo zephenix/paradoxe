@@ -179,7 +179,7 @@ stateDiagram-v2
 | `resources/weapons/pistol.tres` | cadence, vitesse du projectile, temps de charge, durée de bouclier |
 | `resources/enemies/sentinel.tres` | vitesses, distances de vue, angle de vision, seuil de lumière, sensibilité auditive, durées d'alerte / de recherche, temps de réaction |
 | `resources/enemies/sentinel_energy.tres`, `resources/weapons/sentinel_gun.tres` | jauge et arme des Sentinelles (J3) : mêmes réglages qu'Élias, autres valeurs |
-| `resources/rewind.tres` | durée enregistrée (5 s), fréquence d'échantillonnage, utilisations par checkpoint (3) |
+| `resources/rewind.tres` | durée enregistrée (5 s), fréquence d'échantillonnage, utilisations par checkpoint (3), vitesse du défilement, ralenti à la mort |
 | `resources/audio/sound_library.tres` | chaque son : fichiers, bus, volume, variation de hauteur, **rayon de bruit perçu par les ennemis** |
 | `resources/audio/zones/*.tres` | une zone acoustique : couches d'ambiance, réverbération, filtre |
 | `resources/assist.tres` | valeurs par défaut des options d'assistance |
@@ -380,6 +380,20 @@ stateDiagram-v2
 - Son : étouffement progressif (filtre passe-bas sur le master), aspiration, ambiance
   inversée, puis « relâchement » à la reprise.
 - Mode classique : désactivé, retour direct au checkpoint.
+- *Précisions de J4* (réglages dans `resources/rewind.tres`) :
+  - le ralenti dure 0,6 s réelle au quart de la vitesse ; puis le jeu se fige et le choix
+    s'affiche (provisoirement à l'écran ; sur le bracelet en J9) ;
+  - on remonte 1,5 s d'historique par seconde réelle ; relâcher avant d'avoir remonté
+    0,3 s ne consomme rien ;
+  - on reprend à la dernière photo **stable** avant le curseur : jamais au milieu d'un
+    geste engagé (hissage, roulade, réception, tir…), toujours dans une posture simple
+    (arrêt, marche, course, accroupi, chute, suspendu, arme levée) ;
+  - une Sentinelle tuée pendant les secondes remontées se relève ; son hasard (bouclier ou
+    non) repart du même point ;
+  - les rembobinages sont rendus à chaque nouveau checkpoint **et** à chaque retour au
+    checkpoint ;
+  - enregistrés en J4 : Élias (et son énergie), les Sentinelles (et la leur). Portes,
+    ascenseurs, lampes et compagnon rejoindront le groupe `rewindable` avec leur jalon.
 
 ### 5.6 Compagnon (J7)
 - IA à états : **Suivre** (garde une distance, saute et grimpe par des points de passage
@@ -412,6 +426,8 @@ stateDiagram-v2
 Un interrupteur unique, `Settings.classic_mode` (réglage du joueur, lu via
 `GameState.is_classic_mode()`), lu par : le parkour (5.1), le rembobinage
 (5.5) et la perception (5.4). Il est testé automatiquement.
+*État en J4* : un interrupteur « Mode classique » sur l'écran titre (en attendant le menu
+d'options de J9) ; il coupe le rembobinage, et les six aides du parkour de J2.
 
 ### 5.10 Interface diégétique : le bracelet (J9)
 - **Aucun HUD permanent.** Le poignet gauche d'Élias porte un bracelet.

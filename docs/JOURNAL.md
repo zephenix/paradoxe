@@ -605,3 +605,144 @@ procédures sans en fournir le code). L'image la plus proche est un classeur mod
 repart de toutes ses feuilles et formules, et on ne change que ce qui diffère. Avec une
 différence de taille : ici, le lien reste vivant. Une correction dans `EliasVisual`, ou une
 nouvelle pose ajoutée pour Élias, sert aussitôt aux Sentinelles.
+
+---
+
+## J4 — Remonter le temps (v0.4)
+
+### Ce qui a été fait
+
+- **Enregistrement du temps** (`RewindManager`, réglages `resources/rewind.tres`) :
+  30 fois par seconde, une « photo » d'Élias et de chaque Sentinelle est prise (position,
+  vitesse, énergie, pose, état de la machine à états…). Seules les 5 dernières secondes sont
+  gardées : la plus vieille photo est jetée à chaque nouvelle.
+- **Séquence de mort** (`DeathController`, créé par le niveau) :
+  1. **ralenti** : le jeu tourne au quart de sa vitesse pendant 0,6 s, on voit Élias tomber ;
+  2. **temps figé** : le jeu se met en pause, l'image se désature, et le choix s'affiche ;
+  3. **maintenir R** : le temps remonte à l'écran (image froide, lignes qui défilent, son
+     étouffé, souffles à l'envers) ; **relâcher** : on reprend à cet instant ;
+  4. ou **Entrée / Espace** : retour au checkpoint, comme en J3.
+- **Reprise propre** : on ne reprend jamais au milieu d'un geste engagé (hissage, roulade,
+  tir…). Le jeu recule jusqu'à la dernière photo où Élias était dans une posture simple
+  (arrêt, marche, course, accroupi, en chute, suspendu, arme levée).
+- **Le monde remonte aussi le temps** : une Sentinelle tuée pendant les secondes remontées
+  se relève, et son « hasard » repart du même point. Les tirs en vol disparaissent.
+- **3 rembobinages par checkpoint** : rendus à chaque nouveau checkpoint et à chaque retour
+  au checkpoint. Quand il n'en reste plus, la mort ramène directement au checkpoint.
+- **Mode classique** : un interrupteur sur l'écran titre (sauvegardé). Pas de rembobinage
+  (retour direct au checkpoint), et aucune des six aides du parkour de J2. Le diagnostic en
+  bas de l'écran titre l'indique.
+- **2 sons** générés : la boucle du rembobinage et le « relâchement » à la reprise.
+- **Tests** : 206 au total (16 nouveaux). `test_rewind.gd` vérifie entre autres qu'après
+  un rembobinage, Élias est **exactement** à une position qu'il a occupée (au millième de
+  pixel).
+
+### Comment tester
+
+1. Écran titre : cliquer, laisser le mode classique **désactivé**, puis « Salle de test ».
+2. Mourir, par exemple dans le puits de la salle C, ou sous les tirs dans la salle F.
+3. Pendant le choix :
+
+| À essayer | Ce qui doit se passer |
+|---|---|
+| **Maintenir R** | Le temps remonte, l'image devient froide et tremblante, le compteur « << 1,2 s » grandit |
+| **Relâcher R** | Reprise à cet instant, couleurs normales ; « 2 restants » à la mort suivante |
+| Relâcher R tout de suite | « remonter un peu plus » : rien n'est consommé |
+| Maintenir R longtemps | Arrêt au bout des 5 s (« pas plus loin ») |
+| Tuer une Sentinelle, se faire tuer, remonter | La Sentinelle se relève |
+| **Entrée** | Retour au checkpoint |
+| 4 morts de suite | À la 4e, plus de choix : retour direct au checkpoint (et 3 rembobinages rendus) |
+
+4. Puis, sur l'écran titre, activer le **mode classique** : la mort ramène directement au
+   checkpoint, et le parkour perd ses aides (pas de glissade, il faut maintenir Haut pour
+   s'accrocher, etc.).
+
+### Ce qu'il faut écouter
+
+| Moment | Ce que tu dois entendre |
+|---|---|
+| Mort | Le corps qui tombe, au ralenti avec l'image |
+| Temps qui remonte | Tout le son s'étouffe, comme sous l'eau ; des souffles « à l'envers » et un sifflement de bande qui ondule |
+| Reprise | Le son se rouvre d'un coup, avec un souffle vers l'avant et un coup sourd |
+
+L'étouffement agit sur **tout** le son (filtre du bus Master) : c'est l'effet qui ne
+marcherait pas sur le Web en mode « Sample », d'où le choix du mode « Stream » en J1.
+
+### Décisions prises (et pourquoi)
+
+- **Photos d'états explicites plutôt qu'enregistrement de la physique** : chaque objet dit
+  lui-même ce qu'il faut retenir de lui. C'est plus de code, mais c'est la seule façon de
+  restaurer **exactement** (PLAN §10, risque « rembobinage et physique »).
+- **Reprise à la dernière photo stable** : reprendre au milieu d'un hissage ou d'une
+  roulade demanderait de sauvegarder tous les détails internes de ces gestes. En reculant
+  de quelques centièmes de seconde jusqu'à une posture simple, la reprise est toujours
+  cohérente, et le joueur ne voit pas la différence.
+- **Élias reste « mort » pendant le défilement** : il ne revit qu'à la reprise. Si le
+  joueur choisit finalement le checkpoint, le monde est d'abord remis dans son état au
+  moment de la mort.
+- **Le temps de ralenti est mesuré en temps réel** (minuteur qui ignore le ralenti) : sinon
+  un ralenti de 0,6 s au quart de la vitesse durerait 2,4 s.
+- **Checkpoints non rembobinés** : un checkpoint atteint le reste, même si l'on remonte
+  avant le moment où on l'a touché.
+- **Affichage du choix provisoire** : un texte à l'écran, en attendant l'hologramme du
+  bracelet (J9).
+
+### Vérifications effectuées
+
+- **206 tests** au vert. `test_rewind.gd` (15 tests) couvre la mémoire circulaire, la
+  restauration exacte de la position, la Sentinelle relevée, l'énergie, les tirs effacés,
+  le rembobinage trop court, la limite des 5 s, la reprise en l'air, la reprise avant une
+  roulade, la limite de 3, le checkpoint qui les rend, le mode classique, le ralenti, et la
+  sortie du niveau pendant le choix (pause levée, vitesse normale). S'y ajoute
+  `test_title_screen.gd` (interrupteur du mode classique, sauvegardé).
+- **Contrôle par mutation** : 13 erreurs réintroduites, 13 détectées. Au premier essai,
+  l'erreur « reprendre au milieu d'une roulade » passait : le test a été corrigé pour que
+  le curseur tombe vraiment au milieu du geste.
+- **Captures** (`level_tour.gd`, captures 11 à 13) : le choix sur l'image figée, le
+  rembobinage en cours (Élias revenu 1 s en arrière, compteur « << 1.0 s »), la reprise.
+  J'y ai vu que la caméra ne suivait pas Élias pendant le défilement : corrigé.
+- **Web** : export vérifié dans Chromium (démarrage, son, salle de test, tir). L'effet
+  d'image utilise le moteur de rendu « Compatibility », le même sur ordinateur et sur le
+  Web ; je n'ai pas pu déclencher une mort dans le navigateur de test (aucun moyen de tuer
+  Élias depuis la page sans ajouter une triche au jeu). **À vérifier de ton côté** : l'effet
+  du rembobinage sur la version en ligne.
+
+### Reste à faire / points d'attention
+
+- À juger en jouant : durée du ralenti, vitesse du défilement (1,5 s par seconde), nombre
+  de rembobinages. Tout est dans `resources/rewind.tres`.
+- Le compteur de rembobinages et le choix passeront sur le bracelet en J9.
+- L'ambiance « inversée » pendant le rembobinage viendra avec les ambiances de zone (J5).
+- Proposé avant le tag v0.4 : l'**audit du code** de J3 et J4 (voir la fin de ce jalon
+  dans la conversation).
+- Jalon suivant : **J5, le son** (générateur, bibliothèque, ambiances, banc d'écoute).
+
+### Concepts Godot expliqués
+
+**1. La pause, et les nœuds qui continuent quand même**
+
+`get_tree().paused = true` fige le jeu : les nœuds cessent d'appeler leurs fonctions
+`_process` et `_physics_process`. Chaque nœud a un réglage `process_mode` qui dit comment
+il réagit :
+- **Inherit** (par défaut) : comme son parent ;
+- **Pausable** : s'arrête pendant la pause ;
+- **Always** : continue toujours.
+
+Le rembobinage s'appuie là-dessus. Le niveau, Élias et les Sentinelles sont figés.
+`RewindManager`, `AudioManager` et `DeathController` sont en **Always** : ils continuent
+de tourner, remontent le temps et replacent les objets figés, photo après photo. C'est
+comme figer le recalcul d'Excel (mode manuel) : les cellules ne bougent plus toutes
+seules, mais une macro peut encore y écrire des valeurs.
+
+**2. Un shader d'écran : retoucher l'image entière**
+
+Un *shader* est un petit programme exécuté par la carte graphique **pour chaque pixel**.
+Celui du rembobinage (`assets/shaders/rewind.gdshader`) est posé sur un rectangle qui
+couvre l'écran. Il lit l'image déjà dessinée (`hint_screen_texture`), puis :
+- la désature (moyenne pondérée des couleurs) et la refroidit ;
+- la décale un peu à l'horizontale selon une sinusoïde : c'est le tremblement ;
+- l'assombrit une ligne sur deux : ce sont les lignes qui défilent.
+
+Un seul paramètre, `strength`, règle tout : 0 = image normale, 0,5 = temps figé, 1 =
+rembobinage. C'est l'équivalent d'une mise en forme conditionnelle appliquée à toute la
+feuille d'un coup, mais calculée 60 fois par seconde pour chaque pixel.

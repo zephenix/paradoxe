@@ -12,11 +12,12 @@ plan. Le tout est modernisé avec du parkour, un rembobinage temporel limité, u
 de l'infiltration par la lumière et le son, et une interface intégrée au personnage.
 Tous les éléments du jeu (images, sons, musique) sont originaux ou générés par du code.
 
-> **État actuel : jalon J3 (v0.3), le combat.** Depuis l'écran titre, une **salle de
+> **État actuel : jalon J4 (v0.4), le rembobinage.** Depuis l'écran titre, une **salle de
 > test** de six écrans permet d'essayer tous les mouvements d'Élias (marche, course, sauts,
-> rebords, roulade, glissade, chutes) puis de **combattre deux Sentinelles** : pistolet,
-> tir chargé, bouclier, jauge d'énergie, couverts, checkpoints. Le rembobinage temporel
-> arrive en J4. Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
+> rebords, roulade, glissade, chutes), de **combattre deux Sentinelles** (pistolet, tir
+> chargé, bouclier, jauge d'énergie, couverts, checkpoints) et, à chaque mort, de
+> **remonter le temps** (jusqu'à 5 s, 3 fois par checkpoint). Un interrupteur active le
+> **mode classique**, sans rembobinage ni aides. Le son complet arrive en J5. Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
 > avancement : [`docs/JOURNAL.md`](docs/JOURNAL.md).
 
 ---
@@ -87,7 +88,7 @@ touches notées « WASD » (clavier QWERTY) correspondent à **ZQSD** sur un cla
 | Pause | Échap ou P | Start / Menu | J9 |
 | Passer une cinématique (maintenir) | Échap ou Espace | Start ou A | J7 |
 
-Dans la version actuelle (J3), n'importe quelle touche ou un clic active le son. On choisit
+Dans la version actuelle (J4), n'importe quelle touche ou un clic active le son. On choisit
 ensuite « Salle de test » au clavier (flèches, Entrée), à la souris ou à la manette. Dans la
 salle de test, **Haut** (ou Espace à l'arrêt) sert aussi à sauter sur place et à se hisser,
 et **Échap** ramène à l'écran titre.
@@ -98,6 +99,12 @@ bouclier consomment l'énergie d'une jauge unique, qui se recharge après une se
 rien consommer. Un seul tir tue, Élias comme les Sentinelles. Accroupi, Élias esquive les
 tirs debout ; derrière un muret, il est aussi à l'abri des tirs à genou. En cas de mort,
 Élias réapparaît au dernier **checkpoint** (balise verte).
+
+**Mort et rembobinage** : à la mort, le temps ralentit puis se fige. **Maintenir R** fait
+remonter le temps (jusqu'à 5 s) ; en relâchant, on reprend à cet instant. Il y a 3
+rembobinages par checkpoint. **Entrée** ou **Espace** : reprendre au checkpoint. En **mode
+classique** (interrupteur de l'écran titre), pas de rembobinage : retour direct au
+checkpoint, et aucune des aides du parkour.
 
 ---
 
@@ -136,8 +143,9 @@ Autres outils : [`CLAUDE.md`](CLAUDE.md) (commandes, conventions, création d'un
 scenes/      scènes Godot (.tscn) : écrans, personnages, objets, salles
 scripts/     code GDScript : autoload/ (systèmes globaux), core/ (machine à états, unités),
              player/ (Élias : états, visuel, réglages), combat/ (énergie, arme, tirs,
-             bouclier), enemies/ (Sentinelles), props/ (checkpoints), world/ (salles,
-             caméra, niveau), audio/, input/, ui/, fx/
+             bouclier), enemies/ (Sentinelles), props/ (checkpoints), time/ (réglages
+             du rembobinage), world/ (salles, caméra, niveau, séquence de mort),
+             audio/, input/, ui/, fx/
 assets/      sons générés, polices, textures
 resources/   réglages de gameplay (fichiers .tres modifiables sans toucher au code)
 tests/       lanceur de tests maison et tests automatisés
