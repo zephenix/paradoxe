@@ -103,6 +103,11 @@ Sur le Web, un léger décalage entre le clic et le son (environ 90 ms) est norm
   seulement que le générateur fonctionne toujours.
 - **Numéro de version** : la CI l'inscrit dans le jeu à l'export (`0.1.0` pour le tag
   `v0.1`, `0.1.0+<commit>` pour la version Web de `main`).
+- **Création des Releases** : depuis la session cloud, l'envoi d'un tag git est refusé
+  par le proxy (seules les branches passent). Le workflow peut donc aussi être lancé à
+  la main sur `main` avec un champ `release_tag` (ex. `v0.1`) : la CI crée alors le tag
+  elle-même et publie la Release. Pousser un tag depuis un poste local marche toujours
+  et donne le même résultat.
 - Symbole « → » retiré de l'interface : la police par défaut ne le contient pas sur le Web.
 
 ### Vérifications effectuées
@@ -116,14 +121,15 @@ Sur le Web, un léger décalage entre le clic et le son (environ 90 ms) est norm
 - Exécutable Linux lancé avec succès (données intégrées). Ressources du `.exe` Windows
   inspectées : icône du jeu en 6 tailles, nom et description du produit.
 
+- **Site publié vérifié** (<https://zephenix.github.io/paradoxe/>, version
+  `0.1.0+50fba7b`) avec le même contrôle Chromium : isolation dès la première visite, son
+  mesuré après le clic, aucune erreur.
+
 ### Reste à faire / points d'attention
 
 - **Branche par défaut** : le dépôt étant vide au départ, GitHub a pris la branche de
   travail comme branche par défaut. À régler une fois : *Settings → General → Default
   branch → `main`*.
-- **Environnement `github-pages`** : si le déploiement échoue avec « Branch "main" is not
-  allowed to deploy », aller dans *Settings → Environments → github-pages → Deployment
-  branches* et autoriser `main`.
 - Licence du projet (code, contenus) : à choisir.
 - Police dédiée pour l'interface (J9).
 - Jalon suivant : **J2 — déplacement complet, parkour, salles et transitions**.

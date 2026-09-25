@@ -87,6 +87,11 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
 - Police par défaut (Open Sans) : certains symboles (→, ▸…) sont absents sur le Web. Rester
   en ASCII ou choisir une police dédiée.
 - `project.godot` : l'éditeur peut réécrire le fichier et supprimer les commentaires `;`.
+- Vérifier le **site publié** (`node tools/web/check_web.js https://zephenix.github.io/paradoxe/ build/shots`)
+  dans une session cloud : Chromium doit faire confiance à l'autorité du proxy HTTPS. Si
+  `ERR_CERT_AUTHORITY_INVALID`, ajouter les certificats « Anthropic » de
+  `/root/.ccr/ca-bundle.crt` au magasin NSS (`certutil -d sql:$HOME/.pki/nssdb -A -t "C,," …`,
+  paquet `libnss3-tools`). Ne jamais désactiver la vérification TLS.
 
 ## Méthode de travail par jalon (J1 → J9, voir PLAN §9)
 
@@ -101,7 +106,11 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
 5. Ouvrir une Pull Request vers `main` et attendre la CI verte, puis **fusionner la PR
    soi-même**, sans attendre de relecture (autorisation donnée par le propriétaire le
    25/09/2026). Il relit les PR après coup.
-6. **Créer la release** : après la fusion, depuis `main` à jour,
-   `git tag -a vX.Y -m "PARADOXE vX.Y — Jx" && git push origin vX.Y`. La CI exporte et
-   publie la Release (Windows `.exe` unique, Linux `.zip`, Web `.zip`).
+6. **Créer la release** après la fusion. Deux méthodes, qui donnent la même Release
+   (Windows `.exe` unique, Linux `.zip`, Web `.zip`) :
+   - **session cloud** (le proxy git y refuse l'envoi de tags, erreur 403) : lancer le
+     workflow « Build » sur `main` avec l'entrée `release_tag=vX.Y` (outil GitHub
+     `actions_run_trigger`, méthode `run_workflow`, fichier `build.yml`, ref `main`). La
+     CI crée le tag sur le commit de `main` ;
+   - **poste local** : `git tag -a vX.Y -m "PARADOXE vX.Y — Jx" && git push origin vX.Y`.
 7. Vérifier la Release et la version Web (`https://zephenix.github.io/paradoxe/`).
