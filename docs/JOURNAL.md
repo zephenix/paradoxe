@@ -353,6 +353,40 @@ messages de fuite mémoire à la sortie du lanceur de tests. Je ne le reproduis 
 autre contexte, et ces messages sont sans effet sur le jeu. Les tests de déplacement
 coupent donc le Foley. La cause sera examinée en J5, avec la bibliothèque de sons.
 
+### Correctif Web après la v0.2 : la version en ligne restait l'ancienne
+
+**Symptôme** : après la publication de la v0.2, la page en ligne affichait encore la v0.1
+(l'écran de démonstration des sons).
+
+**Cause** : l'export Web de Godot installe un *service worker*, un petit programme que le
+navigateur exécute en arrière-plan pour ce site. Il ajoute les en-têtes qui permettent le
+multithread, et il garde une copie du jeu en cache pour démarrer plus vite. Il fonctionne
+en « cache d'abord » : il sert la copie gardée sans regarder le réseau. Le navigateur finit
+par voir qu'une nouvelle version existe, mais la règle des service workers veut que la
+nouvelle version **attende la fermeture de tous les onglets du site** avant de prendre la
+main. Recharger la page ne suffit donc pas.
+
+**Correction** (dans le script `html/head_include` de `export_presets.cfg`) :
+- à l'ouverture de la page, on demande au navigateur de chercher une mise à jour ;
+- s'il en trouve une, on dit au nouveau service worker de prendre la main tout de suite
+  (message `'update'`, prévu par Godot), puis on recharge la page : la nouvelle version
+  démarre, une ou deux secondes après l'ouverture ;
+- si la nouvelle version n'est prête que plus de 20 s après l'ouverture, on ne recharge pas
+  en pleine partie : elle sera prise à la visite suivante.
+
+Le jeu écrit aussi sa version dans la console du navigateur (`PARADOXE v0.2.0`, touche F12).
+
+**Vérification** : `./tools/web/check_update.sh` exporte deux versions de test, ouvre la
+première dans Chromium, remplace le site par la seconde et revient sur la page, sans fermer
+l'onglet : la seconde s'affiche 2,8 s après le retour. En cherchant, j'ai découvert que
+Chromium met en attente les recherches de mise à jour pendant environ 60 s après la toute
+première installation du service worker. Un joueur qui revient plus tard n'est pas
+concerné, et le test attend donc la fin de cette période.
+
+**Pour toi** : cette correction ne s'applique qu'à partir de la version qui la contient.
+Si ton navigateur affiche encore l'ancienne version, ferme **tous** les onglets du site
+puis rouvre-le : c'est la dernière fois que tu auras à le faire.
+
 ### Concepts Godot expliqués
 
 **1. La machine à états (un script par état)**
