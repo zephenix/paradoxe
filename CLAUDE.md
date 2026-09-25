@@ -88,6 +88,7 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   `AudioManager.reset_tuning(id)` et utilise un `tuning_path` de test.
 - Déplacement d'Élias : piloter ses intentions (`player.input.from_devices = false`, puis
   `input.move`, `input.press(&"jump")`…) et retirer son nœud `Foley` dans les tests.
+  Lancer (J6) : `player.stones = n` puis `input.press(&"throw")`.
   Combat : `input.press(&"fire")` + `input.fire = true` pour charger, `input.shield = true`
   pour le bouclier. Un tir ennemi se crée directement (`Projectile.new()` puis `setup()`).
 - Mort d'Élias (J4) : en mode moderne, avec assez d'historique, la séquence de mort
@@ -132,7 +133,16 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   alors ces données dans `enter(…, data)` avec `"resumed": true` (ne pas rejouer ses sons
   d'entrée). Une photo `"stable": false` n'est jamais un point de reprise.
 - Les Sentinelles trouvent Élias par le groupe `player` et les tirs par le groupe
-  `projectiles`.
+  `projectiles` (les pierres lancées y sont aussi : réapparition et rembobinage les effacent).
+- **Lumière (J6)** : ce que voit une Sentinelle vient de `Lighting.level_at` (lumière
+  ambiante de la salle + lampes `LightSource` du groupe `lights`, arrêtées par le décor).
+  L'écran est teinté par un `CanvasModulate` du niveau (`Level.set_ambient`). Les textes posés
+  dans les salles et les cercles de « Voir les sons » sont dans des `CanvasLayer` qui suivent
+  la caméra, sinon la pénombre les rendrait illisibles. Les lampes sont sur la couche
+  physique `PROPS` (128), que visent tirs et pierres.
+- **Perception (J6)** : dans un test, `sentinel.hear(position, quantité)` simule un indice ;
+  `sentinel.visibility` et `sentinel.suspicion` se lisent directement. Une salle de test
+  doit contenir une `Room` pour que sa lumière ambiante compte (sinon 1 : plein jour).
 - Les fichiers `*.uid` (scripts) et `*.import` (sons, images) **se versionnent**. Le
   dossier `.godot/` ne se versionne pas.
 - `build/` contient un `.gdignore` (créé par `tools/export.sh`), et `tools/web/` et

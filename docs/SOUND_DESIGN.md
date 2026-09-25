@@ -284,6 +284,19 @@ Une zone (`resources/audio/zones/<id>.tres`, classe `AcousticZone`) contient :
 | `amb_buzz` (2) | Grésillement de lampe |
 | `amb_cry` (2) | Cri de faune lointain |
 
+### Infiltration (J6)
+
+Tous ces sons portent un rayon de bruit : c'est le cœur de l'infiltration. **Un mur entre
+le bruit et une Sentinelle divise le rayon par deux** (deux murs : par quatre). L'option
+« Voir les sons » dessine chaque rayon d'un bruit d'Élias.
+
+| Son | Rôle | Déclencheur | Bus | Rayon |
+|---|---|---|---|---|
+| `lamp_break` | Verre qui éclate, grésillement qui meurt | Lampe brisée (tir ou pierre) | SFX | 450 px |
+| `stone_impact` (3 variantes) | Pierre qui retombe, deux rebonds | Pierre lancée qui touche le décor (diversion) | SFX | 520 px |
+| `stone_throw` | Bras qui fouette l'air | Lancer une pierre | SFX | 60 px |
+| `stone_pickup` | Cailloux qui s'entrechoquent | Ramasser des pierres | SFX | 60 px |
+
 ### Interface (J5)
 
 | Son (`ui/`) | Rôle | Bus |

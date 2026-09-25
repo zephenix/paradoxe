@@ -235,6 +235,25 @@ func test_strong_clue_sends_her_searching() -> void:
 	assert_eq(state(), &"Search", "indice sérieux : elle va voir")
 
 
+func test_guard_returns_to_her_post_and_resumes_her_watch() -> void:
+	await setup(2000.0, 1.0)  # garde à x = 700, regard vers la gauche ; Élias hors de vue
+	# Un bruit devant elle, à gauche : elle ira voir, et reviendra en marchant
+	# vers la droite (dos à son sens de guet).
+	sentinel.hear(Vector2(500, FLOOR_Y), cfg.search_threshold + 0.1)
+	assert_eq(sentinel.facing, -1, "tournée vers le bruit")
+	assert_true(await wait_until_state(&"Search", 300), "elle va voir")
+	assert_true(await wait_until_state(&"Patrol", 900), "rien trouvé : elle revient")
+	var home_reached: bool = false
+	for i in 600:
+		await wait_physics(1)
+		if absf(sentinel.global_position.x - 700.0) < 4.0:
+			home_reached = true
+			break
+	assert_true(home_reached, "de retour à son poste")
+	await wait_physics(3)
+	assert_eq(sentinel.facing, -1, "elle reprend sa surveillance dans son sens de départ")
+
+
 # --- Ouïe -------------------------------------------------------------------------
 
 func test_noise_through_a_wall_carries_less_far() -> void:
