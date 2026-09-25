@@ -70,6 +70,7 @@ On peut ensuite ajuster les réglages fins (taille de pièce, amortissement…) 
 | `cut_to_silence(maintien, retour)` / `restore_from_silence()` | Coupure dramatique | J1 ✔ |
 | `set_reverb(wet, taille, amortissement)` | Réverbération de salle (préréglages de zone en J5) | J1 ✔ |
 | `emit_noise(position, rayon, source)` | Signale un bruit aux ennemis | J1 ✔ (utilisé en J6) |
+| `play_stream_2d(son, position, bus, volume_db, hauteur, rayon, source)` | Son **positionné** dans le monde ; si `rayon` > 0, les ennemis l'entendent (signal `noise_emitted`) | J3 ✔ |
 | `play_sfx(id, position, source)` | Son de la bibliothèque : variations aléatoires, position, rayon de bruit | J5 |
 | `set_zone(zone)` | Ambiance et acoustique d'une zone, en fondu | J5 |
 | `set_tension(0..1)`, `play_stinger(id)` | Musique adaptative | J8 |
@@ -127,8 +128,51 @@ remplacera par des sons selon la surface, avec respiration et rayons de bruit.
 | `foley_climb` | Effort, tissu | Se hisser | SFX | — |
 | `foley_body_fall` | Corps qui s'effondre | Mort (à la fin de l'animation) | SFX | — |
 
-*Les catégories arme, créatures, ambiances de zones et musique seront ajoutées en J5
-(voir PLAN §6.4 à §6.8).*
+### Combat provisoire (J3)
+
+Tous les sons du combat passent par `AudioManager.play_stream_2d` : ils sont
+**positionnés** (plus faibles et décalés à gauche ou à droite selon leur place par
+rapport à la caméra). Un **tir** porte un **rayon de bruit** : les Sentinelles qui se
+trouvent dans ce rayon l'entendent et viennent voir (J6 ajoutera l'atténuation par les
+murs). Les chemins sont regroupés dans `scripts/combat/combat_sounds.gd`. L'arme, le
+bouclier et les impacts sont les **mêmes** pour Élias et les Sentinelles (PLAN §5.2),
+sauf le tir normal, plus grave et bourdonnant chez les Sentinelles.
+
+| Fichier | Rôle | Déclencheur | Bus | Rayon |
+|---|---|---|---|---|
+| `combat/weapon_shot` | Tir d'Élias : décharge brève dont la fréquence plonge (« piou ») | Chaque tir normal | SFX | 700 px (`pistol.tres`) |
+| `combat/weapon_shot_sentinel` | Tir des Sentinelles : plus grave, grain « organique » (vibrato rapide) | Tir d'une Sentinelle | SFX | 650 px (`sentinel_gun.tres`) |
+| `combat/weapon_shot_charged` | Tir chargé : décharge lourde et crépitante | Relâcher la détente, charge complète | SFX | 900 px |
+| `combat/weapon_charge` | Tension qui monte pendant 0,8 s | Début de la charge (s'arrête si on relâche) | SFX | — |
+| `combat/weapon_charge_ready` | Tintement bref | Charge complète | SFX | — |
+| `combat/weapon_empty` | Double clic sec | Tir ou bouclier sans assez d'énergie | SFX | — |
+| `combat/weapon_draw` | Tissu + déclic | Dégainer | SFX | — |
+| `combat/shield_up` / `shield_down` | Montée / descente brève | Lever / baisser le bouclier | SFX | — |
+| `combat/shield_loop` | Grésillement continu (boucle de 2 s) | Tant que le bouclier est levé | SFX | — |
+| `combat/shield_hit` | Claquement électrique + résonance | Tir arrêté par un bouclier | SFX | — |
+| `combat/shield_break` | Éclatement, chute de fréquence | Bouclier brisé par un tir chargé | SFX | — |
+| `combat/impact_wall` | Choc + grésillement | Tir qui frappe le décor | SFX | — |
+| `combat/impact_body` | Coup sourd | Tir qui touche un corps | SFX | — |
+| `sfx/checkpoint_on` | Trois notes douces qui montent (do, mi, sol) | Nouveau checkpoint atteint | SFX | — |
+
+### Voix des Sentinelles (J3)
+
+Aucune langue réelle : une « glotte » (dent de scie dont la hauteur varie) passe dans
+trois résonateurs placés sur les formants d'une voyelle. **L'intonation porte l'émotion**
+(PLAN §6.6). Chaque Sentinelle a sa propre hauteur de voix (±10 %).
+
+| Fichier (`creature/`) | Intonation | Déclencheur | Bus |
+|---|---|---|---|
+| `creature_curious` | Montante, deux syllabes | Alerte : un bruit l'intrigue | Voix |
+| `creature_search` | Grave, interrogative | Elle part chercher | Voix |
+| `creature_alert` | Aiguë, hachée | Elle voit Élias (combat) | Voix |
+| `creature_death` | Cri qui retombe | Touchée | Voix |
+| `creature_calm` | Descendante | Retour au calme : la recherche n'a rien donné | Voix |
+
+Leurs pas reprennent un son de pas d'Élias, plus grave et plus discret.
+
+*Les ambiances de zones et la musique seront ajoutées en J5 et J8 (voir PLAN §6.4 à
+§6.8).*
 
 ---
 

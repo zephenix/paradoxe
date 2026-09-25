@@ -423,3 +423,185 @@ le `.tres` dans un éditeur de texte. Change « Running Jump Distance
 Blocks » de 4 à 5 : le saut avec élan ira plus loin. Le code, lui, recalcule seul la vitesse
 nécessaire (`jump_velocity()`, avec les formules de la chute libre). Les ennemis, l'énergie
 et la perception auront chacun leur fichier de réglages.
+
+---
+
+## J3 — Combat, énergie, Sentinelles et checkpoints (v0.3)
+
+### Ce qui a été fait
+
+- **Une jauge d'énergie unique** (`EnergyPool`, réglages `resources/player/energy.tres`) :
+  10 unités, un tir coûte 1, un tir chargé 4, le bouclier 3 par seconde. Elle se recharge
+  toute seule après une seconde sans rien consommer. Sans énergie, rien ne part : l'arme
+  fait un « clic » à vide.
+- **L'arme d'Élias** (`Weapon`, réglages `resources/weapons/pistol.tres`) et quatre nouveaux
+  états :
+  - **Aim** : arme levée. Un appui sur Tirer dégaine puis tire ; la direction opposée fait
+    se retourner Élias en gardant l'arme levée ; la direction du regard le fait rengainer
+    et marcher ; il rengaine seul au bout de 3 s ;
+  - **Shoot** : le tir et le recul (0,28 s, c'est la cadence de tir) ;
+  - **Charge** : en gardant la touche enfoncée après un tir, la tension monte pendant
+    0,8 s ; en relâchant, le **tir chargé** part. Il brise un bouclier ;
+  - **Shield** : un mur d'énergie devant Élias, tant que la touche est maintenue.
+- **Un tir tue** (Élias comme les Sentinelles), sauf pendant la roulade d'esquive. Les
+  **hauteurs de tir** comptent : accroupi, Élias passe sous un tir debout ; un tir « à
+  genou » le touche, sauf s'il est derrière un **muret de 1,5 bloc**.
+- **Projectiles et boucliers** (`scripts/combat/`) : le même code et les mêmes sons pour
+  Élias et les Sentinelles. Les tirs lancent un « rayon » à chaque image (voir le
+  concept 1 ci-dessous) : aucun ne traverse un mur, même fin.
+- **Les Sentinelles** (`scenes/enemies/sentinel.tscn`, réglages
+  `resources/enemies/sentinel.tres`), avec six états (PLAN §5.3) :
+  - **Patrol** : elles vont et viennent, et s'arrêtent au bord des plates-formes ;
+  - **Suspicious** : un bruit (un tir) les intrigue, elles se tournent vers lui ;
+  - **Search** : elles vont voir et regardent autour d'elles ;
+  - **Combat** : réaction, **visée visible** (l'avertissement pour toi), tir, recul, pause.
+    Elles lèvent leur bouclier face à un tir (7 fois sur 10), tirent à genou sur un Élias
+    accroupi, s'approchent s'il est loin ;
+  - **Chase** : elles l'ont perdu de vue, elles courent vers le dernier endroit connu ;
+  - **Dead**.
+
+  Elles **voient** devant elles (620 px, le décor cache) et **entendent** les tirs par le
+  même système que le son (`AudioManager`, rayon de bruit : PLAN §6.3). Leur silhouette
+  reprend le squelette et les gestes d'Élias, avec une autre peau et des marques
+  lumineuses en spirale (les indices du twist, PLAN §4.3). Leurs voix sont des syllabes
+  synthétisées, sans aucune langue : l'intonation dit leur état.
+- **Checkpoints** (`scenes/props/checkpoint.tscn`) : une balise s'allume en vert quand Élias
+  la touche. À la mort, il réapparaît au dernier checkpoint en moins de 2 s, jauge pleine ;
+  les tirs en vol sont effacés et les Sentinelles reprennent leur poste, sauf celles tuées
+  **avant** ce checkpoint. La réapparition « au début de la salle » de J2 disparaît.
+- **Salle de test** : checkpoints à l'entrée des salles B, C, E et F ; nouvelle **salle F**,
+  avec deux Sentinelles et deux murets.
+- **Interface provisoire** : le bracelet d'Élias (poignet de l'arme) brille selon
+  l'énergie, et une petite jauge apparaît au-dessus de sa tête quand l'énergie change.
+  L'hologramme du bracelet la remplacera en J9 (PLAN §5.10).
+- **20 sons provisoires** générés : tirs, charge, clic à vide, bouclier, impacts, voix des
+  Sentinelles, checkpoint (détail dans `docs/SOUND_DESIGN.md`). Nouvelle fonction
+  `AudioManager.play_stream_2d` : son positionné, avec rayon de bruit pour les ennemis.
+- **Tests** : 190 au total (75 nouveaux), dont un test de bout en bout : un « pilote
+  automatique » joue la salle F comme un joueur prudent et doit vaincre les deux
+  Sentinelles.
+- **Point ouvert de J2 résolu** : les « fuites mémoire » affichées à la sortie du lanceur
+  de tests venaient des sons encore en cours au moment de quitter. Le lanceur les arrête
+  maintenant et laisse au moteur le temps de les libérer.
+
+### Comment tester
+
+1. Écran titre : cliquer, puis **« Salle de test : mouvement et combat (J3) »**.
+2. Traverser les salles A à E (ou aller directement au bout du grand hall E) : une porte
+   mène à la **salle F**. En passant, tu vois les balises des checkpoints s'allumer.
+3. Dans la salle F :
+
+| À essayer | Comment |
+|---|---|
+| Tirer | **J** (ou X). La jauge apparaît au-dessus d'Élias |
+| Tir chargé | Tirer, puis **garder J enfoncé** : la tension monte, un tintement, relâcher |
+| Bouclier | **K** (ou W sur AZERTY) maintenu. Regarder la jauge baisser |
+| Se mettre à couvert | **Bas** derrière un muret : les tirs de la Sentinelle s'y écrasent |
+| Esquiver | **C** au moment où un tir arrive |
+| Se faire toucher | Rester debout à découvert : réapparition au checkpoint de la salle F |
+| Clic à vide | Vider la jauge en tirant vite, puis tirer encore |
+
+4. Tactiques qui marchent : attendre qu'une Sentinelle tire (elle ne peut pas lever son
+   bouclier pendant son recul) ; briser son bouclier d'un tir chargé puis tirer ; tirer
+   sur une Sentinelle de dos (elle n'a pas le temps de réagir).
+
+### Ce qu'il faut écouter
+
+| Action | Ce que tu dois entendre |
+|---|---|
+| Tir d'Élias | Un « piou » clair et bref, puis l'impact (choc + grésillement) |
+| Tir d'une Sentinelle | Plus grave et « bourdonnant » : on sait qui tire sans regarder |
+| Charge | Une tension qui monte pendant 0,8 s, puis un tintement : c'est prêt |
+| Tir chargé | Une décharge lourde et crépitante |
+| Bouclier | Montée brève, grésillement tant qu'il est levé, claquement quand un tir le frappe, éclatement s'il est brisé |
+| Jauge vide | Double clic sec, rien ne part |
+| Voix des Sentinelles | Montante (intriguée), grave et interrogative (elle cherche), aiguë et hachée (elle t'a vu), descendante (retour au calme), cri qui retombe (touchée). Chacune a sa propre hauteur de voix |
+| Checkpoint | Trois notes douces qui montent |
+
+Tous ces sons sont **positionnés** : une Sentinelle à droite de l'écran s'entend à droite.
+
+### Décisions prises (et pourquoi)
+
+- **Tir chargé = maintenir après un tir** (et non « appuyer longtemps avant de tirer ») :
+  le premier tir part tout de suite, sans latence, et la charge est un choix délibéré.
+  Pendant la charge, la jauge ne se recharge pas, sinon garder la touche enfoncée serait
+  une recharge gratuite.
+- **Un tir tue**, dans les deux camps : c'est l'esprit des jeux d'origine, et ce qui donne
+  son poids au bouclier et aux couverts.
+- **Hauteurs de tir** : se baisser esquive les tirs debout. Pour que ce ne soit pas une
+  protection absolue, les Sentinelles tirent à genou sur un Élias accroupi ; seul un muret
+  protège alors.
+- **Les Sentinelles réagissent à un tir vu de face**, pas dans le dos. Sans cela, on
+  pouvait les tuer de loin avant qu'elles ne réagissent (le premier essai du pilote
+  automatique gagnait en 3 s). Pour la même raison, la **portée d'un tir** est d'environ
+  un écran (1000 px).
+- **Même squelette pour les Sentinelles et Élias** : leurs gestes sont humains, ce qui sert
+  le twist (PLAN §4.3), et chaque nouvelle pose profite aux deux.
+- **Perception simple** en J3 (distance, sens du regard, décor qui cache) : la lumière,
+  la suspicion progressive et l'atténuation du bruit par les murs arrivent en J6.
+- **Checkpoints plutôt que salles** pour la réapparition : un seul système, placé à la main
+  dans le niveau.
+
+### Vérifications effectuées
+
+- **190 tests** automatisés au vert (4 s). Nouveaux fichiers : `test_energy_pool.gd` (8),
+  `test_projectiles_and_shields.gd` (16), `test_player_combat.gd` (19),
+  `test_sentinel.gd` (21), `test_checkpoints.gd` (8), et 3 tests de plus dans
+  `test_test_level.gd`, dont le pilote automatique de la salle F (il gagne en 7 s de jeu
+  simulé, sans mourir).
+- **Contrôle par mutation** : 14 erreurs réintroduites une à une (roulade qui ne protège
+  plus, bouclier transparent, jauge sans limite, Sentinelle qui voit dans son dos, tir à
+  genou supprimé, réapparition qui ignore le checkpoint…). Les 14 sont détectées. Les deux
+  qui passaient au premier essai ont fait renforcer les tests.
+- **Captures** : planche de poses (tir, recul, charge, bouclier, tir à genou) et visite
+  guidée de la salle F (`tools/godot/level_tour.gd`, captures 7 à 10). En les regardant,
+  j'ai corrigé un recul trop marqué et une Sentinelle trop sombre, qui se fondait dans le
+  décor.
+- **Web** : export vérifié dans Chromium. `tools/web/check_web.sh` entre maintenant dans la
+  salle de test et fait tirer Élias, en échouant à la moindre erreur du moteur.
+
+### Reste à faire / points d'attention
+
+- **L'équilibrage est à juger manette en main** : vitesse des tirs ennemis, temps de visée
+  (l'avertissement), probabilité de bouclier, coûts en énergie. Tout est dans
+  `resources/enemies/sentinel.tres`, `resources/weapons/*.tres` et `resources/*/energy*.tres`.
+- Le bruit d'un tir traverse les murs (atténuation en J6) ; la vue ne dépend pas encore de
+  la lumière (J6).
+- La mort n'a pas encore son court ralenti ni le choix « rembobiner » : c'est J4.
+- La touche « Interagir » attendra les premiers objets interactifs (J7).
+- Jalon suivant : **J4, le rembobinage temporel** (effort recommandé : high).
+
+### Concepts Godot expliqués
+
+**1. Les rayons : demander au moteur « qu'y a-t-il sur cette ligne ? »**
+
+Un *rayon* (`PhysicsRayQueryParameters2D`) est une question posée au moteur physique :
+« en allant du point A au point B, quel est le premier objet rencontré ? ». La réponse
+donne l'objet, le point touché et l'orientation de la surface. C'est l'équivalent d'une
+fonction RECHERCHEV lancée dans le monde du jeu : on ne crée rien, on interroge.
+
+PARADOXE s'en sert partout :
+- **les projectiles** : à chaque image, un rayon va de la position actuelle à la position
+  suivante. Même à 2400 px/s (40 px par image), un tir ne peut donc pas « sauter »
+  par-dessus un mur de 2 px (un test le vérifie) ;
+- **la vue des Sentinelles** : un rayon de leurs yeux vers la tête d'Élias, un autre vers
+  son buste ; si les deux touchent le décor, elles ne le voient pas ;
+- **les rebords** (J2) et le **bord des plates-formes** : un rayon vers le bas, juste
+  devant les pieds, mesure la profondeur du vide.
+
+Le « masque de collision » dit quelles couches le rayon peut toucher : un tir d'Élias voit
+le décor, les boucliers et les ennemis, mais pas Élias lui-même.
+
+**2. L'héritage : une Sentinelle « est un » visuel d'Élias, avec une autre peau**
+
+`class_name SentinelVisual extends EliasVisual` veut dire : « une SentinelVisual est une
+EliasVisual, sauf ce que je redéfinis ». Elle hérite de tout le squelette, des
+animations et de la fonction `play()`, et ne réécrit que trois choses : ses couleurs (dans
+`_init`), sa tête (`_build_head`) et ses décorations (`_decorate`, les spirales au lieu du
+bracelet).
+
+VBA n'a pas vraiment d'héritage (seulement `Implements`, qui impose une liste de
+procédures sans en fournir le code). L'image la plus proche est un classeur modèle : on
+repart de toutes ses feuilles et formules, et on ne change que ce qui diffère. Avec une
+différence de taille : ici, le lien reste vivant. Une correction dans `EliasVisual`, ou une
+nouvelle pose ajoutée pour Élias, sert aussitôt aux Sentinelles.

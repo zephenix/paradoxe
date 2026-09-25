@@ -10,12 +10,13 @@ const GLOW := Color("6dffb0")
 
 
 func _init() -> void:
-	coat_color = Color("2f4145")
-	coat_shade = Color("223236")
-	trousers_color = Color("1b2629")
-	shoes_color = Color("0f1618")
-	skin_color = Color("4a6663")
-	hair_color = Color("2f4145")
+	# Assez clair pour se détacher des fonds de nuit, plus sombre qu'Élias.
+	coat_color = Color("587276")
+	coat_shade = Color("435a5e")
+	trousers_color = Color("33454a")
+	shoes_color = Color("1a2427")
+	skin_color = Color("7e9e97")
+	hair_color = Color("587276")
 	gun_color = Color("3b2c27")
 	gun_glow = Color("ff8a5c")
 

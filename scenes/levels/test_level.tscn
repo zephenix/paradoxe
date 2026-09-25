@@ -105,7 +105,7 @@ text = "SALLE A : LES BASES
 Flèches ou ZQSD : marcher     Maj (maintenue) : courir
 Haut : se hisser sur la marche et sur le mur
 Bas : s'accroupir, puis avancer accroupi dans le tunnel
-C : roulade     Échap : retour au titre"
+C : roulade     J : tirer     K : bouclier (combat : salle F)     Échap : retour au titre"
 
 [node name="RoomB" type="Node2D" parent="."]
 position = Vector2(1280, 0)

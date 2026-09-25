@@ -22,6 +22,7 @@ func physics_update(delta: float) -> void:
 	if check_sight():
 		return
 	if time_in_state >= s.config.search_duration:
+		s.say(&"calm")  # rien trouvé : intonation descendante, retour au calme
 		machine.transition_to(&"Patrol")
 		return
 	if not _arrived:

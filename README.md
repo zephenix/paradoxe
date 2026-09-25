@@ -12,10 +12,11 @@ plan. Le tout est modernisé avec du parkour, un rembobinage temporel limité, u
 de l'infiltration par la lumière et le son, et une interface intégrée au personnage.
 Tous les éléments du jeu (images, sons, musique) sont originaux ou générés par du code.
 
-> **État actuel : jalon J2 (v0.2), les déplacements.** Depuis l'écran titre, une **salle de
-> test** de cinq écrans permet d'essayer tous les mouvements d'Élias : marche, course,
-> sauts, rebords, roulade, glissade, chutes. Elle montre aussi les transitions de caméra
-> d'une salle à l'autre. Le combat arrive en J3. Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
+> **État actuel : jalon J3 (v0.3), le combat.** Depuis l'écran titre, une **salle de
+> test** de six écrans permet d'essayer tous les mouvements d'Élias (marche, course, sauts,
+> rebords, roulade, glissade, chutes) puis de **combattre deux Sentinelles** : pistolet,
+> tir chargé, bouclier, jauge d'énergie, couverts, checkpoints. Le rembobinage temporel
+> arrive en J4. Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
 > avancement : [`docs/JOURNAL.md`](docs/JOURNAL.md).
 
 ---
@@ -78,7 +79,7 @@ touches notées « WASD » (clavier QWERTY) correspondent à **ZQSD** sur un cla
 | Roulade / esquive | C | B | J2 |
 | Tirer (maintenir pour charger) | X ou J | RT | J3 |
 | Bouclier (maintenir) | Z (QWERTY) / W (AZERTY) ou K | LT | J3 |
-| Interagir | E ou Entrée | X | J3 |
+| Interagir | E ou Entrée | X | J7 |
 | Lancer un objet | F | LB | J6 |
 | Donner un ordre au compagnon | Q (QWERTY) / A (AZERTY) | Y | J7 |
 | Rembobiner (après une mort) | R ou Retour arrière | Y | J4 |
@@ -86,10 +87,17 @@ touches notées « WASD » (clavier QWERTY) correspondent à **ZQSD** sur un cla
 | Pause | Échap ou P | Start / Menu | J9 |
 | Passer une cinématique (maintenir) | Échap ou Espace | Start ou A | J7 |
 
-Dans la version actuelle (J2), n'importe quelle touche ou un clic active le son. On choisit
-ensuite « Salle de test : déplacements » au clavier (flèches, Entrée), à la souris ou à la
-manette. Dans la salle de test, **Haut** (ou Espace à l'arrêt) sert aussi à sauter sur place
-et à se hisser, et **Échap** ramène à l'écran titre.
+Dans la version actuelle (J3), n'importe quelle touche ou un clic active le son. On choisit
+ensuite « Salle de test » au clavier (flèches, Entrée), à la souris ou à la manette. Dans la
+salle de test, **Haut** (ou Espace à l'arrêt) sert aussi à sauter sur place et à se hisser,
+et **Échap** ramène à l'écran titre.
+
+**Combat (salle F)** : un appui sur Tirer dégaine et tire ; en gardant la touche enfoncée
+après un tir, Élias charge un tir puissant, qui brise un bouclier. Chaque tir et le
+bouclier consomment l'énergie d'une jauge unique, qui se recharge après une seconde sans
+rien consommer. Un seul tir tue, Élias comme les Sentinelles. Accroupi, Élias esquive les
+tirs debout ; derrière un muret, il est aussi à l'abri des tirs à genou. En cas de mort,
+Élias réapparaît au dernier **checkpoint** (balise verte).
 
 ---
 
@@ -127,8 +135,9 @@ Autres outils : [`CLAUDE.md`](CLAUDE.md) (commandes, conventions, création d'un
 ```
 scenes/      scènes Godot (.tscn) : écrans, personnages, objets, salles
 scripts/     code GDScript : autoload/ (systèmes globaux), core/ (machine à états, unités),
-             player/ (Élias : états, visuel, réglages), world/ (salles, caméra, niveau),
-             audio/, input/, ui/, fx/
+             player/ (Élias : états, visuel, réglages), combat/ (énergie, arme, tirs,
+             bouclier), enemies/ (Sentinelles), props/ (checkpoints), world/ (salles,
+             caméra, niveau), audio/, input/, ui/, fx/
 assets/      sons générés, polices, textures
 resources/   réglages de gameplay (fichiers .tres modifiables sans toucher au code)
 tests/       lanceur de tests maison et tests automatisés

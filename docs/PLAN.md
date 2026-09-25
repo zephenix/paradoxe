@@ -152,7 +152,8 @@ stateDiagram-v2
   `State` avec trois fonctions : `enter()`, `exit()`, `physics_update(delta)`, plus
   `is_committed()`. La `StateMachine` ne fait qu'appeler l'état courant. Les états ne lisent
   pas le clavier : ils interrogent les intentions du personnage (`PlayerInput`). Les états
-  de combat (Aim, Shoot…) du diagramme arrivent en J3.
+  de combat sont arrivés en J3 : Aim (arme levée), Shoot (tir et recul), Charge (tir
+  chargé), Shield (bouclier).
 - **Mouvements engagés** : chaque état indique s'il est *interruptible*. Un saut, une
   roulade, un hissage vont à leur terme. Les commandes pressées pendant ce temps sont
   **mémorisées** (tampon de 0,2 s) et exécutées à la fin : c'est ce qui donne des
@@ -177,6 +178,7 @@ stateDiagram-v2
 | `resources/player/energy.tres` | capacité, vitesse de recharge, délai avant recharge, coûts du tir / bouclier (par seconde) / tir chargé |
 | `resources/weapons/pistol.tres` | cadence, vitesse du projectile, temps de charge, durée de bouclier |
 | `resources/enemies/sentinel.tres` | vitesses, distances de vue, angle de vision, seuil de lumière, sensibilité auditive, durées d'alerte / de recherche, temps de réaction |
+| `resources/enemies/sentinel_energy.tres`, `resources/weapons/sentinel_gun.tres` | jauge et arme des Sentinelles (J3) : mêmes réglages qu'Élias, autres valeurs |
 | `resources/rewind.tres` | durée enregistrée (5 s), fréquence d'échantillonnage, utilisations par checkpoint (3) |
 | `resources/audio/sound_library.tres` | chaque son : fichiers, bus, volume, variation de hauteur, **rayon de bruit perçu par les ennemis** |
 | `resources/audio/zones/*.tres` | une zone acoustique : couches d'ambiance, réverbération, filtre |
@@ -238,7 +240,12 @@ setup.sh, export_presets.cfg, project.godot, README.md, CLAUDE.md, CREDITS.md
 (volumes, touches, mode classique, assistances, accessibilité),
 `ui/sound_board.tscn` (banc d'écoute), `ui/credits.tscn`,
 `cutscenes/intro.tscn` (cinématique d'ouverture), `cutscenes/capture.tscn`, `cutscenes/meeting.tscn`, `cutscenes/ending.tscn`,
-`levels/prototype.tscn` (le niveau complet), `levels/test_room.tscn` (salle de test J1–J3).
+`levels/prototype.tscn` (le niveau complet), `levels/test_level.tscn` (salle de test J2–J3).
+
+*État en J3 :* existent `player/elias.tscn`, `enemies/sentinel.tscn`,
+`props/checkpoint.tscn`, `levels/test_level.tscn` et `ui/title_screen.tscn`. Les
+projectiles, les boucliers et l'arme n'ont pas de scène : ils sont créés par le code
+(`scripts/combat/`), le même pour Élias et les Sentinelles.
 
 ### 4.3 Les 8 écrans du prototype
 
@@ -290,6 +297,22 @@ humanoïdes, appelés **Sentinelles** dans le code ; le prédateur, **Traqueur**
 - **Sans énergie, rien ne part** et le pistolet émet un « clic » à vide (information sonore).
 - Le bouclier est un mur d'énergie devant Élias qui arrête les tirs ; les ennemis
   utilisent **la même scène** de bouclier (même code, mêmes sons).
+- *Précisions de J3* (réglages dans `energy.tres` et `pistol.tres`) :
+  - jauge de 10 unités ; tir 1, tir chargé 4, bouclier 3 par seconde ; recharge de
+    2,5 unités par seconde après 1 s sans rien consommer. **Charger retient l'énergie** : la
+    jauge ne se recharge pas pendant une charge ;
+  - un appui sur Tirer dégaine (0,12 s) puis tire ; **en gardant la touche enfoncée après
+    un tir**, Élias charge (0,8 s) et le tir chargé part au relâchement ;
+  - le bouclier reste levé tant que la touche est maintenue et que la jauge n'est pas
+    vide ; brisé par un tir chargé, il ne se relève pas avant 2 s ;
+  - **un seul tir tue**, Élias comme les Sentinelles (esprit des jeux d'origine), sauf
+    pendant la roulade d'esquive ;
+  - **hauteur des tirs** : un tir debout part à 76 px du sol, au-dessus d'un personnage
+    accroupi (58 px) ; un tir « à genou » part à 40 px. Un muret de 1,5 bloc (72 px) arrête
+    les tirs bas : accroupi derrière, Élias est à l'abri ;
+  - portée d'un tir : 1000 px (environ un écran) ;
+  - en attendant l'hologramme du bracelet (J9), la lueur du bracelet suit l'énergie et une
+    petite jauge **provisoire** apparaît au-dessus d'Élias quand l'énergie change.
 
 ### 5.3 Ennemis : IA à états (J3, perception en J6)
 
@@ -312,6 +335,21 @@ stateDiagram-v2
   son bouclier quand le joueur tire), **poursuite** (suit à travers les portes proches).
 - Les voix des créatures accompagnent chaque changement d'état : l'intonation
   (montante, grave, hachée) informe le joueur sans aucun texte.
+- *Précisions de J3* (réglages dans `sentinel.tres`) :
+  - **vue simple** : Élias est vu s'il est devant la Sentinelle, à moins de 620 px, à peu
+    près à sa hauteur, et si le décor ne cache pas à la fois sa tête et son buste ;
+  - **ouïe** : les tirs portent un rayon de bruit (`AudioManager.noise_emitted`) ; une
+    Sentinelle dans ce rayon passe en alerte, puis va voir. En J3, le bruit traverse les
+    murs (atténuation en J6) ;
+  - un tir d'Élias **vu arriver de face** déclenche le combat ; un tir dans le dos la
+    surprend ;
+  - au combat : réaction (0,4 s), **visée visible** (0,55 s, l'avertissement pour le
+    joueur), tir, recul, pause, et elle s'approche si Élias est loin. Face à un tir, elle
+    lève son bouclier (70 % de chances, tirées au sort une fois par tir), sauf pendant le
+    recul de son propre tir. Si Élias est accroupi, elle tire à genou ;
+  - elle ne descend jamais de plus d'un bloc (pas de chute des plates-formes) ;
+  - mêmes squelette et gestes qu'Élias (indice du twist), autre peau ; les « Sentinelles »
+    restent le nom interne des créatures.
 
 ### 5.4 Perception lumière et son (J6)
 - **Vision** : cône de vision + rayon (le décor bloque la vue). Ce que voit l'ennemi dépend
@@ -359,6 +397,11 @@ stateDiagram-v2
 - Checkpoints à l'entrée de chaque écran et avant chaque passage difficile.
 - Mort en un coup (chute, tir, créature, zone mortelle) → court ralenti → rembobinage ou
   retour au checkpoint en moins de 2 secondes.
+- *Précisions de J3* : une balise s'allume en vert sur le checkpoint actif (un seul à la
+  fois). À la réapparition : jauge pleine, tirs en vol effacés, Sentinelles remises à leur
+  poste, sauf celles tuées **avant** le dernier checkpoint atteint. Charger un niveau
+  commence une nouvelle partie. Le ralenti et le choix « rembobiner » arrivent en J4 ; la
+  touche « Interagir » attendra les premiers objets interactifs (J7).
 
 ### 5.8 Mode chrono et fantôme (J9)
 - Chrono de l'écran 2 à la fin (les cinématiques sont passées automatiquement).
