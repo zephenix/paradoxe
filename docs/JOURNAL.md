@@ -746,3 +746,139 @@ couvre l'écran. Il lit l'image déjà dessinée (`hint_screen_texture`), puis :
 Un seul paramètre, `strength`, règle tout : 0 = image normale, 0,5 = temps figé, 1 =
 rembobinage. C'est l'équivalent d'une mise en forme conditionnelle appliquée à toute la
 feuille d'un coup, mais calculée 60 fois par seconde pour chaque pixel.
+
+---
+
+## J5 — Le son (v0.5)
+
+### Ce qui a été fait
+
+- **Une bibliothèque de sons** (`resources/audio/sound_library.tres`, 57 sons) : chaque son
+  a un identifiant, ses variantes (plusieurs fichiers, une tirée au hasard), son bus, son
+  volume, ses variations de hauteur et de volume, et son **rayon de bruit** (jusqu'où les
+  ennemis l'entendent). Tout le jeu passe désormais par `AudioManager.play_sfx(&"id")` :
+  plus aucun chemin de fichier dans le code. L'ancien `combat_sounds.gd` a disparu.
+- **40 nouveaux fichiers générés** par `tools/audio/generate_sounds.py` : pas sur métal,
+  végétation et eau (4 variantes chacun), respirations (3 paliers), demi-tour, s'accroupir,
+  rengainer, 6 boucles d'ambiance de 11 à 17 s, 11 évènements d'ambiance, 2 sons d'interface.
+  Le générateur écrit aussi un catalogue (`catalog.json`), que l'outil
+  `tools/godot/build_sound_library.gd` transforme en bibliothèque sans écraser les réglages
+  déjà faits.
+- **Foley d'Élias refait** :
+  - les **pas dépendent du sol** (pierre, métal, végétation, eau) : un rayon sous les pieds
+    lit la surface du bloc foulé ;
+  - l'**allure** règle volume et portée : la course s'entend à 300 px, la marche à 180 px,
+    et accroupi, les ennemis n'entendent rien ;
+  - une **respiration** suit l'effort : calme, puis effort, puis essoufflement après une
+    dizaine de secondes de course ;
+  - nouveaux sons : demi-tour, s'accroupir, rengainer l'arme.
+  Réglages : `resources/audio/foley.tres`.
+- **Ambiances et acoustique par zone** : quatre zones (`resources/audio/zones/`) :
+  laboratoire, ruines, puits, grand hall. Chacune a 2 couches en boucle qui « respirent »,
+  des évènements ponctuels au hasard (goutte, craquement, gravats, cri lointain…) et son
+  acoustique (écho, taille, filtre). En changeant de salle, tout passe en **fondu
+  enchaîné** ; le vent, commun aux ruines et au puits, continue sans coupure.
+- **Banc d'écoute** (bouton de l'écran titre) : tous les sons par catégorie, lecture,
+  rafale, boucles, réglages en direct, ambiances de zone, effet de rembobinage, silence.
+  Les réglages s'**enregistrent** sur l'appareil et s'appliquent en jeu ; « **Copier les
+  valeurs** » donne un texte à me transmettre pour les reporter dans le projet.
+- **Salle de test** : chaque salle a sa zone (A-B laboratoire, C et F ruines, D puits,
+  E grand hall) ; le sol du puits est en métal, celui du bas de la salle C en végétation.
+- **Un changement de jeu** : l'impact d'un tir sur un mur fait maintenant du bruit
+  (250 px). Une Sentinelle proche d'un mur touché vient voir, même sans voir le tir.
+- **Tests** : 231 au total (25 nouveaux).
+
+### Comment tester
+
+1. Écran titre : cliquer, puis **« Banc d'écoute »**.
+   - Choisir une catégorie, puis un son ; **Entrée** ou « Jouer ». « Rafale x5 » fait
+     entendre les variations.
+   - Bouger « Volume », rejouer ; « Rétablir ce son » revient à l'origine.
+   - À droite, choisir « Puits » puis « Grand hall » : l'ambiance change en fondu ;
+     « Évènement ponctuel » en joue un tout de suite.
+   - Cocher « Rembobinage » : tout s'étouffe.
+   - Si un réglage te plaît : « Enregistrer », puis « Copier les valeurs » et colle-moi
+     le texte.
+2. Retour (Échap), puis **« Salle de test »** : traverser les six salles en écoutant.
+
+### Ce qu'il faut écouter
+
+| Où | Ce que tu dois entendre |
+|---|---|
+| Salles A et B (laboratoire) | Ventilation et grésillement électrique, parfois une lampe qui grésille ou une goutte ; léger écho |
+| Salle C (ruines) | Le vent qui enfle et retombe, une ville morte au loin, des gravats, un cri lointain ; au bas de la salle, les pas dans la végétation |
+| Salle D (puits) | Grondement très grave, gouttes, craquements, beaucoup d'écho ; les **pas sur le métal** |
+| Salle E (grand hall) | Très grand espace : ton propre pas revient en écho |
+| Salle F (combat, ruines) | Le vent revient ; tirs, impacts, voix des Sentinelles dans l'acoustique extérieure |
+| Partout | Marcher : pas discrets. Courir : pas plus forts, puis la respiration s'accélère. Accroupi : presque rien |
+| Demi-tour, s'accroupir, rengainer | Petits bruits de tissu et de déclic |
+
+### Décisions prises (et pourquoi)
+
+- **Un identifiant plutôt qu'un fichier** : le code dit « joue le saut », la bibliothèque
+  dit quel fichier et à quel volume. On peut changer un son, son volume ou sa portée sans
+  toucher au code, depuis l'inspecteur ou le banc d'écoute.
+- **Le rayon de bruit est rangé avec le son** : un son plus fort doit porter plus loin, et
+  c'est le même tableau qui le dit. `WeaponConfig` ne garde donc plus que l'identifiant du
+  tir (`shot_sound_id`).
+- **L'allure réduit la portée des pas** (60 % en marchant, 0 accroupi) : c'est la base de
+  l'infiltration de J6. Les Sentinelles entendent déjà Élias courir près d'elles.
+- **Les bruits d'ambiance n'alertent personne** : sinon une goutte d'eau enverrait les
+  Sentinelles enquêter.
+- **Réglages du banc d'écoute dans `user://`** : sur le Web, on ne peut pas écrire dans les
+  fichiers du projet. Les réglages restent donc sur l'appareil, et « Copier les valeurs »
+  sert de pont vers le projet.
+- **Interface du banc construite par le code** : environ 400 lignes commentées, plus faciles
+  à lire et à modifier qu'une scène de 80 nœuds.
+
+### Vérifications effectuées
+
+- **231 tests** au vert. Nouveaux fichiers :
+  - `test_sound_library.gd` : chaque son cité dans le code existe, chaque entrée a un fichier et un bus valide ;
+  - `test_player_foley.gd` : pas selon la surface, marche plus discrète que la course, pas accroupis inaudibles, gestes, respiration, et « **chaque action du joueur a son son** » (14 actions jouées une à une, plus demi-tour et accroupi dans un test voisin) ;
+  - `test_ambience.gd` : zones valides, fondu, couches communes gardées, évènements qui n'alertent pas, changement de zone avec la salle ;
+  - `test_sound_board.gd` : réglages en direct, rétablir, enregistrer et recharger, sortie propre.
+- **Contrôle par mutation** : 4 erreurs réintroduites, 4 détectées :
+  - détection de surface cassée ;
+  - rengainer muet ;
+  - niveau qui ne change plus de zone ;
+  - banc qui laisse l'ambiance en sortant.
+- **Captures** du banc d'écoute et de l'écran titre : lisibles, rien ne déborde.
+- **Web** : export vérifié dans Chromium (démarrage, son réel, salle de test). **À vérifier
+  de ton côté** : le banc d'écoute dans le navigateur, et le bouton « Copier les valeurs »
+  (le presse-papiers demande parfois une autorisation).
+
+### Reste à faire / points d'attention
+
+- **À juger à l'oreille**, tout est réglable au banc d'écoute :
+  - volumes relatifs des ambiances et des pas ;
+  - fréquence des évènements ponctuels ;
+  - écho des grandes salles ;
+  - respiration (trop présente ou pas assez).
+- Les sons restent **procéduraux** : ils ont la bonne fonction, pas encore la qualité
+  finale. `SOUND_DESIGN.md` §6 explique comment les remplacer.
+- Pas encore fait : l'ambiance « inversée » pendant le rembobinage (aujourd'hui, tout est
+  étouffé) ; l'atténuation du bruit par les murs (J6) ; la musique (J8).
+- Jalon suivant : **J6, l'infiltration** (lumière et son).
+
+### Concepts Godot expliqués
+
+**1. Une Resource personnalisée : un tableau de réglages**
+
+Une *Resource* est un objet de données enregistré dans un fichier `.tres`. En écrivant
+`class_name SoundEntry extends Resource` et des variables `@export`, on crée un nouveau type
+de fiche que l'inspecteur de Godot sait afficher et modifier, avec des curseurs
+(`@export_range`). `SoundLibrary` contient une liste de ces fiches : c'est exactement une
+feuille Excel dont chaque ligne est un son. Le jeu la charge une fois (`preload`) et y fait
+ses « RECHERCHEV ». Les zones (`AcousticZone`) et le Foley (`FoleyConfig`) suivent le même
+principe : **pas de valeur en dur dans le code**.
+
+**2. Un fondu enchaîné avec un Tween**
+
+Un *Tween* fait varier une valeur dans le temps, par exemple de 0 à 1 en 2,5 s. Pour le
+fondu entre deux zones, chaque couche d'ambiance a un « facteur » entre 0 (muet) et 1
+(plein volume). Un Tween mène le facteur des nouvelles couches vers 1 et celui des
+anciennes vers 0, puis supprime ces dernières (signal `finished`). À chaque image, le
+volume réel est recalculé : volume de base + facteur (en dB) + houle. C'est comme une
+colonne Excel calculée à partir de trois autres, dont l'une glisse doucement d'une valeur
+à l'autre.

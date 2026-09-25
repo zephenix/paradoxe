@@ -12,12 +12,14 @@ plan. Le tout est modernisé avec du parkour, un rembobinage temporel limité, u
 de l'infiltration par la lumière et le son, et une interface intégrée au personnage.
 Tous les éléments du jeu (images, sons, musique) sont originaux ou générés par du code.
 
-> **État actuel : jalon J4 (v0.4), le rembobinage.** Depuis l'écran titre, une **salle de
+> **État actuel : jalon J5 (v0.5), le son.** Depuis l'écran titre, une **salle de
 > test** de six écrans permet d'essayer tous les mouvements d'Élias (marche, course, sauts,
 > rebords, roulade, glissade, chutes), de **combattre deux Sentinelles** (pistolet, tir
 > chargé, bouclier, jauge d'énergie, couverts, checkpoints) et, à chaque mort, de
-> **remonter le temps** (jusqu'à 5 s, 3 fois par checkpoint). Un interrupteur active le
-> **mode classique**, sans rembobinage ni aides. Le son complet arrive en J5. Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
+> **remonter le temps** (jusqu'à 5 s, 3 fois par checkpoint). Chaque salle a son ambiance
+> et son acoustique, les pas d'Élias changent selon le sol et sa respiration suit l'effort.
+> Un **banc d'écoute** permet d'entendre et de régler tous les sons. Un interrupteur active
+> le **mode classique**, sans rembobinage ni aides. Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
 > avancement : [`docs/JOURNAL.md`](docs/JOURNAL.md).
 
 ---
@@ -88,8 +90,8 @@ touches notées « WASD » (clavier QWERTY) correspondent à **ZQSD** sur un cla
 | Pause | Échap ou P | Start / Menu | J9 |
 | Passer une cinématique (maintenir) | Échap ou Espace | Start ou A | J7 |
 
-Dans la version actuelle (J4), n'importe quelle touche ou un clic active le son. On choisit
-ensuite « Salle de test » au clavier (flèches, Entrée), à la souris ou à la manette. Dans la
+Dans la version actuelle (J5), n'importe quelle touche ou un clic active le son. On choisit
+ensuite « Salle de test » ou « Banc d'écoute » au clavier (flèches, Entrée), à la souris ou à la manette. Dans la
 salle de test, **Haut** (ou Espace à l'arrêt) sert aussi à sauter sur place et à se hisser,
 et **Échap** ramène à l'écran titre.
 
@@ -133,6 +135,8 @@ checkpoint, et aucune des aides du parkour.
 ./tools/export.sh web      # exporte la version Web dans build/web/
 ./tools/export.sh all      # exporte Web + Windows + Linux dans build/
 python3 tools/audio/generate_sounds.py   # régénère les sons procéduraux
+godot --headless --path . --import       # puis : Godot les importe…
+godot --headless --path . -s res://tools/godot/build_sound_library.gd   # …et la bibliothèque les ajoute
 ```
 
 Autres outils : [`CLAUDE.md`](CLAUDE.md) (commandes, conventions, création d'une release).

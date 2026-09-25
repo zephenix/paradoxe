@@ -4,8 +4,10 @@
 > **comment c'est construit**, **la liste des sons** (rôle, déclencheur, rayon de bruit)
 > et **comment les remplacer** par des sons définitifs.
 >
-> État : **J1**. La chaîne technique est en place (bus, effets, gestionnaire, Web) avec 3
-> sons de test. La bibliothèque complète arrive en J5.
+> État : **J5**. Tous les sons du jeu passent par une **bibliothèque** (identifiants,
+> volumes, variations, rayons de bruit). Élias a des pas selon le sol et une respiration ;
+> chaque salle a son ambiance et son acoustique ; un **banc d'écoute** permet de tout
+> entendre et régler, y compris sur le Web. La musique arrive en J8.
 
 ---
 
@@ -68,13 +70,15 @@ On peut ensuite ajuster les réglages fins (taille de pièce, amortissement…) 
 | `play_loop(id, son, bus, volume_db, fondu)` / `stop_loop(id, fondu)` | Boucles nommées (ambiances), avec fondus | J1 ✔ |
 | `set_muffle(0..1, durée)` | Étouffement global (rembobinage, choc) | J1 ✔ |
 | `cut_to_silence(maintien, retour)` / `restore_from_silence()` | Coupure dramatique | J1 ✔ |
-| `set_reverb(wet, taille, amortissement)` | Réverbération de salle (préréglages de zone en J5) | J1 ✔ |
+| `set_reverb(wet, taille, amortissement)` / `set_world_lowpass(Hz)` | Réverbération et filtre de la salle (réglés par les zones) | J1 ✔ / J5 ✔ |
 | `emit_noise(position, rayon, source)` | Signale un bruit aux ennemis | J1 ✔ (utilisé en J6) |
 | `play_stream_2d(son, position, bus, volume_db, hauteur, rayon, source)` | Son **positionné** dans le monde ; si `rayon` > 0, les ennemis l'entendent (signal `noise_emitted`) | J3 ✔ |
-| `play_sfx(id, position, source)` | Son de la bibliothèque : variations aléatoires, position, rayon de bruit | J5 |
-| `set_zone(zone)` | Ambiance et acoustique d'une zone, en fondu | J5 |
+| `play_sfx(id, position, source, volume, part_du_rayon)` | Son de la **bibliothèque** : variante au hasard, variations, position, rayon de bruit. **À utiliser pour tout son du jeu.** Émet `sfx_played(id)` | J5 ✔ |
+| `play_loop_sfx(id_boucle, id_son, fondu)` | Boucle nommée, jouée depuis la bibliothèque | J5 ✔ |
+| `set_zone(zone, fondu)` | Ambiance et acoustique d'une zone, en fondu enchaîné (`&""` = silence) | J5 ✔ |
+| `save_tuning()` / `load_tuning()` / `reset_tuning(id)` / `tuning_report()` | Réglages faits au banc d'écoute (`user://sound_tuning.json`) | J5 ✔ |
 | `set_tension(0..1)`, `play_stinger(id)` | Musique adaptative | J8 |
-| `set_rewind_effect(actif)` | Effet complet de rembobinage (étouffement, aspiration, sons inversés) | J4 : fait par `RewindManager` (étouffement + boucle) ; J5 : ambiance inversée |
+| `set_rewind_effect(actif)` | Effet complet de rembobinage | J4 : fait par `RewindManager` (étouffement + boucle) |
 
 ### Particularités du Web
 
@@ -88,7 +92,43 @@ On peut ensuite ajuster les réglages fins (taille de pièce, amortissement…) 
 
 ---
 
-## 4. Catalogue des sons
+## 4. La bibliothèque de sons (J5)
+
+Le code ne manipule jamais un fichier : il demande un **identifiant**.
+
+```gdscript
+AudioManager.play_sfx(&"foley_land", global_position, self)   # son positionné, bruit pour les ennemis
+AudioManager.play_sfx(&"ui_confirm")                           # son d'interface, non positionné
+```
+
+La bibliothèque est une ressource, `resources/audio/sound_library.tres` (classe
+`SoundLibrary`), faite d'entrées (`SoundEntry`) : identifiant, catégorie, **variantes**
+(plusieurs fichiers, une tirée au hasard), bus, volume, variation de hauteur, variation de
+volume, **rayon de bruit** et description. On la règle dans l'inspecteur de Godot, ou au
+banc d'écoute.
+
+*Analogie Excel : un tableau dont chaque ligne est un son ; `play_sfx` fait une RECHERCHEV
+sur l'identifiant, puis lit les colonnes « volume », « rayon »…*
+
+### Ajouter ou régénérer des sons
+
+```bash
+python3 tools/audio/generate_sounds.py                                   # 1) fichiers WAV + catalog.json
+godot --headless --path . --import                                        # 2) import par Godot
+godot --headless --path . -s res://tools/godot/build_sound_library.gd    # 3) bibliothèque
+```
+
+L'outil de l'étape 3 regroupe les variantes (`foley_step_metal_01` à `_04` deviennent
+l'entrée `foley_step_metal`) et **ajoute** les nouveaux sons ; une entrée existante garde
+ses réglages (seule sa liste de fichiers est mise à jour). Les réglages de départ d'un
+nouveau son viennent des tables `CATEGORY_DEFAULTS` et `OVERRIDES` de l'outil.
+
+Un test vérifie que chaque identifiant cité dans le code (`play_sfx(&"…")`) existe dans
+la bibliothèque.
+
+---
+
+## 5. Catalogue des sons
 
 Colonnes : **rayon** = distance (pixels) à laquelle les ennemis entendent le son
 (— = inaudible pour eux) ; **boucle** = le son se répète sans couture.
@@ -101,58 +141,83 @@ Colonnes : **rayon** = distance (pixels) à laquelle les ennemis entendent le so
 | `sfx/test_impact.wav` | Choc métallique : attaque sèche + résonances. Sert à entendre la réverbération | Bouton « Choc métallique » du banc de test | SFX | — | non |
 | `ambience/portal_hum_loop.wav` | Bourdonnement du portail : drone grave (La 55 Hz), battements lents, crépitements | Démarre au premier clic ; interrupteur du banc de test | Ambiance | — | oui (8 s) |
 
-### Foley provisoire du déplacement (J2)
+### Foley d'Élias (J2, refait en J5)
 
 Ces sons sont déclenchés par des **évènements** d'Élias, de deux sources :
 - les **animations**, pour ce qui doit tomber à l'image près : le pied qui touche le sol,
   le corps qui s'effondre ;
-- les **états**, pour les actions : saut, réception, roulade, glissade, prise, hissage.
+- les **états**, pour les actions : saut, réception, roulade, demi-tour, s'accroupir…
 
-Le script `scripts/player/player_foley.gd` fait la correspondance entre évènement et son.
-Un évènement sans son déclenche un avertissement, sauf s'il est déclaré volontairement
-muet : c'est le cas de `death_<cause>` (le cri et la musique de mort viendront plus
-tard). Un test vérifie la correspondance dans les deux sens. Chaque lecture passe par un `AudioStreamRandomizer`,
-qui tire une variante au hasard et fait varier hauteur et volume. **Provisoires** : J5 les
-remplacera par des sons selon la surface, avec respiration et rayons de bruit.
+Le script `scripts/player/player_foley.gd` fait la correspondance entre évènement et son
+(table `EVENTS`). Un évènement sans son déclenche un avertissement, sauf s'il est déclaré
+volontairement muet (`death_<cause>`). Un test vérifie la correspondance dans les deux
+sens, et un autre qu'**une action du joueur a toujours un son**.
 
-| Fichier (`foley/`) | Rôle | Déclencheur (évènement d'animation) | Bus | Rayon |
+**Pas selon le sol.** À chaque pas, un rayon part sous les pieds d'Élias et trouve le bloc
+foulé ; sa propriété `surface` (`SolidBlock.surface`) choisit le son :
+`foley_step_stone`, `foley_step_metal`, `foley_step_plant` ou `foley_step_water`.
+
+**Allure.** Le volume et la portée d'un pas dépendent de l'allure (réglages dans
+`resources/audio/foley.tres`) :
+
+| Allure | Évènement | Volume | Rayon de bruit |
+|---|---|---|---|
+| Course | `footstep_run` | celui de la bibliothèque | 100 % |
+| Marche | `footstep` | -6 dB | 60 % |
+| Accroupi | `footstep_soft` | -18 dB | 0 : les ennemis ne l'entendent pas |
+| Genou (se hisser) | `climb_knee` | -8 dB | 30 % |
+
+**Respiration.** Un « effort » (de 0 à 1) monte en courant et à chaque geste fatigant
+(saut, hissage, roulade, réception lourde), et redescend au repos. Trois paliers :
+`breath_calm` (toutes les 4,5 s, à peine audible), `breath_effort` (au-dessus de 0,35) et
+`breath_exhausted` (au-dessus de 0,7, toutes les 1,2 s). Environ 10 s de course essoufflent
+Élias.
+
+| Son | Rôle | Déclencheur | Bus | Rayon |
 |---|---|---|---|---|
-| `foley_step_stone_01` à `04` | Pas sur pierre (4 variantes) | `footstep` (marche, -12 dB), `footstep_run` (course, -6 dB), `footstep_soft` (accroupi, -24 dB), `climb_knee` | SFX | — (J6) |
-| `foley_jump` | Frottement de tissu à l'impulsion | Décollage d'un saut | SFX | — |
-| `foley_land` | Double impact des pieds | Réception légère | SFX | — |
-| `foley_land_heavy` | Impact grave + souffle | Réception lourde (2 à 3 blocs) | SFX | — |
-| `foley_roll` | Tissu et épaule au sol | Roulade (esquive ou réception) | SFX | — |
-| `foley_slide` | Raclement qui s'éteint | Glissade | SFX | — |
-| `foley_skid` | Semelles qui frottent | Dérapage en fin de course | SFX | — |
-| `foley_grab` | Mains qui agrippent | Prise d'un rebord | SFX | — |
-| `foley_climb` | Effort, tissu | Se hisser | SFX | — |
-| `foley_body_fall` | Corps qui s'effondre | Mort (à la fin de l'animation) | SFX | — |
+| `foley_step_stone` (4 variantes) | Pas sur pierre | Pas sur un bloc « stone » (défaut) | SFX | 300 px |
+| `foley_step_metal` (4) | Pas sur métal | Pas sur « metal » (puits de la salle de test) | SFX | 420 px |
+| `foley_step_plant` (4) | Pas sur végétation | Pas sur « plant » (salle C) | SFX | 240 px |
+| `foley_step_water` (4) | Pas sur eau | Pas sur « water » | SFX | 360 px |
+| `foley_jump` | Frottement de tissu à l'impulsion | Décollage d'un saut | SFX | 120 px |
+| `foley_land` | Double impact des pieds | Réception légère | SFX | 300 px |
+| `foley_land_heavy` | Impact grave + souffle | Réception lourde (2 à 3 blocs) | SFX | 450 px |
+| `foley_roll` | Tissu et épaule au sol | Roulade | SFX | 200 px |
+| `foley_slide` | Raclement qui s'éteint | Glissade | SFX | 280 px |
+| `foley_skid` | Semelles qui frottent | Dérapage en fin de course | SFX | 220 px |
+| `foley_grab` | Mains qui agrippent | Prise d'un rebord | SFX | 120 px |
+| `foley_climb` | Effort, tissu | Se hisser | SFX | 100 px |
+| `foley_turn` | Bref froissement de la blouse | Demi-tour | SFX | — |
+| `foley_crouch` | Tissu et genou qui se plie | S'accroupir | SFX | — |
+| `foley_body_fall` | Corps qui s'effondre | Mort (Élias et Sentinelles) | SFX | 400 px |
+| `breath_calm` / `breath_effort` / `breath_exhausted` (2 chacun) | Respiration | Selon l'effort (voir plus haut) | Voix | — |
 
 ### Combat provisoire (J3)
 
-Tous les sons du combat passent par `AudioManager.play_stream_2d` : ils sont
-**positionnés** (plus faibles et décalés à gauche ou à droite selon leur place par
-rapport à la caméra). Un **tir** porte un **rayon de bruit** : les Sentinelles qui se
-trouvent dans ce rayon l'entendent et viennent voir (J6 ajoutera l'atténuation par les
-murs). Les chemins sont regroupés dans `scripts/combat/combat_sounds.gd`. L'arme, le
+Tous les sons du combat sont **positionnés** (plus faibles et décalés à gauche ou à
+droite selon leur place par rapport à la caméra). Un **tir** ou un **impact** porte un
+**rayon de bruit** : les Sentinelles qui se trouvent dans ce rayon l'entendent et viennent
+voir (J6 ajoutera l'atténuation par les murs). Depuis J5, ils passent tous par la
+bibliothèque ; l'arme d'un combattant désigne son tir par `WeaponConfig.shot_sound_id`. L'arme, le
 bouclier et les impacts sont les **mêmes** pour Élias et les Sentinelles (PLAN §5.2),
 sauf le tir normal, plus grave et bourdonnant chez les Sentinelles.
 
 | Fichier | Rôle | Déclencheur | Bus | Rayon |
 |---|---|---|---|---|
-| `combat/weapon_shot` | Tir d'Élias : décharge brève dont la fréquence plonge (« piou ») | Chaque tir normal | SFX | 700 px (`pistol.tres`) |
-| `combat/weapon_shot_sentinel` | Tir des Sentinelles : plus grave, grain « organique » (vibrato rapide) | Tir d'une Sentinelle | SFX | 650 px (`sentinel_gun.tres`) |
+| `combat/weapon_shot` | Tir d'Élias : décharge brève dont la fréquence plonge (« piou ») | Chaque tir normal | SFX | 700 px |
+| `combat/weapon_shot_sentinel` | Tir des Sentinelles : plus grave, grain « organique » (vibrato rapide) | Tir d'une Sentinelle | SFX | 650 px |
 | `combat/weapon_shot_charged` | Tir chargé : décharge lourde et crépitante | Relâcher la détente, charge complète | SFX | 900 px |
 | `combat/weapon_charge` | Tension qui monte pendant 0,8 s | Début de la charge (s'arrête si on relâche) | SFX | — |
 | `combat/weapon_charge_ready` | Tintement bref | Charge complète | SFX | — |
-| `combat/weapon_empty` | Double clic sec | Tir ou bouclier sans assez d'énergie | SFX | — |
+| `combat/weapon_empty` | Double clic sec | Tir ou bouclier sans assez d'énergie | SFX | 80 px |
 | `combat/weapon_draw` | Tissu + déclic | Dégainer | SFX | — |
+| `combat/weapon_holster` | Déclic puis frottement | Rengainer (quitter la visée) | SFX | — |
 | `combat/shield_up` / `shield_down` | Montée / descente brève | Lever / baisser le bouclier | SFX | — |
 | `combat/shield_loop` | Grésillement continu (boucle de 2 s) | Tant que le bouclier est levé | SFX | — |
-| `combat/shield_hit` | Claquement électrique + résonance | Tir arrêté par un bouclier | SFX | — |
-| `combat/shield_break` | Éclatement, chute de fréquence | Bouclier brisé par un tir chargé | SFX | — |
-| `combat/impact_wall` | Choc + grésillement | Tir qui frappe le décor | SFX | — |
-| `combat/impact_body` | Coup sourd | Tir qui touche un corps | SFX | — |
+| `combat/shield_hit` | Claquement électrique + résonance | Tir arrêté par un bouclier | SFX | 250 px |
+| `combat/shield_break` | Éclatement, chute de fréquence | Bouclier brisé par un tir chargé | SFX | 500 px |
+| `combat/impact_wall` | Choc + grésillement | Tir qui frappe le décor | SFX | 250 px |
+| `combat/impact_body` | Coup sourd | Tir qui touche un corps | SFX | 150 px |
 | `sfx/checkpoint_on` | Trois notes douces qui montent (do, mi, sol) | Nouveau checkpoint atteint | SFX | — |
 
 ### Voix des Sentinelles (J3)
@@ -183,16 +248,59 @@ ces effets.
 | `rewind_loop` | Souffles joués à l'envers (des « aspirations ») et sifflement de bande qui ondule (boucle de 2 s) | Tant que « Rembobiner » est maintenu | UI |
 | `rewind_release` | Souffle vers l'avant, fréquence qui plonge, coup sourd | Reprise après un rembobinage | UI |
 
-*Les ambiances de zones et la musique seront ajoutées en J5 et J8 (voir PLAN §6.4 à
-§6.8).*
+### Ambiances et acoustique par zone (J5)
+
+Chaque salle (`Room`) appartient à une **zone acoustique** (`acoustic_zone`). En entrant
+dans une salle, le niveau appelle `AudioManager.set_zone(zone)` : l'ambiance passe en
+**fondu enchaîné** (2,5 s) à celle de la zone, et l'acoustique (réverbération et filtre du
+bus Monde) glisse vers ses réglages. Une couche commune à deux zones (le vent) continue sans
+coupure. En quittant le niveau, tout s'éteint.
+
+Une zone (`resources/audio/zones/<id>.tres`, classe `AcousticZone`) contient :
+- des **couches** : boucles longues (11 à 17 s, pour que la répétition ne s'entende pas),
+  qui « respirent » (houle lente de quelques dB) ;
+- des **évènements ponctuels** : petits sons tirés au hasard, à gauche ou à droite de
+  l'écran, toutes les quelques secondes. Ils n'alertent **pas** les ennemis ;
+- l'**acoustique** : écho, taille de la pièce, amortissement, filtre.
+
+| Zone | Salles de test | Couches | Évènements | Acoustique |
+|---|---|---|---|---|
+| `lab` (Laboratoire) | A, B | `amb_lab_loop` (ventilation), `amb_electric_loop` (grésillement, -6 dB) | `amb_buzz`, `amb_drip` | petite pièce claire, écho 18 % |
+| `ruins` (Ruines) | C, F | `amb_wind_loop` (vent), `amb_city_loop` (ville lointaine, -3 dB) | `amb_debris`, `amb_creak`, `amb_cry` | plein air, écho 8 % |
+| `shaft` (Puits) | D | `amb_shaft_loop` (grondement), `amb_wind_loop` (-10 dB) | `amb_drip`, `amb_creak`, `amb_debris` | grande cavité sombre, écho 42 %, filtre 9 kHz |
+| `hall` (Grand hall) | E | `amb_hall_loop` (présence, machinerie), `amb_electric_loop` (-12 dB) | `amb_creak`, `amb_cry`, `amb_buzz` | immense, écho 50 % |
+
+| Son (`ambience/`) | Rôle |
+|---|---|
+| `amb_wind_loop` (17 s) | Vent : souffle grave qui enfle et retombe |
+| `amb_city_loop` (13 s) | Ville morte au loin : rumeur sourde, tintements métalliques rares |
+| `amb_lab_loop` (13 s) | Laboratoire : ventilation et bourdonnement électrique à 50 Hz |
+| `amb_electric_loop` (11 s) | Grésillement électrique irrégulier |
+| `amb_shaft_loop` (13 s) | Puits : grondement très grave, air qui circule |
+| `amb_hall_loop` (17 s) | Grand hall : présence de la pièce, machinerie lointaine |
+| `amb_drip` (3 variantes) | Goutte d'eau qui tombe |
+| `amb_creak` (2) | Craquement de structure |
+| `amb_debris` (2) | Petits gravats qui roulent |
+| `amb_buzz` (2) | Grésillement de lampe |
+| `amb_cry` (2) | Cri de faune lointain |
+
+### Interface (J5)
+
+| Son (`ui/`) | Rôle | Bus |
+|---|---|---|
+| `ui_confirm` | Valider | UI |
+| `ui_move` | Tic bref : déplacer la sélection (menus de J9) | UI |
+| `ui_back` | Deux notes descendantes : revenir en arrière | UI |
+
+*La musique sera ajoutée en J8 (voir PLAN §6.7 et §6.8).*
 
 ---
 
-## 5. Remplacer un son par un son définitif
+## 6. Remplacer un son par un son définitif
 
 1. **Même nom, même dossier** : il suffit d'écraser le fichier WAV dans
-   `assets/audio/generated/…` (ou de le placer dans `assets/audio/final/…` et de modifier
-   le chemin dans la bibliothèque de sons, à partir de J5). Godot le réimporte
+   `assets/audio/generated/…` (ou le placer dans `assets/audio/final/…` et changer le
+   fichier de l'entrée dans `resources/audio/sound_library.tres`). Godot le réimporte
    automatiquement.
 2. **Format conseillé** : WAV 44,1 kHz ou 48 kHz, 16 ou 24 bits. Mono pour les bruitages
    positionnés, stéréo possible pour les ambiances et la musique. Godot compresse en QOA à
@@ -203,15 +311,25 @@ ces effets.
    audio le font, bloc « smpl »), soit régler **Loop Mode = Forward** dans l'onglet *Import*
    de Godot. Soigner le raccord : fondu enchaîné, pas de clic.
 5. **Garder le rayon de bruit** cohérent avec le nouveau son : un pas plus fort doit porter
-   plus loin (réglage dans la bibliothèque de sons, J5).
+   plus loin (réglage dans la bibliothèque de sons, ou au banc d'écoute).
 6. Noter la source et la licence dans `CREDITS.md`.
 
 ---
 
-## 6. Écouter et régler
+## 7. Écouter et régler
 
-- **J1** : l'écran titre contient un banc de test (choc, bourdonnement, réverbération,
-  étouffement, silence, volume). Chaque bouton explique ce qu'il fait dans
-  `docs/JOURNAL.md`, section J1.
-- **J5** : le « sound board » (menu principal) permettra d'écouter **tous** les sons, avec
-  leurs variations, dans chaque acoustique de zone, et d'en régler les paramètres.
+- **Banc d'écoute** (J5) : bouton « Banc d'écoute » de l'écran titre. Il fonctionne aussi
+  sur le Web.
+  - À gauche : les sons par catégorie. Un double-clic ou Entrée joue le son.
+  - Au centre : le son choisi. « Jouer » tire une variante au hasard, avec ses variations ;
+    « Rafale x5 » en joue cinq de suite pour juger de la variété ; « Boucle » pour les
+    ambiances. Les curseurs (bus, volume, variations, rayon de bruit) règlent le son **en
+    direct**.
+  - À droite : les ambiances de zone (avec « Évènement ponctuel »), l'effet de rembobinage,
+    le silence dramatique et le volume général.
+  - « **Enregistrer** » garde les réglages sur cet appareil (`user://sound_tuning.json`) :
+    ils s'appliquent aussi en jeu. « **Copier les valeurs** » met le texte des sons
+    modifiés dans le presse-papiers : il suffit de le coller dans la conversation pour que
+    Claude les reporte dans la bibliothèque. « Rétablir ce son » revient à l'origine.
+- **Banc de test des bus** (J1) : sur l'écran titre (choc, bourdonnement, réverbération,
+  étouffement, silence, volume).
