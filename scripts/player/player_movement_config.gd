@@ -85,7 +85,7 @@ extends Resource
 @export var roll_invulnerable_window: Vector2 = Vector2(0.1, 0.7)
 ## Vitesse de départ de la glissade (en fraction de la vitesse de course) et son freinage.
 @export var slide_speed_factor: float = 1.15
-@export var slide_friction: float = 420.0
+@export var slide_friction: float = 300.0
 ## Durée minimale d'une glissade (secondes).
 @export var slide_min_duration: float = 0.35
 
@@ -103,7 +103,7 @@ extends Resource
 ## Largeur et hauteur de la boîte de collision debout / accroupi (pixels).
 @export var body_width: float = 24.0
 @export var stand_height: float = 90.0
-@export var crouch_height: float = 50.0
+@export var crouch_height: float = 58.0
 
 
 # --------------------------------------------------------------------------

@@ -98,6 +98,12 @@ func wait_frames(count: int = 1) -> void:
 		await tree.process_frame
 
 
+## Attend « count » pas de physique (60 par seconde).
+func wait_physics(count: int = 1) -> void:
+	for i in count:
+		await tree.physics_frame
+
+
 ## Attend « seconds » secondes de temps de jeu.
 func wait_seconds(seconds: float) -> void:
 	await tree.create_timer(seconds).timeout
