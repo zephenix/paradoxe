@@ -44,6 +44,14 @@ const VOICES: Dictionary = {
 }
 
 
+## Parti (J8) : Marek a quitté Élias par un conduit (écran 6). Il ne reçoit plus
+## d'ordres et reste invisible, jusqu'à ce qu'une cinématique le fasse revenir.
+var away: bool = false:
+	set(value):
+		away = value
+		visible = not away
+
+
 func _ready() -> void:
 	add_to_group(&"companion")
 	add_to_group(RewindManager.GROUP)
@@ -74,7 +82,7 @@ func _physics_process(delta: float) -> void:
 
 ## Appui court : suivre <-> attendre.
 func order_toggle() -> void:
-	if machine.current_name == &"Scripted":
+	if away or machine.current_name == &"Scripted":
 		return
 	mode = &"Wait" if mode == &"Follow" else &"Follow"
 	if mode == &"Follow":
@@ -89,7 +97,7 @@ func order_toggle() -> void:
 ## Appui long : « Active ça » (Interactable.nearest_for_companion ne propose que
 ## les mécanismes marqués). null = rien à actionner près d'Élias : refus.
 func order_activate(item: Interactable) -> void:
-	if machine.current_name == &"Scripted":
+	if away or machine.current_name == &"Scripted":
 		return
 	if item == null:
 		refuse()
@@ -198,7 +206,7 @@ func capture_state() -> Dictionary:
 	return {
 		"position": global_position, "velocity": velocity, "facing": facing, "mode": mode,
 		"state": machine.current_name, "state_data": machine.current.snapshot() if machine.current else {},
-		"pose": visual.capture_pose(),
+		"pose": visual.capture_pose(), "away": away,
 	}
 
 
@@ -207,6 +215,7 @@ func apply_state(state: Dictionary) -> void:
 	velocity = state["velocity"]
 	facing = state["facing"]
 	mode = state["mode"]
+	away = state.get("away", false)
 	visual.restore_pose(state["pose"])
 
 

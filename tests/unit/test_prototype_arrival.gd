@@ -7,7 +7,7 @@ const LEVEL: PackedScene = preload("res://scenes/levels/prototype.tscn")
 
 var level: Level
 var player: Player
-var tracker: Tracker
+var tracker: Pursuer
 
 
 func setup(opening: bool) -> void:
@@ -94,7 +94,7 @@ func test_arrival_cutscene_lands_elias_safely() -> void:
 	assert_false(player.is_dead, "tombé de haut, mais vivant (chute scénarisée)")
 	assert_eq(AudioManager.music.theme_id, &"mus_theme_arrival", "le thème d'arrivée")
 	assert_eq(level.camera.zoom_override, 0.0, "la caméra a retrouvé son cadrage")
-	assert_eq(tracker.mode, Tracker.Mode.DORMANT, "le Traqueur attend, caché")
+	assert_eq(tracker.mode, Pursuer.Mode.DORMANT, "le Traqueur attend, caché")
 	assert_false(tracker.visible)
 
 
@@ -104,15 +104,15 @@ func test_running_escapes_the_tracker() -> void:
 	var closest: Array[float] = [INF]
 	var ledge_x: float = (level.get_node("Room2/Ledge") as Node2D).global_position.x
 	var escaped: bool = await drive(func() -> bool:
-		if tracker.mode != Tracker.Mode.DORMANT:
+		if tracker.mode != Pursuer.Mode.DORMANT:
 			emerged[0] = true
-		if tracker.mode == Tracker.Mode.CHASE:
+		if tracker.mode == Pursuer.Mode.CHASE:
 			closest[0] = minf(closest[0], absf(player.global_position.x - tracker.global_position.x))
 		return player.global_position.x > ledge_x + 200.0 and player.is_on_floor(), true, [-3905.0])
 	assert_true(emerged[0], "le Traqueur a surgi")
 	assert_true(closest[0] < 450.0, "c'est une vraie poursuite : il se rapproche (%.0f px au plus près)" % closest[0])
 	assert_true(escaped, "en courant, Élias lui échappe et grimpe (x = %.0f, mort : %s)" % [player.global_position.x, player.is_dead])
-	assert_true(await wait_for(func() -> bool: return tracker.mode == Tracker.Mode.BLOCKED, 600), "il ne grimpe pas : bloqué au pied du mur")
+	assert_true(await wait_for(func() -> bool: return tracker.mode == Pursuer.Mode.BLOCKED, 600), "il ne grimpe pas : bloqué au pied du mur")
 	assert_true(tracker.global_position.x < ledge_x, "resté en bas")
 
 
@@ -120,15 +120,15 @@ func test_walking_gets_caught() -> void:
 	await setup(false)
 	await drive(func() -> bool: return false, false, [-3905.0], Vector2.ZERO, 60 * 20)
 	assert_true(player.is_dead, "en marchant, le Traqueur le rattrape")
-	assert_eq(tracker.mode, Tracker.Mode.FED)
+	assert_eq(tracker.mode, Pursuer.Mode.FED)
 
 
 func test_tracker_hides_again_when_elias_respawns() -> void:
 	await setup(false)
 	player.global_position = Vector2(-4200.0, 672.0)
-	assert_true(await wait_for(func() -> bool: return tracker.mode == Tracker.Mode.CHASE, 200), "la poursuite commence")
+	assert_true(await wait_for(func() -> bool: return tracker.mode == Pursuer.Mode.CHASE, 200), "la poursuite commence")
 	player.respawn(Vector2(-4950.0, 672.0), 1)
-	assert_eq(tracker.mode, Tracker.Mode.DORMANT, "réapparition : il retourne se cacher")
+	assert_eq(tracker.mode, Pursuer.Mode.DORMANT, "réapparition : il retourne se cacher")
 	assert_false(tracker.visible)
 
 
@@ -136,9 +136,9 @@ func test_tracker_follows_the_rewind() -> void:
 	await setup(false)
 	var photo: Dictionary = tracker.capture_state()
 	player.global_position = Vector2(-4200.0, 672.0)
-	assert_true(await wait_for(func() -> bool: return tracker.mode == Tracker.Mode.CHASE, 200))
+	assert_true(await wait_for(func() -> bool: return tracker.mode == Pursuer.Mode.CHASE, 200))
 	tracker.apply_state(photo)
-	assert_eq(tracker.mode, Tracker.Mode.DORMANT, "rembobiné : de nouveau caché")
+	assert_eq(tracker.mode, Pursuer.Mode.DORMANT, "rembobiné : de nouveau caché")
 	assert_almost_eq(tracker.global_position.x, photo["position"].x, 0.5)
 
 

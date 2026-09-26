@@ -4,7 +4,8 @@ extends Node2D
 ## Sortie d'un écran (J7) : quand Élias arrive dans la bande [x, x + width]
 ## (à peu près à cette hauteur), et que le compagnon est avec lui si
 ## « needs_companion », la sortie est atteinte : le texte « message » (un Label)
-## s'affiche. Le niveau suivant arrivera en J8.
+## s'affiche, et la cinématique « cutscene » se joue (J8 : le passage vers
+## l'écran suivant).
 
 signal exit_reached
 
@@ -17,6 +18,8 @@ signal exit_reached
 @export var companion_distance: float = 220.0
 ## Texte à montrer une fois la sortie atteinte.
 @export var message: NodePath
+## Cinématique jouée à la sortie (vide : aucune).
+@export var cutscene: NodePath
 
 var reached: bool = false
 ## Le texte (gardé ici : le niveau déplace les textes dans un autre calque).
@@ -45,6 +48,17 @@ func _physics_process(_delta: float) -> void:
 	if _label:
 		_label.visible = true
 	exit_reached.emit()
+	var scene: Cutscene = get_node_or_null(cutscene) as Cutscene
+	var level: Level = _level()
+	if scene and level:
+		level.cutscenes.play(scene)
+
+
+func _level() -> Level:
+	var node: Node = get_parent()
+	while node and not (node is Level):
+		node = node.get_parent()
+	return node as Level
 
 
 func _inside(point: Vector2) -> bool:

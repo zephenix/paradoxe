@@ -177,6 +177,11 @@ func test_screens_4_and_5_end_to_end() -> void:
 	assert_almost_eq(ly(buddy), 240.0, 4.0, "le compagnon est en haut")
 	# --- La sortie ---
 	var exit: ExitZone = room5.get_node("Exit")
-	assert_true(await walk_to(1240.0, rx), "à la sortie")
+	player.input.move = -1 if player.global_position.x - rx > 1240.0 else 1
 	assert_true(await wait_for(func() -> bool: return exit.reached, 600), "sortie atteinte, à deux")
+	player.input.move = 0
 	assert_false(player.is_dead)
+	# J8 : la sortie mène, par un conduit, aux ruines de l'écran 6.
+	assert_true(await wait_for(func() -> bool: return not level.cutscenes.playing, 1800), "passage vers l'écran 6")
+	assert_true((level.get_node("Room6") as Room).world_rect().has_point(player.global_position + Vector2(0, -10)),
+			"Élias est dans les ruines")

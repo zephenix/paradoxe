@@ -25,6 +25,16 @@
 [ext_resource type="Script" path="res://scripts/fx/ruin.gd" id="23_ruin"]
 [ext_resource type="Script" path="res://scripts/fx/liana.gd" id="24_liana"]
 [ext_resource type="Script" path="res://scripts/cutscene/arrival_cutscene.gd" id="25_arrival"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/sentinel.tscn" id="26_sentinel"]
+[ext_resource type="Script" path="res://scripts/world/light_source.gd" id="27_light"]
+[ext_resource type="Script" path="res://scripts/props/rubble_pile.gd" id="28_rubble"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/sentinel_pursuer.tscn" id="29_pursuer"]
+[ext_resource type="Script" path="res://scripts/fx/duct.gd" id="30_duct"]
+[ext_resource type="Script" path="res://scripts/cutscene/passage_cutscene.gd" id="31_passage"]
+[ext_resource type="Script" path="res://scripts/cutscene/guide_cutscene.gd" id="32_guide"]
+[ext_resource type="Script" path="res://scripts/cutscene/companion_rescue.gd" id="33_rescue"]
+[ext_resource type="Script" path="res://scripts/cutscene/finale_cutscene.gd" id="34_finale"]
+[ext_resource type="Script" path="res://scripts/cutscene/ending_shot.gd" id="35_ending"]
 
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
@@ -601,7 +611,7 @@ targets = Array[NodePath]([NodePath("../Elevator")])
 position = Vector2(1200, 240)
 script = ExtResource("20_exit")
 width = 90.0
-message = NodePath("../EndLabel")
+cutscene = NodePath("../../Story/Passage")
 
 [node name="Hint" type="Label" parent="Room5"]
 offset_left = 60
@@ -612,14 +622,339 @@ theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "ÉCRAN 5 : CELLULES. E : interagir (levier, casier, terminal).\nQ (A en AZERTY) : ordre au compagnon. Appui bref : suis-moi / attends.\nMaintenir Q (A) jusqu'à remplir l'anneau : « Active ça » sur la spirale verte entourée.\nLes deux leviers des cellules doivent être tirés ensemble."
 
-[node name="EndLabel" type="Label" parent="Room5"]
-offset_left = 1150
-offset_top = 110
-offset_right = 1850
-offset_bottom = 170
-theme_override_colors/font_color = Color(0.45, 1, 0.75, 1)
-theme_override_font_sizes/font_size = 20
-text = "Évasion réussie. La suite (écrans 6 à 8) arrive en J8."
+[node name="Room6" type="Node2D" parent="."]
+position = Vector2(0.0, 2400.0)
+script = ExtResource("2_room")
+room_size = Vector2(2560.0, 720.0)
+camera_zoom = 1.0
+title = "6 - Ruines"
+acoustic_zone = &"ruins"
+ambient_light = 0.22
+
+[node name="Ruin1" type="Node2D" parent="Room6"]
+position = Vector2(150.0, 672.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 300.0
+height = 400.0
+seed_value = 41
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin2" type="Node2D" parent="Room6"]
+position = Vector2(900.0, 672.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 500.0
+height = 520.0
+seed_value = 42
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin3" type="Node2D" parent="Room6"]
+position = Vector2(1700.0, 672.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 400.0
+height = 380.0
+seed_value = 43
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin4" type="Node2D" parent="Room6"]
+position = Vector2(2150.0, 672.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 380.0
+height = 450.0
+seed_value = 44
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="LeftWall" type="StaticBody2D" parent="Room6"]
+position = Vector2(-48.0, 0.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1.0, 15.0)
+
+[node name="Ground" type="StaticBody2D" parent="Room6"]
+position = Vector2(0.0, 672.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(53.3333, 2.0)
+color = Color(0.16, 0.19, 0.2, 1.0)
+
+[node name="DuctGrate" type="Node2D" parent="Room6"]
+position = Vector2(300.0, 672.0)
+script = ExtResource("30_duct")
+
+[node name="Crate" type="StaticBody2D" parent="Room6"]
+position = Vector2(560.0, 576.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(2.0, 2.0)
+color = Color(0.28, 0.23, 0.17, 1.0)
+
+[node name="Catwalk" type="StaticBody2D" parent="Room6"]
+position = Vector2(656.0, 528.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(17.5, 0.4)
+color = Color(0.3, 0.33, 0.37, 1.0)
+surface = &"metal"
+
+[node name="Lamp" type="StaticBody2D" parent="Room6"]
+position = Vector2(1100.0, 598.0)
+script = ExtResource("27_light")
+radius = 300.0
+energy = 0.9
+cord_length = 0.0
+post_length = 74.0
+
+[node name="Sentinel1" parent="Room6" instance=ExtResource("26_sentinel")]
+position = Vector2(1100.0, 672.0)
+patrol_left_blocks = 4.0
+patrol_right_blocks = 4.0
+rng_seed = 5
+
+[node name="Rubble" type="Area2D" parent="Room6"]
+position = Vector2(1900.0, 672.0)
+script = ExtResource("28_rubble")
+
+[node name="Entry" type="Marker2D" parent="Room6"]
+position = Vector2(100.0, 672.0)
+
+[node name="CompanionEntry" type="Marker2D" parent="Room6"]
+position = Vector2(40.0, 672.0)
+
+[node name="Lookout" type="Marker2D" parent="Room6"]
+position = Vector2(500.0, 672.0)
+
+[node name="DuctSpot" type="Marker2D" parent="Room6"]
+position = Vector2(300.0, 672.0)
+
+[node name="Hint" type="Label" parent="Room6"]
+offset_left = 40
+offset_top = 40
+offset_right = 1140
+offset_bottom = 160
+theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
+theme_override_font_sizes/font_size = 17
+text = "ÉCRAN 6 : RUINES, DE NUIT\nMarek vous montre un chemin par les hauteurs. Accroupi (Bas), vos pas sont muets.\nLes Sentinelles voient mal dans le noir et ne regardent pas en l'air. F : lancer une pierre."
+
+[node name="Room7" type="Node2D" parent="."]
+position = Vector2(2560.0, 2400.0)
+script = ExtResource("2_room")
+room_size = Vector2(1920.0, 720.0)
+camera_zoom = 1.0
+title = "7 - Hall"
+acoustic_zone = &"hall"
+ambient_light = 0.85
+
+[node name="Ceiling" type="StaticBody2D" parent="Room7"]
+position = Vector2(0.0, 0.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(40.0, 1.0)
+color = Color(0.2, 0.23, 0.27, 1.0)
+
+[node name="Ground" type="StaticBody2D" parent="Room7"]
+position = Vector2(0.0, 672.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(34.6667, 2.0)
+color = Color(0.2, 0.23, 0.27, 1.0)
+
+[node name="UnderElevator" type="StaticBody2D" parent="Room7"]
+position = Vector2(1664.0, 696.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(4.0, 1.5)
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="ExitLedge" type="StaticBody2D" parent="Room7"]
+position = Vector2(1856.0, 480.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1.3333, 4.0)
+color = Color(0.2, 0.23, 0.27, 1.0)
+
+[node name="Cover1" type="StaticBody2D" parent="Room7"]
+position = Vector2(440.0, 600.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1.0, 1.5)
+color = Color(0.33, 0.37, 0.42, 1.0)
+
+[node name="Cover2" type="StaticBody2D" parent="Room7"]
+position = Vector2(960.0, 600.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1.0, 1.5)
+color = Color(0.33, 0.37, 0.42, 1.0)
+
+[node name="Sentinel1" parent="Room7" instance=ExtResource("26_sentinel")]
+position = Vector2(740.0, 672.0)
+patrol_left_blocks = 2.0
+patrol_right_blocks = 2.0
+rng_seed = 6
+
+[node name="Sentinel2" parent="Room7" instance=ExtResource("26_sentinel")]
+position = Vector2(1290.0, 672.0)
+patrol_left_blocks = 2.0
+patrol_right_blocks = 2.0
+rng_seed = 7
+
+[node name="Elevator" type="AnimatableBody2D" parent="Room7"]
+position = Vector2(1664.0, 672.0)
+script = ExtResource("17_elevator")
+width_blocks = 4.0
+travel = Vector2(0.0, -192.0)
+speed = 120.0
+ride_when_boarded = true
+
+[node name="Checkpoint" parent="Room7" instance=ExtResource("7_checkpoint")]
+position = Vector2(80.0, 672.0)
+checkpoint_id = &"hall"
+
+[node name="Hint" type="Label" parent="Room7"]
+offset_left = 40
+offset_top = 70
+offset_right = 1140
+offset_bottom = 190
+theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
+theme_override_font_sizes/font_size = 17
+text = "ÉCRAN 7 : LE HALL\nX ou J : tirer (maintenir : tir chargé). Z (W en AZERTY) ou K : bouclier. Abritez-vous derrière les murets.\nAu fond, l'ascenseur monte quand vous vous tenez dessus."
+
+[node name="Room8" type="Node2D" parent="."]
+position = Vector2(4480.0, 2400.0)
+script = ExtResource("2_room")
+room_size = Vector2(3200.0, 720.0)
+camera_zoom = 1.0
+title = "8 - Poursuite"
+acoustic_zone = &"ruins"
+ambient_light = 0.45
+
+[node name="Ruin1" type="Node2D" parent="Room8"]
+position = Vector2(220.0, 480.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 420.0
+height = 360.0
+seed_value = 51
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin2" type="Node2D" parent="Room8"]
+position = Vector2(920.0, 480.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 360.0
+height = 300.0
+seed_value = 52
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin3" type="Node2D" parent="Room8"]
+position = Vector2(1520.0, 480.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 500.0
+height = 420.0
+seed_value = 53
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin4" type="Node2D" parent="Room8"]
+position = Vector2(2220.0, 480.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 300.0
+height = 320.0
+seed_value = 54
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ground1" type="StaticBody2D" parent="Room8"]
+position = Vector2(0.0, 480.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(23.0, 5.0)
+color = Color(0.16, 0.19, 0.2, 1.0)
+
+[node name="Barrier" type="StaticBody2D" parent="Room8"]
+position = Vector2(720.0, 456.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1.0, 0.5)
+color = Color(0.3, 0.33, 0.37, 1.0)
+surface = &"metal"
+
+[node name="PitFloor1" type="StaticBody2D" parent="Room8"]
+position = Vector2(1104.0, 576.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(3.0, 3.0)
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ground2" type="StaticBody2D" parent="Room8"]
+position = Vector2(1248.0, 480.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(14.0, 5.0)
+color = Color(0.16, 0.19, 0.2, 1.0)
+
+[node name="Overhang" type="StaticBody2D" parent="Room8"]
+position = Vector2(1470.0, 356.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(2.5, 1.0)
+color = Color(0.3, 0.33, 0.37, 1.0)
+surface = &"metal"
+
+[node name="PitFloor2" type="StaticBody2D" parent="Room8"]
+position = Vector2(1920.0, 576.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(3.0, 3.0)
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ground3" type="StaticBody2D" parent="Room8"]
+position = Vector2(2064.0, 480.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(23.6667, 5.0)
+color = Color(0.16, 0.19, 0.2, 1.0)
+
+[node name="RightWall" type="StaticBody2D" parent="Room8"]
+position = Vector2(3152.0, 0.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1.0, 10.0)
+
+[node name="Door" type="StaticBody2D" parent="Room8"]
+position = Vector2(2520.0, 336.0)
+script = ExtResource("15_door")
+size_blocks = Vector2(1.0, 3.0)
+switches = Array[NodePath]([NodePath("../Lever")])
+
+[node name="Lever" type="Node2D" parent="Room8"]
+position = Vector2(2620.0, 480.0)
+script = ExtResource("14_lever")
+companion_can_use = true
+
+[node name="Hideout" type="Marker2D" parent="Room8"]
+position = Vector2(2700.0, 480.0)
+
+[node name="Rescue" type="Node2D" parent="Room8"]
+position = Vector2(1820.0, 480.0)
+script = ExtResource("33_rescue")
+width = 240.0
+companion = NodePath("../../Room5/Companion")
+lever = NodePath("../Lever")
+
+[node name="FinaleTrigger" type="Node2D" parent="Room8"]
+position = Vector2(2740.0, 480.0)
+script = ExtResource("11_trigger")
+cutscene = NodePath("../../Story/Finale")
+width = 150.0
+
+[node name="Pursuer1" parent="Room8" instance=ExtResource("29_pursuer")]
+position = Vector2(20.0, 480.0)
+trigger_offset = 330.0
+limit_offset = 2400.0
+
+[node name="Pursuer2" parent="Room8" instance=ExtResource("29_pursuer")]
+position = Vector2(80.0, 480.0)
+trigger_offset = 270.0
+limit_offset = 2340.0
+
+[node name="Checkpoint" parent="Room8" instance=ExtResource("7_checkpoint")]
+position = Vector2(60.0, 480.0)
+checkpoint_id = &"poursuite"
+
+[node name="Hint" type="Label" parent="Room8"]
+offset_left = 40
+offset_top = 70
+offset_right = 1140
+offset_bottom = 190
+theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
+theme_override_font_sizes/font_size = 17
+text = "ÉCRAN 8 : LA POURSUITE\nCourez ! Sautez par-dessus les obstacles et les trous (Espace en courant),\nglissez sous le passage bas (Bas en courant)."
 
 [node name="Elias" parent="." instance=ExtResource("5_elias")]
 position = Vector2(-4950, 672)
@@ -642,3 +977,29 @@ cell_spawn = NodePath("../../Room5/CellSpawn")
 [node name="Meeting" type="Node" parent="Story"]
 script = ExtResource("13_meeting")
 companion = NodePath("../../Room5/Companion")
+
+[node name="Passage" type="Node" parent="Story"]
+script = ExtResource("31_passage")
+next = NodePath("../Guide")
+destination = NodePath("../../Room6/Entry")
+companion_destination = NodePath("../../Room6/CompanionEntry")
+checkpoint_id = &"ruines"
+
+[node name="Guide" type="Node" parent="Story"]
+script = ExtResource("32_guide")
+companion = NodePath("../../Room5/Companion")
+lookout = NodePath("../../Room6/Lookout")
+duct = NodePath("../../Room6/DuctSpot")
+hideout = NodePath("../../Room8/Hideout")
+
+[node name="Finale" type="Node" parent="Story"]
+script = ExtResource("34_finale")
+companion = NodePath("../../Room5/Companion")
+lever = NodePath("../../Room8/Lever")
+ending_shot = NodePath("../EndingLayer/EndingShot")
+
+[node name="EndingLayer" type="CanvasLayer" parent="Story"]
+layer = 20
+
+[node name="EndingShot" type="Node2D" parent="Story/EndingLayer"]
+script = ExtResource("35_ending")

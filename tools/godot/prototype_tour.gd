@@ -16,6 +16,12 @@ const STOPS: Array = [
 	["proto_3c_balcon", -800.0, 480.0, 30],
 	["proto_3d_descente", -300.0, 480.0, 30],
 	["proto_4_clairiere", 300.0, 672.0, 30],
+	["proto_5_cellules", 600.0, 1872.0, 30],
+	["proto_6a_ruines", 400.0, 3072.0, 30],
+	["proto_6b_passerelle", 1100.0, 2928.0, 30],
+	["proto_7_hall", 3200.0, 3072.0, 30],
+	["proto_8a_poursuite", 5100.0, 2880.0, 30],
+	["proto_8b_porte", 6900.0, 2880.0, 30],
 ]
 
 var _out: String = "build/shots"

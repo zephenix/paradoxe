@@ -28,6 +28,10 @@ signal arrived(at_top: bool)
 @export var speed: float = 140.0
 ## Leviers qui l'appellent (une impulsion à chaque fois qu'on les enclenche).
 @export var switches: Array[NodePath] = []
+## Monte tout seul quand Élias se tient dessus (ascenseur de sortie, J8).
+@export var ride_when_boarded: bool = false
+## Temps passé dessus avant le départ (secondes).
+@export var board_delay: float = 0.6
 
 ## Position : 0 = en bas, 1 = en haut.
 var progress: float = 0.0
@@ -35,6 +39,7 @@ var progress: float = 0.0
 var goal: float = 0.0
 var _bottom: Vector2
 var _moving: bool = false
+var _boarded_time: float = 0.0
 
 const LOOP_ID: StringName = &"elevator"
 const THICKNESS: float = 24.0
@@ -90,6 +95,15 @@ func top_y() -> float:
 	return global_position.y
 
 
+## Élias se tient-il sur la plate-forme ?
+func _player_on_board() -> bool:
+	var player: CharacterBody2D = get_tree().get_first_node_in_group(&"player") as CharacterBody2D
+	if player == null or not player.is_on_floor():
+		return false
+	var x: float = player.global_position.x - global_position.x
+	return x >= 0.0 and x <= width_blocks * GameUnits.BLOCK and absf(player.global_position.y - top_y()) < 6.0
+
+
 ## Abscisse du milieu de la plate-forme.
 func center_x() -> float:
 	return global_position.x + width_blocks * GameUnits.BLOCK * 0.5
@@ -98,6 +112,11 @@ func center_x() -> float:
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
+	if ride_when_boarded and is_at_bottom():
+		_boarded_time = _boarded_time + delta if _player_on_board() else 0.0
+		if _boarded_time >= board_delay:
+			_boarded_time = 0.0
+			trigger()
 	if is_equal_approx(progress, goal):
 		if _moving:
 			_moving = false
