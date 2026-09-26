@@ -81,6 +81,9 @@ func _exit_tree() -> void:
 	RewindManager.recording = false
 	RewindManager.clear()
 	AudioManager.set_zone(&"", 1.0)
+	# La musique ne survit pas au niveau (retour au menu) : tension et thème s'éteignent.
+	Events.alert_level_changed.emit(0.0)
+	AudioManager.stop_music(1.0)
 
 
 func _on_room_changed(room: Room) -> void:
@@ -187,6 +190,8 @@ func respawn_point() -> Array:
 
 func _on_player_died(_cause: StringName) -> void:
 	RewindManager.stop_recording()
+	# Courte phrase musicale de la mort (J8) : elle fait aussi taire la tension.
+	AudioManager.play_music(&"mus_sting_death", 0.0)
 	if RewindManager.can_rewind():
 		var result: StringName = await death.play()
 		if not is_inside_tree():

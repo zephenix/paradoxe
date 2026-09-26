@@ -26,6 +26,7 @@ const CATEGORY_DEFAULTS: Dictionary = {
 	"ambience": [&"Ambiance", -14.0, 0.12],
 	"ui": [&"UI", -2.0, 0.02],
 	"sfx": [&"SFX", -6.0, 0.0],
+	"music": [&"Musique", -6.0, 0.0],   # musique (J8) : jamais de variation de hauteur
 }
 
 ## Réglages de départ particuliers : identifiant -> {champ: valeur}.
@@ -35,6 +36,16 @@ const CATEGORY_DEFAULTS: Dictionary = {
 ## rayon d'un pas de COURSE ; la marche et la marche accroupie le réduisent
 ## (resources/audio/foley.tres).
 const OVERRIDES: Dictionary = {
+	# Musique (J8) : niveaux effectifs sous ceux des bruitages (familles de measure_levels).
+	&"mus_tension_pad": {"volume_db": -11.0},
+	&"mus_tension_pulse": {"volume_db": -12.0},
+	&"mus_tension_perc": {"volume_db": -8.0},
+	&"mus_theme_intro": {"volume_db": -5.5},
+	&"mus_theme_arrival": {"volume_db": -7.5},
+	&"mus_theme_meeting": {"volume_db": -7.0},
+	&"mus_chase_loop": {"volume_db": -5.5},
+	&"mus_sting_death": {"volume_db": -9.5},
+	&"mus_theme_end": {"volume_db": -8.0},
 	&"foley_step_stone": {"volume_db": -6.0, "noise_radius": 300.0},
 	&"foley_step_metal": {"volume_db": -2.5, "noise_radius": 420.0},
 	&"foley_step_plant": {"volume_db": 1.5, "noise_radius": 240.0},
@@ -154,7 +165,7 @@ func _new_entry(id: StringName, info: Dictionary) -> SoundEntry:
 	entry.bus = defaults[0]
 	entry.volume_db = defaults[1]
 	entry.pitch_random = defaults[2]
-	if info["loop"] or info["category"] == "creature":
+	if info["loop"] or info["category"] in ["creature", "music"]:
 		entry.volume_random_db = 0.0
 	if String(info["category"]) == "ambience" and not info["loop"]:
 		entry.volume_random_db = 3.0

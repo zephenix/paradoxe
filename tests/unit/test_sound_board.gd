@@ -82,3 +82,13 @@ func test_zone_selection_and_exit_restore_silence() -> void:
 	assert_eq(AudioManager.ambience.zone_id, &"", "on quitte le banc : silence")
 	assert_almost_eq(AudioManager.muffle, 0.0, 0.001, "effet de rembobinage retiré")
 	assert_false(AudioManager.is_loop_playing(&"sound_board_rewind"))
+
+
+func test_tension_slider_drives_the_music() -> void:
+	var board: Node = add_node(BOARD.instantiate())
+	await wait_frames(2)
+	board.tension_slider.value = 1.0
+	assert_almost_eq(AudioManager.music.tension, 1.0, 0.001, "le curseur règle la tension")
+	board.free()
+	assert_eq(AudioManager.music.tension, 0.0, "en quittant le banc, la musique se tait")
+	AudioManager.music.silence()

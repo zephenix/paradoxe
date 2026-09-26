@@ -21,7 +21,9 @@ J1 : trois sons de test pour valider la chaîne audio (bus, effets, Web).
 J3 : sons provisoires du combat (arme, bouclier, impacts, voix des Sentinelles).
 J4 : sons du rembobinage.
 J5 : Foley par surface, respiration, ambiances de zone, sons d'interface.
-J5 : bibliothèque complète (Foley, ambiances, arme, créatures, musique).
+J5 : bibliothèque complète (Foley, ambiances, arme, créatures).
+J7 : compagnon, mécanismes, jungle, chaînes.
+J8 : musique (couches de tension, thèmes) : voir music.py.
 """
 
 from __future__ import annotations
@@ -930,6 +932,10 @@ def _register_chains() -> None:
 
 
 _register_chains()
+
+# Musique (J8) : composée dans music.py, inscrite ici au catalogue.
+import music  # noqa: E402
+music.register(sound)
 
 
 # =============================================================================
