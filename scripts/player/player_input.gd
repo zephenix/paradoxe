@@ -24,6 +24,8 @@ var run: bool = false
 ## Détente maintenue (tir chargé) et bouclier maintenu (J3).
 var fire: bool = false
 var shield: bool = false
+## Touche « Ordre » maintenue (compagnon, J7) : court = suivre/attendre, long = activer.
+var order: bool = false
 
 ## Horloge interne (secondes) et date du dernier appui de chaque commande.
 var _clock: float = 0.0
@@ -46,6 +48,7 @@ func update(delta: float) -> void:
 	run = Input.is_action_pressed(&"run")
 	fire = Input.is_action_pressed(&"fire")
 	shield = Input.is_action_pressed(&"shield")
+	order = Input.is_action_pressed(&"order")
 	for action in BUFFERED:
 		if Input.is_action_just_pressed(action):
 			_pressed_at[action] = _clock
@@ -81,3 +84,4 @@ func clear() -> void:
 	run = false
 	fire = false
 	shield = false
+	order = false

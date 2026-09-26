@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/companion/companion.gd" id="1_companion"]
+[ext_resource type="Script" path="res://scripts/companion/companion_visual.gd" id="2_visual"]
+[ext_resource type="Script" path="res://scripts/core/state_machine.gd" id="3_machine"]
+[ext_resource type="Script" path="res://scripts/companion/states/follow.gd" id="s0_follow"]
+[ext_resource type="Script" path="res://scripts/companion/states/wait.gd" id="s1_wait"]
+[ext_resource type="Script" path="res://scripts/companion/states/activate.gd" id="s2_activate"]
+[ext_resource type="Script" path="res://scripts/companion/states/scripted.gd" id="s3_scripted"]
+
+[node name="Companion" type="CharacterBody2D"]
+script = ExtResource("1_companion")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("2_visual")
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("3_machine")
+initial_state = &"Wait"
+
+[node name="Follow" type="Node" parent="StateMachine"]
+script = ExtResource("s0_follow")
+
+[node name="Wait" type="Node" parent="StateMachine"]
+script = ExtResource("s1_wait")
+
+[node name="Activate" type="Node" parent="StateMachine"]
+script = ExtResource("s2_activate")
+
+[node name="Scripted" type="Node" parent="StateMachine"]
+script = ExtResource("s3_scripted")
