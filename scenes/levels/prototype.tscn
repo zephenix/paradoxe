@@ -20,6 +20,11 @@
 [ext_resource type="Script" path="res://scripts/interact/terminal.gd" id="18_terminal"]
 [ext_resource type="Script" path="res://scripts/interact/item_pickup.gd" id="19_pickup"]
 [ext_resource type="Script" path="res://scripts/world/exit_zone.gd" id="20_exit"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/tracker.tscn" id="21_tracker"]
+[ext_resource type="Script" path="res://scripts/fx/lab_sign.gd" id="22_sign"]
+[ext_resource type="Script" path="res://scripts/fx/ruin.gd" id="23_ruin"]
+[ext_resource type="Script" path="res://scripts/fx/liana.gd" id="24_liana"]
+[ext_resource type="Script" path="res://scripts/cutscene/arrival_cutscene.gd" id="25_arrival"]
 
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
@@ -32,6 +37,7 @@ fill_to = Vector2(0, 1)
 
 [node name="Prototype" type="Node2D"]
 script = ExtResource("1_level")
+opening_cutscene = NodePath("Story/Arrival")
 
 [node name="Sky" type="CanvasLayer" parent="."]
 layer = -10
@@ -53,6 +59,316 @@ min_height = 200.0
 max_height = 480.0
 color = Color(0.06, 0.11, 0.11, 1)
 seed_value = 21
+
+[node name="Room2" type="Node2D" parent="."]
+position = Vector2(-5120.0, -360.0)
+script = ExtResource("2_room")
+room_size = Vector2(2560.0, 1080.0)
+camera_zoom = 0.75
+title = "2 - Arrivée"
+acoustic_zone = &"arrival"
+ambient_light = 0.8
+
+[node name="Ruin1" type="Node2D" parent="Room2"]
+position = Vector2(20.0, 1032.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 360.0
+height = 560.0
+seed_value = 3
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin2" type="Node2D" parent="Room2"]
+position = Vector2(480.0, 1032.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 260.0
+height = 400.0
+seed_value = 5
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin3" type="Node2D" parent="Room2"]
+position = Vector2(1000.0, 1032.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 420.0
+height = 640.0
+seed_value = 7
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin4" type="Node2D" parent="Room2"]
+position = Vector2(1500.0, 1032.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 300.0
+height = 460.0
+seed_value = 9
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin5" type="Node2D" parent="Room2"]
+position = Vector2(1920.0, 936.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 380.0
+height = 600.0
+seed_value = 11
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="LeftWall" type="StaticBody2D" parent="Room2"]
+position = Vector2(-48.0, 0.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1.0, 23.0)
+
+[node name="Ground" type="StaticBody2D" parent="Room2"]
+position = Vector2(0.0, 1032.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(38.0, 2.0)
+color = Color(0.18, 0.24, 0.22, 1.0)
+surface = &"plant"
+
+[node name="FallenBeam" type="StaticBody2D" parent="Room2"]
+position = Vector2(1280.0, 1008.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(2.0, 0.5)
+color = Color(0.3, 0.33, 0.37, 1.0)
+surface = &"metal"
+
+[node name="Ledge" type="StaticBody2D" parent="Room2"]
+position = Vector2(1824.0, 936.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(15.3333, 3.0)
+color = Color(0.16, 0.19, 0.2, 1.0)
+
+[node name="Plants1" type="Node2D" parent="Room2"]
+position = Vector2(0.0, 1032.0)
+script = ExtResource("9_vegetation")
+width = 700.0
+max_height = 200.0
+seed_value = 11
+
+[node name="Plants2" type="Node2D" parent="Room2"]
+position = Vector2(820.0, 1032.0)
+script = ExtResource("9_vegetation")
+width = 500.0
+max_height = 150.0
+seed_value = 12
+
+[node name="Plants3" type="Node2D" parent="Room2"]
+position = Vector2(1420.0, 1032.0)
+script = ExtResource("9_vegetation")
+width = 380.0
+max_height = 220.0
+seed_value = 13
+
+[node name="Plants4" type="Node2D" parent="Room2"]
+position = Vector2(1824.0, 936.0)
+script = ExtResource("9_vegetation")
+width = 700.0
+max_height = 180.0
+seed_value = 14
+
+[node name="Lianas1" type="Node2D" parent="Room2"]
+position = Vector2(1070.0, 400.0)
+script = ExtResource("24_liana")
+count = 4
+length = 260.0
+seed_value = 1
+
+[node name="Lianas2" type="Node2D" parent="Room2"]
+position = Vector2(1940.0, 360.0)
+script = ExtResource("24_liana")
+count = 5
+length = 300.0
+seed_value = 2
+
+[node name="Sign" type="Node2D" parent="Room2"]
+position = Vector2(640.0, 1032.0)
+script = ExtResource("22_sign")
+size = Vector2(220.0, 100.0)
+
+[node name="Landing" type="Marker2D" parent="Room2"]
+position = Vector2(170.0, 1032.0)
+
+[node name="Tracker" parent="Room2" instance=ExtResource("21_tracker")]
+position = Vector2(370.0, 1032.0)
+trigger_offset = 350.0
+limit_offset = 1314.0
+
+[node name="Hint" type="Label" parent="Room2"]
+offset_left = 40
+offset_top = 140
+offset_right = 1140
+offset_bottom = 260
+theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
+theme_override_font_sizes/font_size = 17
+text = "ÉCRAN 2 : ARRIVÉE\nFlèches : marcher. Maj (maintenue) : courir. Espace : sauter (plus loin en courant).\nAu pied d'un mur pas trop haut : Haut pour grimper."
+
+[node name="Room3" type="Node2D" parent="."]
+position = Vector2(-2560.0, -360.0)
+script = ExtResource("2_room")
+room_size = Vector2(2560.0, 1080.0)
+camera_zoom = 1.0
+title = "3 - Canopée"
+acoustic_zone = &"canopy"
+ambient_light = 0.7
+
+[node name="Ruin1" type="Node2D" parent="Room3"]
+position = Vector2(1060.0, 1032.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 170.0
+height = 260.0
+seed_value = 21
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin2" type="Node2D" parent="Room3"]
+position = Vector2(1570.0, 1032.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 280.0
+height = 170.0
+seed_value = 22
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Ruin3" type="Node2D" parent="Room3"]
+position = Vector2(460.0, 840.0)
+script = ExtResource("23_ruin")
+z_index = -1
+width = 250.0
+height = 380.0
+seed_value = 23
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="RoofA" type="StaticBody2D" parent="Room3"]
+position = Vector2(0.0, 936.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(7.5, 3.0)
+color = Color(0.16, 0.19, 0.2, 1.0)
+
+[node name="RoofB" type="StaticBody2D" parent="Room3"]
+position = Vector2(360.0, 840.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(7.5, 5.0)
+color = Color(0.16, 0.19, 0.2, 1.0)
+
+[node name="RoofC" type="StaticBody2D" parent="Room3"]
+position = Vector2(720.0, 744.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(7.5, 7.0)
+color = Color(0.16, 0.19, 0.2, 1.0)
+
+[node name="PitFloor1" type="StaticBody2D" parent="Room3"]
+position = Vector2(1080.0, 1032.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(3.0, 1.0)
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Beam" type="StaticBody2D" parent="Room3"]
+position = Vector2(1224.0, 744.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(7.0, 0.5)
+color = Color(0.3, 0.33, 0.37, 1.0)
+surface = &"metal"
+
+[node name="PitFloor2" type="StaticBody2D" parent="Room3"]
+position = Vector2(1224.0, 1032.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(7.0, 1.0)
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="Overhang" type="StaticBody2D" parent="Room3"]
+position = Vector2(1320.0, 640.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(3.0, 0.8333)
+color = Color(0.3, 0.33, 0.37, 1.0)
+surface = &"metal"
+
+[node name="Balcony" type="StaticBody2D" parent="Room3"]
+position = Vector2(1560.0, 840.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(6.25, 0.5)
+color = Color(0.3, 0.33, 0.37, 1.0)
+surface = &"metal"
+
+[node name="PitFloor3" type="StaticBody2D" parent="Room3"]
+position = Vector2(1560.0, 1032.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(6.25, 1.0)
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="PitFloor4" type="StaticBody2D" parent="Room3"]
+position = Vector2(1860.0, 1032.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(3.75, 1.0)
+color = Color(0.1, 0.13, 0.15, 1.0)
+
+[node name="RoofF" type="StaticBody2D" parent="Room3"]
+position = Vector2(2040.0, 840.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(5.625, 5.0)
+color = Color(0.16, 0.19, 0.2, 1.0)
+
+[node name="Ground" type="StaticBody2D" parent="Room3"]
+position = Vector2(2310.0, 1032.0)
+script = ExtResource("3_block")
+size_blocks = Vector2(5.2083, 2.0)
+color = Color(0.18, 0.24, 0.22, 1.0)
+surface = &"plant"
+
+[node name="Plants1" type="Node2D" parent="Room3"]
+position = Vector2(0.0, 936.0)
+script = ExtResource("9_vegetation")
+width = 340.0
+max_height = 120.0
+seed_value = 31
+
+[node name="Plants2" type="Node2D" parent="Room3"]
+position = Vector2(360.0, 840.0)
+script = ExtResource("9_vegetation")
+width = 300.0
+max_height = 90.0
+seed_value = 32
+
+[node name="Plants3" type="Node2D" parent="Room3"]
+position = Vector2(2040.0, 840.0)
+script = ExtResource("9_vegetation")
+width = 250.0
+max_height = 100.0
+seed_value = 33
+
+[node name="Plants4" type="Node2D" parent="Room3"]
+position = Vector2(2310.0, 1032.0)
+script = ExtResource("9_vegetation")
+width = 250.0
+max_height = 160.0
+seed_value = 34
+
+[node name="Lianas1" type="Node2D" parent="Room3"]
+position = Vector2(1080.0, 240.0)
+script = ExtResource("24_liana")
+count = 4
+length = 320.0
+seed_value = 3
+
+[node name="Lianas2" type="Node2D" parent="Room3"]
+position = Vector2(1870.0, 220.0)
+script = ExtResource("24_liana")
+count = 5
+length = 380.0
+seed_value = 4
+
+[node name="Checkpoint" parent="Room3" instance=ExtResource("7_checkpoint")]
+position = Vector2(60.0, 936.0)
+checkpoint_id = &"canopee"
+
+[node name="Hint" type="Label" parent="Room3"]
+offset_left = 40
+offset_top = 380
+offset_right = 1140
+offset_bottom = 500
+theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
+theme_override_font_sizes/font_size = 17
+text = "ÉCRAN 3 : CANOPÉE\nPour franchir un trou : courir (Maj), puis Espace juste avant le bord.\nPassage bas : Bas (accroupi), ou Bas en courant (glissade). Plus de 5 blocs de chute : mortel."
 
 [node name="Room4" type="Node2D" parent="."]
 position = Vector2(0, 0)
@@ -83,11 +399,6 @@ script = ExtResource("9_vegetation")
 width = 640.0
 max_height = 210.0
 seed_value = 2
-
-[node name="LeftWall" type="StaticBody2D" parent="Room4"]
-position = Vector2(-48, 0)
-script = ExtResource("3_block")
-size_blocks = Vector2(1, 15)
 
 [node name="Floor" type="StaticBody2D" parent="Room4"]
 position = Vector2(0, 672)
@@ -311,12 +622,16 @@ theme_override_font_sizes/font_size = 20
 text = "Évasion réussie. La suite (écrans 6 à 8) arrive en J8."
 
 [node name="Elias" parent="." instance=ExtResource("5_elias")]
-position = Vector2(96, 672)
+position = Vector2(-4950, 672)
 
 [node name="CameraDirector" type="Camera2D" parent="."]
 script = ExtResource("4_camera")
 
 [node name="Story" type="Node" parent="."]
+
+[node name="Arrival" type="Node" parent="Story"]
+script = ExtResource("25_arrival")
+landing = NodePath("../../Room2/Landing")
 
 [node name="Capture" type="Node" parent="Story"]
 script = ExtResource("12_capture")

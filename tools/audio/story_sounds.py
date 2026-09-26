@@ -170,6 +170,41 @@ def sfx_paper_fall(rng: np.random.Generator) -> np.ndarray:
 
 
 # =============================================================================
+# Le Traqueur (écran 2) : le prédateur
+# =============================================================================
+
+def creature_tracker_roar(rng: np.random.Generator) -> np.ndarray:
+    """Le cri du Traqueur, reconnaissable : un grognement grave qui s'ouvre en
+    hurlement rauque (voyelles « o » puis « a »), puis retombe en râle."""
+    # --- Paramètres ---
+    d = 2.4
+    f0 = (95.0, 170.0, 70.0)            # départ, sommet, fin (Hz)
+    formants = [(420, 750), (900, 1250), (2400, 2700)]  # « o » -> « a »
+    # ------------------
+    t = dsp.time_axis(d)
+    rise = np.minimum(t / 0.7, 1.0)
+    fall = np.clip((t - 1.2) / 1.2, 0.0, 1.0)
+    pitch = f0[0] + (f0[1] - f0[0]) * rise - (f0[1] - f0[2]) * fall
+    pitch = pitch * (1.0 + 0.04 * np.sin(2 * np.pi * 23.0 * t))  # rugosité
+    source = dsp.saw(pitch, d) + 0.6 * dsp.square(pitch * 0.5, d, 0.3)  # sous-harmonique : la gorge
+    voice = np.zeros(len(t))
+    for k, (start, end) in enumerate(formants):
+        f = start + (end - start) * rise
+        voice += dsp.bandpass(source, float(np.mean(f)) * 0.8, float(np.mean(f)) * 1.25) / (k + 1)
+    breath = dsp.bandpass(dsp.white_noise(d, rng), 500, 3500) * 0.35
+    env = dsp.adsr(d, 0.25, 0.6, 0.8, 1.1)
+    return dsp.fade(dsp.normalize((dsp.normalize(voice) + breath) * env, 0.9), 0.01, 0.2)
+
+
+def _tracker_step(rng: np.random.Generator, i: int) -> np.ndarray:
+    """Un pas du Traqueur : lourd, sourd, avec un craquement de végétation."""
+    d = 0.5
+    thud = _thump(rng, d, 55.0 + 6 * i, 0.18, 700.0, 0.4)
+    crunch = dsp.bandpass(dsp.crackle(d, rng, 250.0), 1200, 5000) * dsp.exp_decay(d, 0.12) * 0.4
+    return dsp.fade(dsp.normalize(thud + crunch, 0.8), 0.001, 0.1)
+
+
+# =============================================================================
 # Inscription au catalogue
 # =============================================================================
 
@@ -192,3 +227,8 @@ def register(sound: Callable) -> None:
     sound("sfx_portal_charge", "sfx", description="L'anneau se charge : bourdonnement qui monte, arcs (intro, plan 8).")(sfx_portal_charge)
     sound("sfx_flash_breath", "sfx", description="Après le flash : souffle grave qui s'éteint (intro, plan 11).")(sfx_flash_breath)
     sound("sfx_paper_fall", "sfx", description="La photo tombe au sol (intro, plan 11).")(sfx_paper_fall)
+    sound("creature_tracker_roar", "creature", description="Cri du Traqueur : grognement qui s'ouvre en hurlement rauque (écran 2).")(creature_tracker_roar)
+    for i in range(1, 3):
+        def build_step(rng: np.random.Generator, i: int = i) -> np.ndarray:
+            return _tracker_step(rng, i)
+        sound(f"creature_tracker_step_{i:02d}", "creature", description=f"Pas lourd du Traqueur, variante {i}.")(build_step)

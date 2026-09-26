@@ -12,6 +12,7 @@ func _draw() -> void:
 	draw_rect(Rect2(930, 420, 90, GROUND_Y - 420), Color("d9e8e0"))
 	draw_rect(Rect2(900, 400, 150, GROUND_Y - 400), Color(0.85, 0.95, 0.9, 0.1))
 	poly([Vector2(890, 405), Vector2(1060, 405), Vector2(1080, 390), Vector2(870, 390)], Color("2b3440"))
+	LabSign.draw_logo(self, Vector2(975.0, 360.0), 15.0, Color("c9d6d2"), 3.0)  # le logo du labo (on le reverra)
 	for i in 5:
 		draw_rect(Rect2(1090 + (i % 3) * 55, 290 + floorf(i / 3.0) * 60, 30, 36), Color("e8d9a6") if i != 2 else Color("1b2430"))
 	# Sol mouillé : reflet de la porte.

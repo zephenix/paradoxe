@@ -19,6 +19,7 @@ func _draw() -> void:
 	if gap > 0.5:
 		draw_rect(Rect2(260.0 - gap * 0.5, 0.0, gap, H), Color("cfe3da"))
 	draw_line(Vector2(260, 0), Vector2(260, H), Color("0d1116"), 4.0)
+	LabSign.draw_logo(self, Vector2(750.0, 118.0), 18.0, Color("8a99a1"), 4.0)  # le logo du labo
 	# Le lecteur : cadre, grille, voyant.
 	draw_rect(READER.grow(14.0), Color("2f3844"))
 	draw_rect(READER, Color("0c1a1a"))

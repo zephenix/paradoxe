@@ -25,6 +25,10 @@ const AMBIENT_FADE: float = 0.8
 ## Commencer une nouvelle partie en chargeant ce niveau (oublie les checkpoints
 ## d'une partie précédente, gardés par l'autoload GameState).
 @export var new_game_on_start: bool = true
+## Cinématique jouée dès l'entrée dans le niveau (J8 : l'arrivée d'Élias).
+@export var opening_cutscene: NodePath
+## Faux dans les tests : pas de cinématique d'ouverture.
+var play_opening: bool = true
 
 @onready var player: Player = $Elias
 @onready var camera: CameraDirector = $CameraDirector
@@ -71,6 +75,8 @@ func _ready() -> void:
 	cutscenes = CutscenePlayer.new()
 	cutscenes.name = "Cutscenes"
 	add_child(cutscenes)
+	if play_opening and not opening_cutscene.is_empty():
+		_play_opening.call_deferred()
 	# Pendant le défilement arrière, le jeu est en pause : la caméra ne suit plus
 	# d'elle-même, on la recadre à chaque image.
 	death.scrubbed.connect(camera.snap_to_target)
@@ -179,6 +185,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"pause") and not (cutscenes and cutscenes.playing):
 		get_viewport().set_input_as_handled()
 		SceneTransition.change_scene("res://scenes/ui/title_screen.tscn")
+
+
+func _play_opening() -> void:
+	var opening: Cutscene = get_node_or_null(opening_cutscene) as Cutscene
+	if opening:
+		cutscenes.play(opening)
 
 
 ## Où Élias réapparaîtra s'il meurt maintenant : [position des pieds, sens du regard].

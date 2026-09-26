@@ -199,6 +199,21 @@
   "description": "Sentinelle qui cherche : grognement grave, interrogatif (provisoire J3).",
   "loop": false
  },
+ "creature_tracker_roar": {
+  "category": "creature",
+  "description": "Cri du Traqueur : grognement qui s'ouvre en hurlement rauque (écran 2).",
+  "loop": false
+ },
+ "creature_tracker_step_01": {
+  "category": "creature",
+  "description": "Pas lourd du Traqueur, variante 1.",
+  "loop": false
+ },
+ "creature_tracker_step_02": {
+  "category": "creature",
+  "description": "Pas lourd du Traqueur, variante 2.",
+  "loop": false
+ },
  "door_slide": {
   "category": "sfx",
   "description": "Porte qui coulisse : glissement mécanique et butée (J7).",

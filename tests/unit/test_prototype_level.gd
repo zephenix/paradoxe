@@ -17,6 +17,7 @@ var elevator: Elevator
 func before_each() -> void:
 	Settings.classic_mode = false
 	level = LEVEL.instantiate()
+	level.play_opening = false  # pas d'arrivée (écran 2) : on commence à l'écran 4
 	level.get_node("Elias/Foley").free()
 	add_node(level)
 	player = level.player
@@ -26,6 +27,8 @@ func before_each() -> void:
 	room5 = level.get_node("Room5")
 	buddy = room5.get_node("Companion")
 	elevator = room5.get_node("Elevator")
+	player.global_position = (level.get_node("Room4/Spawn") as Node2D).global_position
+	level.camera.snap_to_target()
 	await wait_physics(3)
 
 

@@ -55,8 +55,11 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/door_slide.wav" id="41_gh5ba"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/elevator_loop.wav" id="42_ed374"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_metal_02.wav" id="42_qb42j"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/creature/creature_tracker_roar.wav" id="42_tma8s"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/elevator_stop.wav" id="43_0rrfb"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_metal_03.wav" id="43_3sjhw"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/creature/creature_tracker_step_01.wav" id="43_o73a6"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/creature/creature_tracker_step_02.wav" id="44_0q65d"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_metal_04.wav" id="44_5k22w"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_plant_01.wav" id="45_d636w"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_plant_02.wav" id="46_pp5p5"]
@@ -435,6 +438,28 @@ volume_db = -6.5
 pitch_random = 0.0
 volume_random_db = 0.0
 description = "Sentinelle qui cherche : grognement grave, interrogatif (provisoire J3)."
+
+[sub_resource type="Resource" id="Resource_ev643"]
+script = ExtResource("1_5fyfp")
+id = &"creature_tracker_roar"
+category = &"creature"
+streams = Array[AudioStream]([ExtResource("42_tma8s")])
+bus = &"Voix"
+volume_db = -4.0
+pitch_random = 0.0
+volume_random_db = 0.0
+description = "Cri du Traqueur : grognement qui s'ouvre en hurlement rauque (écran 2)."
+
+[sub_resource type="Resource" id="Resource_t32yr"]
+script = ExtResource("1_5fyfp")
+id = &"creature_tracker_step"
+category = &"creature"
+streams = Array[AudioStream]([ExtResource("43_o73a6"), ExtResource("44_0q65d")])
+bus = &"Voix"
+volume_db = -4.0
+pitch_random = 0.0
+volume_random_db = 0.0
+description = "Pas lourd du Traqueur."
 
 [sub_resource type="Resource" id="Resource_tma8s"]
 script = ExtResource("1_5fyfp")
@@ -1075,4 +1100,4 @@ description = "Tir des Sentinelles : plus grave et bourdonnant, pour le distingu
 
 [resource]
 script = ExtResource("80_bwg7w")
-entries = Array[ExtResource("1_5fyfp")]([SubResource("Resource_2woyv"), SubResource("Resource_d18p2"), SubResource("Resource_o6odg"), SubResource("Resource_qjpsi"), SubResource("Resource_8hpxx"), SubResource("Resource_iu6ju"), SubResource("Resource_xxjd7"), SubResource("Resource_2u5yj"), SubResource("Resource_8jum6"), SubResource("Resource_qb42j"), SubResource("Resource_p70og"), SubResource("Resource_r30dm"), SubResource("Resource_kejka"), SubResource("Resource_kyjv3"), SubResource("Resource_3sjhw"), SubResource("Resource_15pcx"), SubResource("Resource_dji1g"), SubResource("Resource_hyhjn"), SubResource("Resource_hp3pa"), SubResource("Resource_5k22w"), SubResource("Resource_d636w"), SubResource("Resource_pp5p5"), SubResource("Resource_8cktx"), SubResource("Resource_ahn8u"), SubResource("Resource_sq8gf"), SubResource("Resource_r5uah"), SubResource("Resource_xp1mo"), SubResource("Resource_8tobh"), SubResource("Resource_uef2a"), SubResource("Resource_x6h8f"), SubResource("Resource_tma8s"), SubResource("Resource_o73a6"), SubResource("Resource_0q65d"), SubResource("Resource_8e33i"), SubResource("Resource_al0tc"), SubResource("Resource_qvxmp"), SubResource("Resource_pr4dm"), SubResource("Resource_sujdi"), SubResource("Resource_vu1h8"), SubResource("Resource_egnxw"), SubResource("Resource_tac66"), SubResource("Resource_5eunv"), SubResource("Resource_6vv7q"), SubResource("Resource_tggwl"), SubResource("Resource_kcmox"), SubResource("Resource_pa8o6"), SubResource("Resource_adqno"), SubResource("Resource_xo1nh"), SubResource("Resource_0bukn"), SubResource("Resource_0fvoo"), SubResource("Resource_r1oyr"), SubResource("Resource_o32l7"), SubResource("Resource_cyg40"), SubResource("Resource_vyld8"), SubResource("Resource_2jq3k"), SubResource("Resource_4ex48"), SubResource("Resource_b5amj"), SubResource("Resource_ukee8"), SubResource("Resource_42vyo"), SubResource("Resource_ruh2x"), SubResource("Resource_fggpv"), SubResource("Resource_dshwg"), SubResource("Resource_4owrd"), SubResource("Resource_5us7m"), SubResource("Resource_1qngj"), SubResource("Resource_5qie6"), SubResource("Resource_ipmmc"), SubResource("Resource_7v4xt"), SubResource("Resource_c0kd3"), SubResource("Resource_umla4"), SubResource("Resource_vjani"), SubResource("Resource_tjl3e"), SubResource("Resource_oeyvm"), SubResource("Resource_ma1yv"), SubResource("Resource_fleqf"), SubResource("Resource_gbgv2"), SubResource("Resource_ewrgr"), SubResource("Resource_u4ubl"), SubResource("Resource_mi1tt"), SubResource("Resource_rx6wq"), SubResource("Resource_lpcou"), SubResource("Resource_nmrsd"), SubResource("Resource_o1k2y"), SubResource("Resource_54ysb"), SubResource("Resource_narpj"), SubResource("Resource_uo6hv"), SubResource("Resource_dg2c2"), SubResource("Resource_3frbw"), SubResource("Resource_c8wha"), SubResource("Resource_yw80b"), SubResource("Resource_qp4hd"), SubResource("Resource_2g1c1"), SubResource("Resource_lmow8"), SubResource("Resource_5cyfj"), SubResource("Resource_ox468"), SubResource("Resource_16sv4"), SubResource("Resource_x1rr1")])
+entries = Array[ExtResource("1_5fyfp")]([SubResource("Resource_2woyv"), SubResource("Resource_d18p2"), SubResource("Resource_o6odg"), SubResource("Resource_qjpsi"), SubResource("Resource_8hpxx"), SubResource("Resource_iu6ju"), SubResource("Resource_xxjd7"), SubResource("Resource_2u5yj"), SubResource("Resource_8jum6"), SubResource("Resource_qb42j"), SubResource("Resource_p70og"), SubResource("Resource_r30dm"), SubResource("Resource_kejka"), SubResource("Resource_kyjv3"), SubResource("Resource_3sjhw"), SubResource("Resource_15pcx"), SubResource("Resource_dji1g"), SubResource("Resource_hyhjn"), SubResource("Resource_hp3pa"), SubResource("Resource_5k22w"), SubResource("Resource_d636w"), SubResource("Resource_pp5p5"), SubResource("Resource_8cktx"), SubResource("Resource_ahn8u"), SubResource("Resource_sq8gf"), SubResource("Resource_r5uah"), SubResource("Resource_xp1mo"), SubResource("Resource_8tobh"), SubResource("Resource_uef2a"), SubResource("Resource_x6h8f"), SubResource("Resource_ev643"), SubResource("Resource_t32yr"), SubResource("Resource_tma8s"), SubResource("Resource_o73a6"), SubResource("Resource_0q65d"), SubResource("Resource_8e33i"), SubResource("Resource_al0tc"), SubResource("Resource_qvxmp"), SubResource("Resource_pr4dm"), SubResource("Resource_sujdi"), SubResource("Resource_vu1h8"), SubResource("Resource_egnxw"), SubResource("Resource_tac66"), SubResource("Resource_5eunv"), SubResource("Resource_6vv7q"), SubResource("Resource_tggwl"), SubResource("Resource_kcmox"), SubResource("Resource_pa8o6"), SubResource("Resource_adqno"), SubResource("Resource_xo1nh"), SubResource("Resource_0bukn"), SubResource("Resource_0fvoo"), SubResource("Resource_r1oyr"), SubResource("Resource_o32l7"), SubResource("Resource_cyg40"), SubResource("Resource_vyld8"), SubResource("Resource_2jq3k"), SubResource("Resource_4ex48"), SubResource("Resource_b5amj"), SubResource("Resource_ukee8"), SubResource("Resource_42vyo"), SubResource("Resource_ruh2x"), SubResource("Resource_fggpv"), SubResource("Resource_dshwg"), SubResource("Resource_4owrd"), SubResource("Resource_5us7m"), SubResource("Resource_1qngj"), SubResource("Resource_5qie6"), SubResource("Resource_ipmmc"), SubResource("Resource_7v4xt"), SubResource("Resource_c0kd3"), SubResource("Resource_umla4"), SubResource("Resource_vjani"), SubResource("Resource_tjl3e"), SubResource("Resource_oeyvm"), SubResource("Resource_ma1yv"), SubResource("Resource_fleqf"), SubResource("Resource_gbgv2"), SubResource("Resource_ewrgr"), SubResource("Resource_u4ubl"), SubResource("Resource_mi1tt"), SubResource("Resource_rx6wq"), SubResource("Resource_lpcou"), SubResource("Resource_nmrsd"), SubResource("Resource_o1k2y"), SubResource("Resource_54ysb"), SubResource("Resource_narpj"), SubResource("Resource_uo6hv"), SubResource("Resource_dg2c2"), SubResource("Resource_3frbw"), SubResource("Resource_c8wha"), SubResource("Resource_yw80b"), SubResource("Resource_qp4hd"), SubResource("Resource_2g1c1"), SubResource("Resource_lmow8"), SubResource("Resource_5cyfj"), SubResource("Resource_ox468"), SubResource("Resource_16sv4"), SubResource("Resource_x1rr1")])
