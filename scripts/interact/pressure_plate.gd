@@ -1,9 +1,11 @@
 @tool
 class_name PressurePlate
-extends Node2D
+extends Interactable
 ## Plaque de pression (J7) : enclenchée tant que quelqu'un (Élias ou le
 ## compagnon) se tient dessus. Une porte peut rester ouverte tant qu'elle est
 ## enfoncée : le compagnon qui y attend la tient pour Élias (écran 5).
+## C'est un objet interactif pour le compagnon seulement : l'ordre « Active
+## ça » l'envoie s'y placer (et il y attend).
 ## L'origine du nœud est le milieu de la plaque, au ras du sol.
 
 ## Émis quand la plaque s'enfonce ou remonte.
@@ -18,9 +20,20 @@ signal changed(on: bool)
 var on: bool = false
 
 
+func _init() -> void:
+	companion_can_use = true
+	player_can_use = false
+
+
 func _ready() -> void:
+	super._ready()
 	if not Engine.is_editor_hint():
 		add_to_group(RewindManager.GROUP)
+
+
+## Le compagnon « l'actionne » en se plaçant dessus : rien d'autre à faire.
+func _on_interact(by: Node) -> bool:
+	return by is Companion
 
 
 func is_on() -> bool:
@@ -69,3 +82,4 @@ func _draw() -> void:
 	var depth: float = 1.0 if on else 4.0
 	draw_rect(Rect2(-half, -depth, width, depth), Color(0.43, 1.0, 0.69) if on else Color(0.55, 0.5, 0.35))
 	draw_rect(Rect2(-half - 3, -1, width + 6, 2), Color(0.2, 0.22, 0.25))
+	draw_companion_mark(Vector2(0, -20))

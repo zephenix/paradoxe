@@ -1,0 +1,329 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/level.gd" id="1_level"]
+[ext_resource type="Script" path="res://scripts/world/room.gd" id="2_room"]
+[ext_resource type="Script" path="res://scripts/world/solid_block.gd" id="3_block"]
+[ext_resource type="Script" path="res://scripts/world/camera_director.gd" id="4_camera"]
+[ext_resource type="PackedScene" path="res://scenes/player/elias.tscn" id="5_elias"]
+[ext_resource type="Script" path="res://scripts/fx/skyline.gd" id="6_skyline"]
+[ext_resource type="PackedScene" path="res://scenes/props/checkpoint.tscn" id="7_checkpoint"]
+[ext_resource type="PackedScene" path="res://scenes/characters/companion.tscn" id="8_companion"]
+[ext_resource type="Script" path="res://scripts/fx/vegetation.gd" id="9_vegetation"]
+[ext_resource type="Script" path="res://scripts/cutscene/puppet.gd" id="10_puppet"]
+[ext_resource type="Script" path="res://scripts/cutscene/cutscene_trigger.gd" id="11_trigger"]
+[ext_resource type="Script" path="res://scripts/cutscene/capture_cutscene.gd" id="12_capture"]
+[ext_resource type="Script" path="res://scripts/cutscene/meeting_cutscene.gd" id="13_meeting"]
+[ext_resource type="Script" path="res://scripts/interact/lever.gd" id="14_lever"]
+[ext_resource type="Script" path="res://scripts/interact/door.gd" id="15_door"]
+[ext_resource type="Script" path="res://scripts/interact/pressure_plate.gd" id="16_plate"]
+[ext_resource type="Script" path="res://scripts/interact/elevator.gd" id="17_elevator"]
+[ext_resource type="Script" path="res://scripts/interact/terminal.gd" id="18_terminal"]
+[ext_resource type="Script" path="res://scripts/interact/item_pickup.gd" id="19_pickup"]
+[ext_resource type="Script" path="res://scripts/world/exit_zone.gd" id="20_exit"]
+
+[sub_resource type="Gradient" id="Gradient_sky"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.03, 0.06, 0.07, 1, 0.08, 0.17, 0.15, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sky"]
+gradient = SubResource("Gradient_sky")
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[node name="Prototype" type="Node2D"]
+script = ExtResource("1_level")
+
+[node name="Sky" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="Gradient" type="TextureRect" parent="Sky"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = SubResource("GradientTexture2D_sky")
+expand_mode = 1
+
+[node name="FarCity" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.2, 0.2)
+
+[node name="Skyline" type="Node2D" parent="FarCity"]
+script = ExtResource("6_skyline")
+base_y = 760.0
+min_height = 200.0
+max_height = 480.0
+color = Color(0.06, 0.11, 0.11, 1)
+seed_value = 21
+
+[node name="Room4" type="Node2D" parent="."]
+position = Vector2(0, 0)
+script = ExtResource("2_room")
+room_size = Vector2(1920, 720)
+camera_zoom = 1.0
+title = "4 - Clairière"
+acoustic_zone = &"clearing"
+ambient_light = 0.6
+
+[node name="Plants1" type="Node2D" parent="Room4"]
+position = Vector2(0, 672)
+script = ExtResource("9_vegetation")
+width = 520.0
+max_height = 190.0
+seed_value = 1
+
+[node name="Plants2" type="Node2D" parent="Room4"]
+position = Vector2(620, 672)
+script = ExtResource("9_vegetation")
+width = 240.0
+max_height = 110.0
+seed_value = 3
+
+[node name="Plants3" type="Node2D" parent="Room4"]
+position = Vector2(1280, 672)
+script = ExtResource("9_vegetation")
+width = 640.0
+max_height = 210.0
+seed_value = 2
+
+[node name="LeftWall" type="StaticBody2D" parent="Room4"]
+position = Vector2(-48, 0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1, 15)
+
+[node name="Floor" type="StaticBody2D" parent="Room4"]
+position = Vector2(0, 672)
+script = ExtResource("3_block")
+size_blocks = Vector2(40, 2)
+color = Color(0.18, 0.24, 0.22, 1)
+surface = &"plant"
+
+[node name="RightWall" type="StaticBody2D" parent="Room4"]
+position = Vector2(1920, 0)
+script = ExtResource("3_block")
+size_blocks = Vector2(1, 15)
+
+[node name="Checkpoint" parent="Room4" instance=ExtResource("7_checkpoint")]
+position = Vector2(96, 672)
+checkpoint_id = &"clairiere"
+
+[node name="Spawn" type="Marker2D" parent="Room4"]
+position = Vector2(96, 672)
+
+[node name="Sentinel1" type="Node2D" parent="Room4"]
+visible = false
+position = Vector2(1560, 672)
+script = ExtResource("10_puppet")
+facing = -1
+
+[node name="Sentinel2" type="Node2D" parent="Room4"]
+visible = false
+position = Vector2(1760, 672)
+script = ExtResource("10_puppet")
+facing = -1
+
+[node name="Sentinel3" type="Node2D" parent="Room4"]
+visible = false
+position = Vector2(260, 672)
+script = ExtResource("10_puppet")
+facing = 1
+
+[node name="CaptureTrigger" type="Node2D" parent="Room4"]
+position = Vector2(880, 672)
+script = ExtResource("11_trigger")
+cutscene = NodePath("../../Story/Capture")
+width = 120.0
+
+[node name="Hint" type="Label" parent="Room4"]
+offset_left = 48
+offset_top = 96
+offset_right = 1148
+offset_bottom = 206
+theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
+theme_override_font_sizes/font_size = 17
+text = "ÉCRAN 4 : CLAIRIÈRE (fin de la canopée)\nFlèches : avancer. Au milieu de la clairière, une cinématique commence :\nmaintenir Échap ou Espace pour la passer."
+
+[node name="Room5" type="Node2D" parent="."]
+position = Vector2(0, 1200)
+script = ExtResource("2_room")
+room_size = Vector2(1920, 720)
+camera_zoom = 1.0
+title = "5 - Cellules"
+acoustic_zone = &"cells"
+ambient_light = 0.55
+
+[node name="Backdrop" type="Polygon2D" parent="Room5"]
+z_index = -1
+color = Color(0.09, 0.1, 0.12, 1)
+polygon = PackedVector2Array(0, 0, 1920, 0, 1920, 720, 0, 720)
+
+[node name="Ceiling" type="StaticBody2D" parent="Room5"]
+position = Vector2(0, 0)
+script = ExtResource("3_block")
+size_blocks = Vector2(40, 1)
+color = Color(0.2, 0.22, 0.25, 1)
+
+[node name="LeftWall" type="StaticBody2D" parent="Room5"]
+position = Vector2(0, 48)
+script = ExtResource("3_block")
+size_blocks = Vector2(1, 13)
+
+[node name="RightWall" type="StaticBody2D" parent="Room5"]
+position = Vector2(1872, 48)
+script = ExtResource("3_block")
+size_blocks = Vector2(1, 13)
+
+[node name="FloorA" type="StaticBody2D" parent="Room5"]
+position = Vector2(0, 672)
+script = ExtResource("3_block")
+size_blocks = Vector2(33, 2)
+
+[node name="FloorB" type="StaticBody2D" parent="Room5"]
+position = Vector2(1776, 672)
+script = ExtResource("3_block")
+size_blocks = Vector2(2, 2)
+
+[node name="PitBottom" type="StaticBody2D" parent="Room5"]
+position = Vector2(1584, 696)
+script = ExtResource("3_block")
+size_blocks = Vector2(4, 1.5)
+
+[node name="WallAboveA" type="StaticBody2D" parent="Room5"]
+position = Vector2(432, 48)
+script = ExtResource("3_block")
+size_blocks = Vector2(0.5, 10)
+
+[node name="WallAboveB" type="StaticBody2D" parent="Room5"]
+position = Vector2(816, 48)
+script = ExtResource("3_block")
+size_blocks = Vector2(0.5, 10)
+
+[node name="WallAboveC" type="StaticBody2D" parent="Room5"]
+position = Vector2(1056, 48)
+script = ExtResource("3_block")
+size_blocks = Vector2(0.5, 10)
+
+[node name="Landing" type="StaticBody2D" parent="Room5"]
+position = Vector2(1200, 240)
+script = ExtResource("3_block")
+size_blocks = Vector2(8, 0.5)
+color = Color(0.3, 0.33, 0.37, 1)
+surface = &"metal"
+
+[node name="CellSpawn" type="Marker2D" parent="Room5"]
+position = Vector2(200, 672)
+
+[node name="LeverA" type="Node2D" parent="Room5"]
+position = Vector2(380, 672)
+script = ExtResource("14_lever")
+hold_time = 3.0
+
+[node name="LeverB" type="Node2D" parent="Room5"]
+position = Vector2(680, 672)
+script = ExtResource("14_lever")
+companion_can_use = true
+hold_time = 3.0
+
+[node name="BarsA" type="StaticBody2D" parent="Room5"]
+position = Vector2(432, 528)
+script = ExtResource("15_door")
+size_blocks = Vector2(0.5, 3)
+style = &"bars"
+switches = Array[NodePath]([NodePath("../LeverA"), NodePath("../LeverB")])
+require_all = true
+latch = true
+
+[node name="BarsB" type="StaticBody2D" parent="Room5"]
+position = Vector2(816, 528)
+script = ExtResource("15_door")
+size_blocks = Vector2(0.5, 3)
+style = &"bars"
+switches = Array[NodePath]([NodePath("../LeverA"), NodePath("../LeverB")])
+require_all = true
+latch = true
+
+[node name="Companion" parent="Room5" instance=ExtResource("8_companion")]
+position = Vector2(600, 672)
+start_facing = -1
+start_mode = &"Wait"
+
+[node name="Checkpoint" parent="Room5" instance=ExtResource("7_checkpoint")]
+position = Vector2(900, 672)
+checkpoint_id = &"couloir"
+
+[node name="Plate" type="Node2D" parent="Room5"]
+position = Vector2(960, 672)
+script = ExtResource("16_plate")
+
+[node name="DoorC" type="StaticBody2D" parent="Room5"]
+position = Vector2(1056, 528)
+script = ExtResource("15_door")
+size_blocks = Vector2(0.5, 3)
+switches = Array[NodePath]([NodePath("../Plate"), NodePath("../LeverC")])
+
+[node name="LeverC" type="Node2D" parent="Room5"]
+position = Vector2(1140, 672)
+script = ExtResource("14_lever")
+
+[node name="Locker" type="Node2D" parent="Room5"]
+position = Vector2(1260, 672)
+script = ExtResource("19_pickup")
+item = &"pistol"
+
+[node name="LeverE" type="Node2D" parent="Room5"]
+position = Vector2(1530, 672)
+script = ExtResource("14_lever")
+companion_can_use = true
+hold_time = 0.8
+
+[node name="Elevator" type="AnimatableBody2D" parent="Room5"]
+position = Vector2(1584, 672)
+script = ExtResource("17_elevator")
+width_blocks = 4.0
+travel = Vector2(0, -432)
+switches = Array[NodePath]([NodePath("../LeverE")])
+
+[node name="Terminal" type="Node2D" parent="Room5"]
+position = Vector2(1480, 240)
+script = ExtResource("18_terminal")
+targets = Array[NodePath]([NodePath("../Elevator")])
+
+[node name="Exit" type="Node2D" parent="Room5"]
+position = Vector2(1200, 240)
+script = ExtResource("20_exit")
+width = 90.0
+message = NodePath("../EndLabel")
+
+[node name="Hint" type="Label" parent="Room5"]
+offset_left = 60
+offset_top = 64
+offset_right = 1180
+offset_bottom = 204
+theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
+theme_override_font_sizes/font_size = 17
+text = "ÉCRAN 5 : CELLULES. E : interagir (levier, casier, terminal).\nQ : ordre au compagnon. Appui court : suivre / attendre.\nAppui long près d'une spirale verte : « Active ça ».\nLes deux leviers des cellules doivent être tirés ensemble."
+
+[node name="EndLabel" type="Label" parent="Room5"]
+offset_left = 1150
+offset_top = 110
+offset_right = 1850
+offset_bottom = 170
+theme_override_colors/font_color = Color(0.45, 1, 0.75, 1)
+theme_override_font_sizes/font_size = 20
+text = "Évasion réussie. La suite (écrans 6 à 8) arrive en J8."
+
+[node name="Elias" parent="." instance=ExtResource("5_elias")]
+position = Vector2(96, 672)
+
+[node name="CameraDirector" type="Camera2D" parent="."]
+script = ExtResource("4_camera")
+
+[node name="Story" type="Node" parent="."]
+
+[node name="Capture" type="Node" parent="Story"]
+script = ExtResource("12_capture")
+next = NodePath("../Meeting")
+puppets = Array[NodePath]([NodePath("../../Room4/Sentinel3"), NodePath("../../Room4/Sentinel1"), NodePath("../../Room4/Sentinel2")])
+cell_spawn = NodePath("../../Room5/CellSpawn")
+
+[node name="Meeting" type="Node" parent="Story"]
+script = ExtResource("13_meeting")
+companion = NodePath("../../Room5/Companion")

@@ -25,6 +25,9 @@ const GROUP: StringName = &"interactables"
 	set(value):
 		companion_can_use = value
 		queue_redraw()
+## Élias peut-il l'actionner avec « Interagir » ? (Une plaque de pression, non :
+## on marche dessus.)
+@export var player_can_use: bool = true
 ## Actionnable en ce moment ?
 @export var enabled: bool = true
 
@@ -57,7 +60,7 @@ static func find_for(who: Node2D, facing: int, reach: float) -> Interactable:
 	var best_distance: float = INF
 	for node in who.get_tree().get_nodes_in_group(GROUP):
 		var item: Interactable = node as Interactable
-		if item == null or not item.enabled or not item.is_visible_in_tree():
+		if item == null or not item.enabled or not item.player_can_use or not item.is_visible_in_tree():
 			continue
 		var offset: Vector2 = item.global_position - who.global_position
 		if absf(offset.y) > 48.0:
