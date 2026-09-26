@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PursuerConfig" format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/pursuer_config.gd" id="1_cfg"]
+
+[resource]
+script = ExtResource("1_cfg")
+skin = &"sentinel"
+body_size = Vector2(32, 70)
+visual_scale = 1.0
+emerge_animation = &"halt"
+cry_sound = &"creature_alert"
+step_sound = &"foley_step_stone"
+step_interval = 0.3
+run_speed = 255.0
+acceleration = 900.0
+emerge_time = 0.6
+catch_distance = 14.0
+hop_height_blocks = 2.2
+chase_theme = &"mus_chase_loop"

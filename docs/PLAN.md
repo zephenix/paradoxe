@@ -113,7 +113,10 @@ temps de chargement), et les ennemis d'un écran voisin peuvent entendre un brui
 travers une porte. *État en J2 :* les salles de la salle de test sont décrites directement
 dans `scenes/levels/test_level.tscn`. Pour le niveau du prototype (J7-J8), chaque salle
 pourra devenir une scène séparée (`scenes/rooms/…`) instanciée dans le niveau, afin de les
-éditer une par une.
+éditer une par une. *État en J8 :* les 7 salles jouables du prototype (écrans 2 à 8) sont
+toutes dans `scenes/levels/prototype.tscn` : les cinématiques relient des nœuds de plusieurs
+salles, plus simples à désigner dans une seule scène. L'écran 1 est la cinématique
+`scenes/cutscenes/intro.tscn`.
 
 ### 3.4 Le personnage : machine à états explicite
 
@@ -242,6 +245,9 @@ setup.sh, export_presets.cfg, project.godot, README.md, CLAUDE.md, CREDITS.md
 `cutscenes/intro.tscn` (cinématique d'ouverture), `cutscenes/capture.tscn`, `cutscenes/meeting.tscn`, `cutscenes/ending.tscn`,
 `levels/prototype.tscn` (le niveau complet), `levels/test_level.tscn` (salle de test J2–J3).
 
+*État en J8 :* s'ajoutent `cutscenes/intro.tscn` (écran 1), `enemies/tracker.tscn` et
+`enemies/sentinel_pursuer.tscn` (les poursuivants) ; `levels/prototype.tscn` contient les
+écrans 2 à 8.
 *État en J7 :* s'ajoutent `characters/companion.tscn` et `levels/prototype.tscn` (écrans 4
 et 5 ; les écrans 6 à 8 viendront en J8). Les objets interactifs (leviers, portes,
 ascenseur…) n'ont pas de scène : ce sont des scripts posés sur des nœuds du niveau.
@@ -262,6 +268,20 @@ projectiles, les boucliers et l'arme n'ont pas de scène : ils sont créés par 
 | 6 | **Ruines urbaines — infiltration** | Rues effondrées, patrouilles. Le compagnon montre un chemin, puis part par un conduit. | **Lumière et son** : lampes destructibles, pierre à lancer, marche accroupie silencieuse | Ambiance « ville morte », bourdonnements électriques, **musique de tension** qui suit le niveau d'alerte |
 | 7 | **Hall — combat** | 2 à 3 sentinelles, couverts, ascenseur de sortie. | **Pistolet**, jauge d'énergie, bouclier, tir chargé, boucliers ennemis | Signature sonore de l'arme, grésillement des boucliers, impacts distincts, réverbération d'un grand hall |
 | 8 | **Poursuite et fin** | Fuite à travers la ville, le compagnon ouvre la dernière porte. **Plan final** : la caméra recule et révèle que la jungle rayonne depuis un cratère centré sur l'anneau du portail, qui luit du même vert que dans l'intro. Une créature s'y agenouille et pose un **pendentif en spirale**. | Poursuite rythmée, ouverture de porte par le compagnon | **Thème de poursuite**, puis silence, puis thème de fin très court |
+
+*Précisions de J8* (ce qui est réellement construit) :
+- écran 2 : la chute est une cinématique (tombé de si haut, Élias mourrait) ; la caméra
+  s'écarte pendant qu'il se relève ; le Traqueur (`Pursuer`, `resources/enemies/tracker.tres`)
+  surgit quand Élias dépasse l'enseigne, court un peu plus vite que lui, et ne peut pas
+  grimper la corniche du bout de l'écran ;
+- écran 3 : toits à escalader, trous mortels (plus de 5 blocs), poutre avec passage bas,
+  saut avec élan, descente en roulade vers la clairière ;
+- écran 6 : Marek montre la passerelle, puis part par un conduit (`Companion.away`) ; une
+  patrouille sous un réverbère, que la passerelle permet d'éviter ;
+- écran 7 : deux Sentinelles, deux murets ; l'ascenseur monte quand Élias s'y tient ;
+- écran 8 : des Sentinelles poursuivantes (`sentinel_pursuer.tres`) ; Marek revient ouvrir
+  la porte (sans cinématique : Élias garde la main), puis la referme ; le plan final est une
+  composition dessinée (`ending_shot.gd`) dont l'agrandissement diminue (la caméra recule).
 
 **Indices du twist** (jamais expliqués) : le vert du portail = le vert de la végétation ;
 les marques lumineuses des créatures reprennent le motif en spirale ; le logo du labo
@@ -538,6 +558,13 @@ parole compréhensible. On reprend cette grammaire, avec nos propres images.
 Le jeu commence ensuite à l'écran 2 (arrivée). La cinématique est **passable** et
 **rejouable** depuis le menu principal ; le mode chrono la saute automatiquement.
 
+*Précisions de J8* : chaque plan est un script (`scripts/cutscene/intro/*_shot.gd`, classe
+`IntroShot`) qui se dessine selon son avancement `progress` (0 → 1). La table de montage est
+écrite en **tableaux** dans `intro_cutscene.gd` (plans, éclairs, sons) ; au démarrage, elle
+devient une animation d'`AnimationPlayer` (pistes `visible`, `progress`, `flash`, et une
+piste d'appels pour les sons). Bandes noires de 80 px. Le logo du labo (un anneau barré)
+apparaît aux plans 3 et 4, et sur l'enseigne de l'écran 2.
+
 ---
 
 ## 6. Plan audio
@@ -616,6 +643,14 @@ sans jouer un son, et inversement. Le rayon de bruit est une propriété du son.
   (changement sur la mesure, fondus).
 - **Thèmes courts** : arrivée sur Terre, première rencontre (Marek), poursuite, mort, fin.
 - Musique synthétisée par le générateur Python (nappes, drones, arpèges, pulsations).
+- *Précisions de J8* : `tools/audio/music.py`. Trois couches de tension de 20 s (96 BPM),
+  jouées par **un lecteur chacune**, démarrés sur la même image (plus simple que
+  `AudioStreamSynchronized`, et chaque volume se règle librement). Seuils des couches et
+  temps de montée / descente : `resources/audio/music.tres`. Les thèmes s'enchaînent par
+  **fondu** (pas d'`AudioStreamInteractive` : quelques thèmes courts n'en ont pas besoin).
+  Pendant un thème, la tension se tait. API : `AudioManager.play_music(id)`,
+  `stop_music()`, `set_tension()` ; le Level règle la tension par
+  `Events.alert_level_changed`. Motif commun : la spirale (ré fa mi sol fa la).
 
 ### 6.8 Production des sons
 - `tools/audio/generate_sounds.py` (numpy/scipy) : bruits filtrés, oscillateurs, enveloppes,

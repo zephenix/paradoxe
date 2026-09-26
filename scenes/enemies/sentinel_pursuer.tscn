@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/pursuer.gd" id="1_pursuer"]
+[ext_resource type="Resource" path="res://resources/enemies/sentinel_pursuer.tres" id="2_cfg"]
+
+[node name="SentinelPursuer" type="CharacterBody2D"]
+script = ExtResource("1_pursuer")
+config = ExtResource("2_cfg")

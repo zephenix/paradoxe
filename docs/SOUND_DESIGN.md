@@ -326,6 +326,68 @@ Zones : `clearing` (clairière : jungle, vent léger, cris lointains, très peu 
 électrique : sans source visible, il paraissait gratuit et fatiguait l'oreille). À la capture,
 l'ambiance s'éteint d'un coup (`set_zone(&"")`) : le **silence** annonce le danger.
 
+### Cinématique d'ouverture (J8)
+
+Tous joués par la table de montage (`scripts/cutscene/intro/intro_cutscene.gd`, tableau
+`CUES`), au bon instant, sans position (ce sont des plans de cinéma).
+
+| Son | Rôle | Plan |
+|---|---|---|
+| `amb_rain_loop` (12 s) | Pluie d'orage : rideau et gouttes. Plus faible à l'intérieur | 1 à 9 |
+| `sfx_thunder` (2 variantes) | Tonnerre lointain qui roule | 1, 2 |
+| `sfx_glider_pass` | Le glisseur électrique arrive et se pose | 3 |
+| `sfx_bio_scan` | Lecteur biométrique : balayage, deux bips « accepté » | 4 |
+| `sfx_airlock` | Sas pneumatique | 4 |
+| `sfx_key` (3 variantes) | Touches du terminal | 7 |
+| `sfx_terminal_rise` | Bips qui montent : l'expérience démarre | 7 |
+| `sfx_portal_charge` | L'anneau se charge : bourdonnement qui monte, arcs | 8 |
+| `sfx_lightning_strike` | La foudre frappe : claquement, infra-basse, grondement | 9 |
+| `sfx_flash_breath` | Après le flash : souffle grave qui s'éteint | 11 |
+| `sfx_paper_fall` | La photo tombe au sol | 11 |
+
+Au plan 10, **tout se coupe** (`AudioManager.cut_to_silence`) : musique, pluie, grondement.
+
+### Le Traqueur (J8)
+
+| Son | Rôle | Bus | Rayon |
+|---|---|---|---|
+| `creature_tracker_roar` | Son cri : un grognement qui s'ouvre en hurlement rauque (voyelles « o » puis « a »), reconnaissable | Voix | — |
+| `creature_tracker_step` (2 variantes) | Pas lourds, craquements de végétation, pendant la course | Voix | — |
+
+Les Sentinelles qui poursuivent Élias à l'écran 8 réutilisent `creature_alert` et
+`foley_step_stone` (réglages : `resources/enemies/sentinel_pursuer.tres`).
+
+Zones ajoutées : `arrival` (écran 2 : jungle, vent, cris lointains, débris) et `canopy`
+(écran 3 : vent fort, craquements de structure).
+
+### Musique (J8)
+
+Composée par `tools/audio/music.py` (catégorie `music`, bus Musique). Le jeu est surtout
+**silencieux** : la musique arrive à des moments choisis.
+
+| Piste | Rôle | Quand |
+|---|---|---|
+| `mus_tension_pad` (boucle 20 s) | Couche 1 : nappe en ré mineur | Alerte à partir de 0,1 (pleine à 0,4) |
+| `mus_tension_pulse` (boucle 20 s) | Couche 2 : pulsation grave en croches | À partir de 0,45 (pleine à 0,75) |
+| `mus_tension_perc` (boucle 20 s) | Couche 3 : percussions | Combat (0,9 à 1) |
+| `mus_theme_intro` | Arpèges, motif de la spirale, montée coupée net | Intro, plans 7 à 9 |
+| `mus_theme_arrival` | Mode lydien, cloches, grande réverbération | Écran 2, après la chute |
+| `mus_theme_meeting` | Le motif de la spirale sur une nappe chaude | Écran 5, Marek touche son pendentif |
+| `mus_chase_loop` (boucle) | Basse obstinée, 138 BPM | Écran 8, la poursuite |
+| `mus_sting_death` | Accord grave et dissonant | Chaque mort d'Élias |
+| `mus_theme_end` | Le motif, très lent ; accord non résolu | Plan final |
+
+Les trois couches de tension ont exactement la même durée : jouées ensemble, elles restent
+calées. Leur volume suit le niveau d'alerte (`Events.alert_level_changed`), monte en 1,5 s
+et redescend en 5 s (réglages : `resources/audio/music.tres`). Sous un thème, la tension se
+tait. Au banc d'écoute, le curseur « Tension » simule le niveau d'alerte.
+
+**Le motif de la spirale** : ré fa mi sol fa la (monte d'une tierce, redescend d'un ton…),
+comme la spirale du pendentif. On l'entend dans l'intro, à la rencontre et à la fin.
+
+Niveaux : familles « Couches de tension » (-27 dB) et « Thèmes musicaux » (-24 dB) dans
+`measure_levels.py` : sous les bruitages.
+
 ### Interface (J5)
 
 | Son (`ui/`) | Rôle | Bus |

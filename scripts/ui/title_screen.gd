@@ -13,6 +13,7 @@ extends Control
 const TEST_LEVEL: String = "res://scenes/levels/test_level.tscn"
 const SOUND_BOARD: String = "res://scenes/ui/sound_board.tscn"
 const PROTOTYPE: String = "res://scenes/levels/prototype.tscn"
+const INTRO: String = "res://scenes/cutscenes/intro.tscn"
 const HUM_LOOP_ID: StringName = &"title_portal_hum"
 ## Décalage vers la gauche du portail et du titre quand le banc de test s'ouvre.
 const SHIFT_WHEN_PANEL_OPEN: float = -210.0
@@ -25,6 +26,8 @@ const SHIFT_WHEN_PANEL_OPEN: float = -210.0
 @onready var _level_button: Button = %LevelButton
 @onready var _sound_board_button: Button = %SoundBoardButton
 @onready var _prototype_button: Button = %PrototypeButton
+@onready var _new_game_button: Button = %NewGameButton
+@onready var _intro_button: Button = %IntroButton
 @onready var _classic_toggle: CheckButton = %ClassicToggle
 @onready var _show_sounds_toggle: CheckButton = %ShowSoundsToggle
 @onready var _impact_button: Button = %ImpactButton
@@ -51,6 +54,8 @@ func _ready() -> void:
 	_level_button.pressed.connect(_on_level_pressed)
 	_sound_board_button.pressed.connect(_on_sound_board_pressed)
 	_prototype_button.pressed.connect(_on_prototype_pressed)
+	_new_game_button.pressed.connect(_on_new_game_pressed)
+	_intro_button.pressed.connect(_on_intro_pressed)
 	_classic_toggle.set_pressed_no_signal(Settings.classic_mode)
 	_classic_toggle.toggled.connect(_on_classic_toggled)
 	_show_sounds_toggle.set_pressed_no_signal(Settings.show_sounds)
@@ -122,7 +127,7 @@ func _show_test_panel(animate: bool = false) -> void:
 		_portal.position.x = portal_x
 		_title.position.x = title_x
 	_hum_toggle.set_pressed_no_signal(AudioManager.is_loop_playing(HUM_LOOP_ID))
-	_level_button.grab_focus()  # navigation au clavier / à la manette
+	_new_game_button.grab_focus()  # navigation au clavier / à la manette
 
 
 func _update_diagnostics() -> void:
@@ -155,6 +160,25 @@ func _on_prototype_pressed() -> void:
 	AudioManager.play_sfx(&"ui_confirm")
 	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
 	SceneTransition.change_scene(PROTOTYPE)
+
+
+## Nouvelle partie (J8) : l'intro, puis le prototype depuis l'écran 2.
+func _on_new_game_pressed() -> void:
+	_new_game_button.disabled = true
+	AudioManager.play_sfx(&"ui_confirm")
+	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
+	GameState.new_game()
+	IntroScene.return_to_title = false
+	SceneTransition.change_scene(INTRO, 1.0)
+
+
+## Revoir l'intro : on revient ici à la fin.
+func _on_intro_pressed() -> void:
+	_intro_button.disabled = true
+	AudioManager.play_sfx(&"ui_confirm")
+	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
+	IntroScene.return_to_title = true
+	SceneTransition.change_scene(INTRO, 1.0)
 
 
 func _on_sound_board_pressed() -> void:

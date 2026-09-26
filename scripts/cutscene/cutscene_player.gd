@@ -24,6 +24,8 @@ const BAR_TIME: float = 0.4
 ## Durée d'appui pour passer (secondes).
 const SKIP_HOLD: float = 1.0
 
+## Hauteur des bandes pour ce lecteur (l'intro, hors niveau, en veut de plus larges).
+var bar_height: float = BAR_HEIGHT
 ## Vrai pendant une cinématique.
 var playing: bool = false
 ## Vrai quand le joueur a demandé à passer : les attentes se terminent aussitôt.
@@ -165,13 +167,13 @@ func _show_bars(visible_now: bool) -> void:
 	if _bar_tween:
 		_bar_tween.kill()
 	_bar_tween = create_tween()
-	_bar_tween.tween_method(_set_bars, _top.offset_bottom / BAR_HEIGHT, 1.0 if visible_now else 0.0, BAR_TIME)
+	_bar_tween.tween_method(_set_bars, _top.offset_bottom / bar_height, 1.0 if visible_now else 0.0, BAR_TIME)
 
 
 ## Hauteur des bandes (0 = rentrées, 1 = sorties). On règle les « offsets » (les
 ## marges par rapport aux ancres) plutôt que la taille : les ancres décident.
 func _set_bars(k: float) -> void:
-	var height: float = BAR_HEIGHT * k
+	var height: float = bar_height * k
 	for bar: ColorRect in [_top, _bottom]:
 		bar.offset_left = 0.0  # toute la largeur de l'écran (ancres 0 et 1)
 		bar.offset_right = 0.0

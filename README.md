@@ -12,14 +12,14 @@ plan. Le tout est modernisé avec du parkour, un rembobinage temporel limité, u
 de l'infiltration par la lumière et le son, et une interface intégrée au personnage.
 Tous les éléments du jeu (images, sons, musique) sont originaux ou générés par du code.
 
-> **État actuel : jalon J7 (v0.7), le compagnon.** Depuis l'écran titre :
-> - le **prototype** (écrans 4 et 5) : la capture dans une clairière luminescente
->   (cinématique), puis l'**évasion à deux** avec un vieux prisonnier, qu'on commande :
->   suivre, attendre, « active ça ». Leviers à tirer ensemble, plaque de pression, casier,
->   ascenseur manœuvré par l'un pour l'autre ;
-> - la **salle de test** (sept écrans) : mouvements, combat contre deux Sentinelles,
->   rembobinage à chaque mort, infiltration de nuit (lumière, bruit, pierres) ;
-> - le **banc d'écoute** de tous les sons ;
+> **État actuel : jalon J8 (v0.8), le prototype de bout en bout.** Depuis l'écran titre :
+> - **Nouvelle partie** : la cinématique d'ouverture (le laboratoire, l'orage, le portail),
+>   puis les 7 écrans jouables : l'arrivée et la fuite devant un prédateur, la canopée,
+>   la capture, l'évasion à deux avec un vieux prisonnier, les ruines de nuit, le combat du
+>   hall, la poursuite, et la fin ;
+> - **Revoir l'intro**, ou **Prototype sans l'intro** ;
+> - la **salle de test** (sept écrans) : mouvements, combat, rembobinage, infiltration ;
+> - le **banc d'écoute** de tous les sons et musiques (avec un curseur de tension) ;
 > - deux interrupteurs : **mode classique** et **Voir les sons**.
 >
 > Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
@@ -93,8 +93,8 @@ touches notées « WASD » (clavier QWERTY) correspondent à **ZQSD** sur un cla
 | Pause | Échap ou P | Start / Menu | J9 |
 | Passer une cinématique (maintenir) | Échap ou Espace | Start ou A | J7 |
 
-Dans la version actuelle (J7), n'importe quelle touche ou un clic active le son. On choisit
-ensuite « Salle de test », « Prototype » ou « Banc d'écoute » au clavier (flèches, Entrée), à la souris ou à la manette. Dans la
+Dans la version actuelle (J8), n'importe quelle touche ou un clic active le son. On choisit
+ensuite « Nouvelle partie », « Salle de test » ou « Banc d'écoute » au clavier (flèches, Entrée), à la souris ou à la manette. Dans la
 salle de test, **Haut** (ou Espace à l'arrêt) sert aussi à sauter sur place et à se hisser,
 et **Échap** ramène à l'écran titre.
 
@@ -105,7 +105,11 @@ rien consommer. Un seul tir tue, Élias comme les Sentinelles. Accroupi, Élias 
 tirs debout ; derrière un muret, il est aussi à l'abri des tirs à genou. En cas de mort,
 Élias réapparaît au dernier **checkpoint** (balise verte).
 
-**Prototype (écrans 4 et 5)** : **E** (ou Entrée) actionne l'objet devant Élias : levier,
+**Prototype (J8)** : à l'écran 2, un prédateur surgit : **courez** (Maj) et grimpez (Haut
+au pied du mur). À l'écran 3, les trous se sautent avec élan (courir, puis Espace). Pendant
+une cinématique (dont l'intro), **maintenir Échap ou Espace** une seconde la passe.
+
+**Compagnon (écrans 5 à 8)** : **E** (ou Entrée) actionne l'objet devant Élias : levier,
 casier, terminal. **Q** (A en AZERTY) donne un ordre au compagnon. Un appui court le fait **suivre** ou
 **attendre**. Un appui long près d'un mécanisme marqué d'une **spirale verte** l'envoie
 l'actionner (« Active ça ») : un anneau se remplit au-dessus d'Élias, et la spirale visée

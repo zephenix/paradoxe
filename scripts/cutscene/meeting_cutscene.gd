@@ -29,6 +29,8 @@ func run(ctx: CutscenePlayer) -> void:
 		await ctx.wait(0.5)
 		marek.visual.play(&"touch_pendant")
 		marek.say(&"surprise")
+		# Le motif de la spirale (J8) : le même que sur la photo de l'intro.
+		AudioManager.play_music(&"mus_theme_meeting", 1.0)
 	await ctx.wait(2.2)
 	await ctx.wait(0.6)
 

@@ -61,6 +61,8 @@ var _muffle_tween: Tween
 var _gain_tween: Tween
 ## Ambiance de la zone acoustique courante (J5) : voir set_zone().
 var ambience: AmbiencePlayer
+## Musique (J8) : thèmes et tension. Voir play_music(), set_tension().
+var music: MusicPlayer
 
 
 func _ready() -> void:
@@ -72,6 +74,9 @@ func _ready() -> void:
 	ambience = AmbiencePlayer.new()
 	ambience.name = "Ambience"
 	add_child(ambience)
+	music = MusicPlayer.new()
+	music.name = "Music"
+	add_child(music)
 	for entry in library.entries:
 		_factory[entry.id] = entry.get_tuning()
 	load_tuning()
@@ -359,6 +364,27 @@ func tuning_report() -> String:
 ## (resources/audio/zones/<id>.tres). &"" = silence (on quitte le niveau).
 func set_zone(id: StringName, fade: float = 2.5) -> void:
 	ambience.set_zone(id, fade)
+
+
+# --------------------------------------------------------------------------
+# Musique (J8)
+# --------------------------------------------------------------------------
+
+## Joue un thème de la bibliothèque (catégorie « music »), par exemple
+## &"mus_theme_arrival". L'ancien thème s'efface en fondu.
+func play_music(id: StringName, fade_in: float = -1.0) -> void:
+	music.play_theme(id, fade_in)
+
+
+## Arrête le thème en cours (0 = coupure nette).
+func stop_music(fade_out: float = 1.0) -> void:
+	music.stop_theme(fade_out)
+
+
+## Niveau de tension de la musique (0 = calme, 1 = combat). Le Level le règle
+## tout seul par Events.alert_level_changed ; le banc d'écoute l'utilise aussi.
+func set_tension(level: float) -> void:
+	music.set_tension(level)
 
 
 # --------------------------------------------------------------------------

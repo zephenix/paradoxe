@@ -20,6 +20,9 @@ signal room_changed(room: Room)
 @export var target_height: float = 45.0
 
 var current_room: Room
+## Zoom imposé par une cinématique (J8 : « la caméra s'écarte ») ; 0 = celui de la
+## salle. On peut l'animer (Tween) : le cadrage suit en douceur.
+var zoom_override: float = 0.0
 var _from_position: Vector2
 var _from_zoom: float = 1.0
 var _transition_time: float = -1.0  # < 0 : pas de transition en cours
@@ -39,7 +42,7 @@ func _physics_process(delta: float) -> void:
 		_enter_room(room)
 	if current_room == null:
 		return
-	var zoom_goal: float = current_room.camera_zoom
+	var zoom_goal: float = zoom_override if zoom_override > 0.0 else current_room.camera_zoom
 	var goal: Vector2 = framing_for(current_room, _target_point(), zoom_goal)
 	if _transition_time >= 0.0:
 		_transition_time += delta

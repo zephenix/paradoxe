@@ -79,6 +79,12 @@ FAMILIES: dict[str, tuple[float, float, list[str]]] = {
         "amb_shaft_loop", "amb_wind_loop", "amb_jungle_loop"]),
     "Évènements d'ambiance": (-32.5, 2.0, ["amb_buzz", "amb_creak", "amb_cry", "amb_debris", "amb_drip", "amb_chain"]),
     "Interface": (-20.0, 1.5, ["ui_confirm", "ui_back"]),
+    # Musique (J8) : sous les bruitages. Chaque couche de tension seule reste
+    # discrète ; les trois ensemble (combat) montent d'environ 4 dB.
+    "Couches de tension": (-27.0, 1.5, ["mus_tension_pad", "mus_tension_pulse", "mus_tension_perc"]),
+    "Thèmes musicaux": (-24.0, 1.5, [
+        "mus_theme_intro", "mus_theme_arrival", "mus_theme_meeting", "mus_chase_loop",
+        "mus_sting_death", "mus_theme_end"]),
 }
 
 

@@ -24,7 +24,7 @@ const ACCENT: Color = Color("6effc0")
 const CATEGORY_LABELS: Dictionary = {
 	&"ambience": "Ambiances", &"combat": "Combat", &"creature": "Créatures",
 	&"foley": "Bruitages d'Élias (Foley)", &"sfx": "Effets", &"ui": "Interface",
-	&"voice": "Respiration d'Élias",
+	&"voice": "Respiration d'Élias", &"music": "Musique",
 }
 
 var _library: SoundLibrary
@@ -45,6 +45,8 @@ var _zone_ids: Array[StringName] = []
 var _zone_info: Label
 var _status: Label
 var _rewind_toggle: CheckButton
+## Curseur « tension » (J8) : simule le niveau d'alerte des ennemis.
+var tension_slider: HSlider
 var _updating: bool = false
 
 
@@ -62,6 +64,7 @@ func _exit_tree() -> void:
 	AudioManager.stop_loop(&"sound_board_rewind", 0.2)
 	AudioManager.set_muffle(0.0, 0.0)
 	AudioManager.set_zone(&"", 0.5)
+	AudioManager.set_tension(0.0)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -187,6 +190,12 @@ func _on_rewind_toggled(enabled: bool) -> void:
 	else:
 		AudioManager.stop_loop(&"sound_board_rewind", 0.1)
 		AudioManager.play_sfx(&"rewind_release")
+
+
+## 0 : silence ; vers 0,3 la nappe ; vers 0,6 la pulsation ; 1 : les percussions.
+func _on_tension_changed(value: float) -> void:
+	AudioManager.set_tension(value)
+	_refresh_status("Tension %.2f : les couches de musique suivent (comme l'alerte des ennemis)." % value)
 
 
 func _on_silence_pressed() -> void:
@@ -373,6 +382,13 @@ func _build() -> void:
 	_rewind_toggle.toggled.connect(_on_rewind_toggled)
 	right.add_child(_rewind_toggle)
 	right.add_child(_button("Silence dramatique", _on_silence_pressed))
+	right.add_child(_label("Tension de la musique (niveau d'alerte)", 14, ACCENT))
+	tension_slider = HSlider.new()
+	tension_slider.min_value = 0.0
+	tension_slider.max_value = 1.0
+	tension_slider.step = 0.05
+	tension_slider.value_changed.connect(_on_tension_changed)
+	right.add_child(tension_slider)
 	right.add_child(_label("Volume général", 14, ACCENT))
 	var volume := HSlider.new()
 	volume.min_value = 0.0

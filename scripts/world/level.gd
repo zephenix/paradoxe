@@ -25,6 +25,10 @@ const AMBIENT_FADE: float = 0.8
 ## Commencer une nouvelle partie en chargeant ce niveau (oublie les checkpoints
 ## d'une partie précédente, gardés par l'autoload GameState).
 @export var new_game_on_start: bool = true
+## Cinématique jouée dès l'entrée dans le niveau (J8 : l'arrivée d'Élias).
+@export var opening_cutscene: NodePath
+## Faux dans les tests : pas de cinématique d'ouverture.
+var play_opening: bool = true
 
 @onready var player: Player = $Elias
 @onready var camera: CameraDirector = $CameraDirector
@@ -71,6 +75,8 @@ func _ready() -> void:
 	cutscenes = CutscenePlayer.new()
 	cutscenes.name = "Cutscenes"
 	add_child(cutscenes)
+	if play_opening and not opening_cutscene.is_empty():
+		_play_opening.call_deferred()
 	# Pendant le défilement arrière, le jeu est en pause : la caméra ne suit plus
 	# d'elle-même, on la recadre à chaque image.
 	death.scrubbed.connect(camera.snap_to_target)
@@ -81,6 +87,9 @@ func _exit_tree() -> void:
 	RewindManager.recording = false
 	RewindManager.clear()
 	AudioManager.set_zone(&"", 1.0)
+	# La musique ne survit pas au niveau (retour au menu) : tension et thème s'éteignent.
+	Events.alert_level_changed.emit(0.0)
+	AudioManager.stop_music(1.0)
 
 
 func _on_room_changed(room: Room) -> void:
@@ -178,6 +187,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		SceneTransition.change_scene("res://scenes/ui/title_screen.tscn")
 
 
+func _play_opening() -> void:
+	var opening: Cutscene = get_node_or_null(opening_cutscene) as Cutscene
+	if opening:
+		cutscenes.play(opening)
+
+
 ## Où Élias réapparaîtra s'il meurt maintenant : [position des pieds, sens du regard].
 func respawn_point() -> Array:
 	if GameState.has_checkpoint():
@@ -187,6 +202,8 @@ func respawn_point() -> Array:
 
 func _on_player_died(_cause: StringName) -> void:
 	RewindManager.stop_recording()
+	# Courte phrase musicale de la mort (J8) : elle fait aussi taire la tension.
+	AudioManager.play_music(&"mus_sting_death", 0.0)
 	if RewindManager.can_rewind():
 		var result: StringName = await death.play()
 		if not is_inside_tree():

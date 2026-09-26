@@ -131,7 +131,7 @@ var order_indicator: OrderIndicator
 ## visé : le joueur voit qu'il faut maintenir, et sur quoi l'ordre portera.
 func _update_orders(delta: float) -> void:
 	var buddy: Companion = get_tree().get_first_node_in_group(&"companion") as Companion
-	if buddy == null or is_dead:
+	if buddy == null or is_dead or buddy.away:
 		_order_held = 0.0
 		order_indicator.hide_progress()
 		return

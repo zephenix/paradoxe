@@ -89,6 +89,11 @@
   "description": "Laboratoire : ventilation et bourdonnement électrique à 50 Hz (13 s, J5).",
   "loop": true
  },
+ "amb_rain_loop": {
+  "category": "ambience",
+  "description": "Pluie d'orage : rideau de pluie et gouttes (boucle de 12 s, intro).",
+  "loop": true
+ },
  "amb_shaft_loop": {
   "category": "ambience",
   "description": "Puits : grondement très grave, air qui circule (13 s, J5).",
@@ -192,6 +197,21 @@
  "creature_search": {
   "category": "creature",
   "description": "Sentinelle qui cherche : grognement grave, interrogatif (provisoire J3).",
+  "loop": false
+ },
+ "creature_tracker_roar": {
+  "category": "creature",
+  "description": "Cri du Traqueur : grognement qui s'ouvre en hurlement rauque (écran 2).",
+  "loop": false
+ },
+ "creature_tracker_step_01": {
+  "category": "creature",
+  "description": "Pas lourd du Traqueur, variante 1.",
+  "loop": false
+ },
+ "creature_tracker_step_02": {
+  "category": "creature",
+  "description": "Pas lourd du Traqueur, variante 2.",
   "loop": false
  },
  "door_slide": {
@@ -369,6 +389,51 @@
   "description": "Levier : frottement métallique et claquement (J7).",
   "loop": false
  },
+ "mus_chase_loop": {
+  "category": "music",
+  "description": "Poursuite (écran 8) : basse obstinée, 138 BPM (boucle).",
+  "loop": true
+ },
+ "mus_sting_death": {
+  "category": "music",
+  "description": "Mort : accord grave et dissonant qui gonfle et retombe.",
+  "loop": false
+ },
+ "mus_tension_pad": {
+  "category": "music",
+  "description": "Tension, couche 1 : nappe en ré mineur (boucle de 20 s, 96 BPM). Monte dès que l'ennemi s'inquiète.",
+  "loop": true
+ },
+ "mus_tension_perc": {
+  "category": "music",
+  "description": "Tension, couche 3 : percussions (boucle de 20 s). Combat.",
+  "loop": true
+ },
+ "mus_tension_pulse": {
+  "category": "music",
+  "description": "Tension, couche 2 : pulsation grave en croches (boucle de 20 s). Recherche et alerte.",
+  "loop": true
+ },
+ "mus_theme_arrival": {
+  "category": "music",
+  "description": "Thème d'arrivée (écran 2) : lydien, cloches, grande réverbération.",
+  "loop": false
+ },
+ "mus_theme_end": {
+  "category": "music",
+  "description": "Fin : motif de la spirale très lent, accord non résolu.",
+  "loop": false
+ },
+ "mus_theme_intro": {
+  "category": "music",
+  "description": "Thème de l'intro : arpèges, motif de la spirale, montée coupée net au plan 10.",
+  "loop": false
+ },
+ "mus_theme_meeting": {
+  "category": "music",
+  "description": "Rencontre avec Marek : le motif de la spirale sur une nappe chaude.",
+  "loop": false
+ },
  "plate_click": {
   "category": "sfx",
   "description": "Plaque de pression : déclic sourd (J7).",
@@ -387,6 +452,71 @@
  "rewind_release": {
   "category": "sfx",
   "description": "Reprise après un rembobinage : souffle vers l'avant et coup sourd (provisoire J4).",
+  "loop": false
+ },
+ "sfx_airlock": {
+  "category": "sfx",
+  "description": "Sas pneumatique : air, glissement, butée (intro, plan 4).",
+  "loop": false
+ },
+ "sfx_bio_scan": {
+  "category": "sfx",
+  "description": "Lecteur biométrique : balayage et deux bips « accepté » (intro, plan 4).",
+  "loop": false
+ },
+ "sfx_flash_breath": {
+  "category": "sfx",
+  "description": "Après le flash : souffle grave qui s'éteint (intro, plan 11).",
+  "loop": false
+ },
+ "sfx_glider_pass": {
+  "category": "sfx",
+  "description": "Glisseur électrique qui arrive et se pose (intro, plan 3).",
+  "loop": false
+ },
+ "sfx_key_01": {
+  "category": "sfx",
+  "description": "Touche de clavier, variante 1 (intro, plan 7).",
+  "loop": false
+ },
+ "sfx_key_02": {
+  "category": "sfx",
+  "description": "Touche de clavier, variante 2 (intro, plan 7).",
+  "loop": false
+ },
+ "sfx_key_03": {
+  "category": "sfx",
+  "description": "Touche de clavier, variante 3 (intro, plan 7).",
+  "loop": false
+ },
+ "sfx_lightning_strike": {
+  "category": "sfx",
+  "description": "La foudre frappe le laboratoire : claquement, infra-basse, grondement (intro, plan 9).",
+  "loop": false
+ },
+ "sfx_paper_fall": {
+  "category": "sfx",
+  "description": "La photo tombe au sol (intro, plan 11).",
+  "loop": false
+ },
+ "sfx_portal_charge": {
+  "category": "sfx",
+  "description": "L'anneau se charge : bourdonnement qui monte, arcs (intro, plan 8).",
+  "loop": false
+ },
+ "sfx_terminal_rise": {
+  "category": "sfx",
+  "description": "Le terminal lance l'expérience : bips qui montent (intro, plan 7).",
+  "loop": false
+ },
+ "sfx_thunder_01": {
+  "category": "sfx",
+  "description": "Tonnerre lointain qui roule, variante 1 (intro).",
+  "loop": false
+ },
+ "sfx_thunder_02": {
+  "category": "sfx",
+  "description": "Tonnerre lointain qui roule, variante 2 (intro).",
   "loop": false
  },
  "shield_break": {
