@@ -10,6 +10,10 @@ extends Interactable
 var _flash: float = 0.0
 
 
+func _init() -> void:
+	mark_offset = Vector2(0.0, -84.0)
+
+
 func _on_interact(by: Node) -> bool:
 	for path in targets:
 		var target: Node = get_node_or_null(path)
@@ -35,4 +39,4 @@ func _draw() -> void:
 	draw_rect(Rect2(-11, -66, 22, 16), Color(screen, 0.35 + _flash))
 	draw_line(Vector2(-8, -56), Vector2(-2, -62), screen, 1.5)
 	draw_line(Vector2(-2, -62), Vector2(8, -58), screen, 1.5)
-	draw_companion_mark(Vector2(0, -84))
+	draw_companion_mark()

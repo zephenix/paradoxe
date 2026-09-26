@@ -25,8 +25,9 @@ extends Resource
 @export_group("Ordres")
 ## Appui plus long que ceci sur « Ordre » : « Active ça » (sinon : suivre / attendre).
 @export var long_press_time: float = 0.45
-## Distance maximale entre Élias et le mécanisme désigné (pixels).
-@export var order_range: float = 340.0
+## Distance maximale entre Élias et le mécanisme désigné (pixels). 500 : depuis
+## le fond de sa cellule, Élias peut désigner le levier de celle de Marek.
+@export var order_range: float = 500.0
 ## Distance à laquelle il s'arrête devant le mécanisme à actionner.
 @export var activate_reach: float = 14.0
 ## Durée du geste pour actionner, et instant où la main touche l'objet.

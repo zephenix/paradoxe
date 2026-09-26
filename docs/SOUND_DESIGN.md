@@ -322,7 +322,8 @@ Sentinelles, **l'intonation porte le sens**. Sa voix est humaine, plus grave et 
 | `amb_chain` (2 variantes) | Chaînes qui tintent | Zone `cells` (écran 5) | Ambiance | — |
 
 Zones : `clearing` (clairière : jungle, vent léger, cris lointains, très peu d'écho) et
-`cells` (cellules : grondement, grésillement, gouttes, chaînes, écho modéré). À la capture,
+`cells` (cellules : grondement, gouttes, chaînes, écho modéré ; pas de grésillement
+électrique : sans source visible, il paraissait gratuit et fatiguait l'oreille). À la capture,
 l'ambiance s'éteint d'un coup (`set_zone(&"")`) : le **silence** annonce le danger.
 
 ### Interface (J5)

@@ -90,7 +90,17 @@ func test_long_order_activates_the_marked_mechanism() -> void:
 	lever.companion_can_use = true
 	arena.add_child(lever)
 	await spawn(300.0, 100.0, &"Wait")
-	await order(cfg.long_press_time + 0.1)
+	# Pendant l'appui : l'anneau se remplit et le levier visé est entouré.
+	player.input.order = true
+	await wait_physics_seconds(cfg.long_press_time * 0.5)
+	var ring: OrderIndicator = player.order_indicator
+	assert_true(ring.progress > 0.2 and ring.progress < 0.8, "anneau à moitié (%.2f)" % ring.progress)
+	assert_eq(ring.target, lever, "le levier visé est montré avant l'ordre")
+	assert_ne(buddy.machine.current_name, &"Activate", "pas encore d'ordre")
+	await wait_physics_seconds(cfg.long_press_time * 0.5 + 0.1)
+	player.input.order = false
+	await wait_physics(2)
+	assert_true(ring.progress < 0.0, "touche relâchée : l'anneau disparaît")
 	assert_eq(buddy.machine.current_name, &"Activate", "« Active ça »")
 	assert_true(await wait_until(func() -> bool: return lever.on, 400), "il actionne le levier")
 	await wait_physics_seconds(cfg.activate_duration + 0.1)
@@ -106,7 +116,13 @@ func test_long_order_without_a_marked_mechanism_is_refused() -> void:
 	var listener := func(id: StringName) -> void: played.append(id)
 	AudioManager.sfx_played.connect(listener)
 	await spawn(300.0, 100.0, &"Wait")
-	await order(cfg.long_press_time + 0.1)
+	player.input.order = true
+	await wait_physics_seconds(cfg.long_press_time * 0.5)
+	assert_true(player.order_indicator.progress > 0.0, "l'anneau se remplit")
+	assert_null(player.order_indicator.target, "rien d'entouré : anneau gris")
+	await wait_physics_seconds(cfg.long_press_time * 0.5 + 0.1)
+	player.input.order = false
+	await wait_physics(2)
 	AudioManager.sfx_played.disconnect(listener)
 	assert_ne(buddy.machine.current_name, &"Activate")
 	assert_true(played.has(&"companion_no"), "il refuse (%s)" % [played])

@@ -108,7 +108,8 @@ tirs debout ; derrière un muret, il est aussi à l'abri des tirs à genou. En c
 **Prototype (écrans 4 et 5)** : **E** (ou Entrée) actionne l'objet devant Élias : levier,
 casier, terminal. **Q** (A en AZERTY) donne un ordre au compagnon. Un appui court le fait **suivre** ou
 **attendre**. Un appui long près d'un mécanisme marqué d'une **spirale verte** l'envoie
-l'actionner (« Active ça ») ; il attend ensuite sur place, par exemple sur une plaque de
+l'actionner (« Active ça ») : un anneau se remplit au-dessus d'Élias, et la spirale visée
+s'entoure d'un cercle. Il attend ensuite sur place, par exemple sur une plaque de
 pression. **Maintenir Échap ou Espace** pendant une seconde passe une cinématique.
 
 **Infiltration (salle G, de nuit)** : dans le noir, les Sentinelles voient mal ; sous une

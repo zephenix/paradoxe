@@ -76,4 +76,4 @@ func _draw() -> void:
 	var tip := Vector2(14 if on else -14, -70)
 	draw_line(Vector2(0, -44), tip, Color(0.62, 0.64, 0.66), 4.0)
 	draw_circle(tip, 4.0, Color(0.85, 0.35, 0.25) if not on else Color(0.43, 1.0, 0.69))
-	draw_companion_mark(Vector2(0, -92))
+	draw_companion_mark()

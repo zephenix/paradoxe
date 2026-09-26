@@ -31,6 +31,11 @@ const GROUP: StringName = &"interactables"
 ## Actionnable en ce moment ?
 @export var enabled: bool = true
 
+## Où est dessinée la spirale verte, par rapport à l'origine de l'objet (au sol).
+## Chaque type d'objet règle la sienne dans _init() ; l'indicateur d'ordre
+## d'Élias (OrderIndicator) s'en sert pour allumer la spirale visée.
+var mark_offset: Vector2 = Vector2(0.0, -92.0)
+
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
@@ -90,10 +95,16 @@ static func nearest_for_companion(context: Node, point: Vector2, radius: float) 
 	return best
 
 
+## Position de la spirale verte dans le monde.
+func mark_position() -> Vector2:
+	return to_global(mark_offset)
+
+
 ## Petite spirale verte au-dessus des objets que le compagnon sait actionner.
-func draw_companion_mark(at: Vector2) -> void:
+func draw_companion_mark() -> void:
 	if not companion_can_use:
 		return
+	var at: Vector2 = mark_offset
 	var points := PackedVector2Array()
 	for i in 21:
 		var k: float = float(i) / 20.0
