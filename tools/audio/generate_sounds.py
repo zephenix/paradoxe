@@ -937,6 +937,10 @@ _register_chains()
 import music  # noqa: E402
 music.register(sound)
 
+# Mise en scène (J8) : intro, Traqueur, écrans 2 à 8 : voir story_sounds.py.
+import story_sounds  # noqa: E402
+story_sounds.register(sound)
+
 
 # =============================================================================
 # Programme principal

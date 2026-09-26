@@ -88,39 +88,51 @@ anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -390.0
-offset_top = 70.0
+offset_top = 20.0
 offset_right = -24.0
-offset_bottom = -110.0
+offset_bottom = -20.0
 grow_horizontal = 0
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="Items" type="VBoxContainer" parent="TestPanel"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 5
 
 [node name="Heading" type="Label" parent="TestPanel/Items"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.43, 1, 0.75, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 text = "PARADOXE - prototype"
+
+[node name="NewGameButton" type="Button" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Nouvelle partie (intro, puis le prototype)"
+
+[node name="IntroButton" type="Button" parent="TestPanel/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Revoir l'intro"
 
 [node name="LevelButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 text = "Salle de test (mouvement, combat, infiltration)"
 
 [node name="PrototypeButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Prototype : écrans 4 et 5 (J7)"
+theme_override_font_sizes/font_size = 16
+text = "Prototype sans l'intro"
 
 [node name="SoundBoardButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 text = "Banc d'écoute : tous les sons (J5)"
 
 [node name="ClassicToggle" type="CheckButton" parent="TestPanel/Items"]

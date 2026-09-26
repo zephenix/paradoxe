@@ -22,6 +22,7 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_jungle_loop.wav" id="18_t17c2"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_wind_loop.wav" id="18_t172r"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_calm_01.wav" id="19_3w4ty"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_rain_loop.wav" id="20_8cktx"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_calm_02.wav" id="20_gyt7b"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_effort_01.wav" id="21_ef6w0"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_effort_02.wav" id="22_3cngm"]
@@ -111,7 +112,20 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/music/mus_theme_end.wav" id="82_8cxli"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/music/mus_theme_intro.wav" id="83_t87jo"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/music/mus_theme_meeting.wav" id="84_d18p2"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_airlock.wav" id="90_ahn8u"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/terminal_beep.wav" id="90_t87jo"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_bio_scan.wav" id="91_uef2a"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_flash_breath.wav" id="92_tma8s"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_glider_pass.wav" id="93_o73a6"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_key_01.wav" id="94_0q65d"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_key_02.wav" id="95_r1oyr"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_key_03.wav" id="96_cyg40"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_lightning_strike.wav" id="97_4owrd"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_paper_fall.wav" id="98_narpj"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_portal_charge.wav" id="99_vyld8"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_terminal_rise.wav" id="100_2jq3k"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_thunder_01.wav" id="101_4ex48"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/sfx_thunder_02.wav" id="102_b5amj"]
 
 [sub_resource type="Resource" id="Resource_2woyv"]
 script = ExtResource("1_5fyfp")
@@ -233,6 +247,17 @@ volume_db = -14.0
 pitch_random = 0.12
 volume_random_db = 0.0
 description = "Laboratoire : ventilation et bourdonnement électrique à 50 Hz (13 s, J5)."
+
+[sub_resource type="Resource" id="Resource_r30dm"]
+script = ExtResource("1_5fyfp")
+id = &"amb_rain_loop"
+category = &"ambience"
+streams = Array[AudioStream]([ExtResource("20_8cktx")])
+bus = &"Ambiance"
+volume_db = -14.0
+pitch_random = 0.12
+volume_random_db = 0.0
+description = "Pluie d'orage : rideau de pluie et gouttes (boucle de 12 s, intro)."
 
 [sub_resource type="Resource" id="Resource_kejka"]
 script = ExtResource("1_5fyfp")
@@ -769,6 +794,86 @@ volume_db = -4.0
 pitch_random = 0.0
 description = "Reprise après un rembobinage : souffle vers l'avant et coup sourd (provisoire J4)."
 
+[sub_resource type="Resource" id="Resource_ipmmc"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_airlock"
+streams = Array[AudioStream]([ExtResource("90_ahn8u")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "Sas pneumatique : air, glissement, butée (intro, plan 4)."
+
+[sub_resource type="Resource" id="Resource_7v4xt"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_bio_scan"
+streams = Array[AudioStream]([ExtResource("91_uef2a")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "Lecteur biométrique : balayage et deux bips « accepté » (intro, plan 4)."
+
+[sub_resource type="Resource" id="Resource_c0kd3"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_flash_breath"
+streams = Array[AudioStream]([ExtResource("92_tma8s")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "Après le flash : souffle grave qui s'éteint (intro, plan 11)."
+
+[sub_resource type="Resource" id="Resource_umla4"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_glider_pass"
+streams = Array[AudioStream]([ExtResource("93_o73a6")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "Glisseur électrique qui arrive et se pose (intro, plan 3)."
+
+[sub_resource type="Resource" id="Resource_vjani"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_key"
+streams = Array[AudioStream]([ExtResource("94_0q65d"), ExtResource("95_r1oyr"), ExtResource("96_cyg40")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "Touche de clavier (intro, plan 7)."
+
+[sub_resource type="Resource" id="Resource_tjl3e"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_lightning_strike"
+streams = Array[AudioStream]([ExtResource("97_4owrd")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "La foudre frappe le laboratoire : claquement, infra-basse, grondement (intro, plan 9)."
+
+[sub_resource type="Resource" id="Resource_oeyvm"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_paper_fall"
+streams = Array[AudioStream]([ExtResource("98_narpj")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "La photo tombe au sol (intro, plan 11)."
+
+[sub_resource type="Resource" id="Resource_ma1yv"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_portal_charge"
+streams = Array[AudioStream]([ExtResource("99_vyld8")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "L'anneau se charge : bourdonnement qui monte, arcs (intro, plan 8)."
+
+[sub_resource type="Resource" id="Resource_fleqf"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_terminal_rise"
+streams = Array[AudioStream]([ExtResource("100_2jq3k")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "Le terminal lance l'expérience : bips qui montent (intro, plan 7)."
+
+[sub_resource type="Resource" id="Resource_gbgv2"]
+script = ExtResource("1_5fyfp")
+id = &"sfx_thunder"
+streams = Array[AudioStream]([ExtResource("101_4ex48"), ExtResource("102_b5amj")])
+volume_db = -6.0
+pitch_random = 0.0
+description = "Tonnerre lointain qui roule (intro)."
+
 [sub_resource type="Resource" id="Resource_ewrgr"]
 script = ExtResource("1_5fyfp")
 id = &"shield_break"
@@ -970,4 +1075,4 @@ description = "Tir des Sentinelles : plus grave et bourdonnant, pour le distingu
 
 [resource]
 script = ExtResource("80_bwg7w")
-entries = Array[ExtResource("1_5fyfp")]([SubResource("Resource_2woyv"), SubResource("Resource_d18p2"), SubResource("Resource_o6odg"), SubResource("Resource_qjpsi"), SubResource("Resource_8hpxx"), SubResource("Resource_iu6ju"), SubResource("Resource_xxjd7"), SubResource("Resource_2u5yj"), SubResource("Resource_8jum6"), SubResource("Resource_qb42j"), SubResource("Resource_p70og"), SubResource("Resource_kejka"), SubResource("Resource_kyjv3"), SubResource("Resource_3sjhw"), SubResource("Resource_15pcx"), SubResource("Resource_dji1g"), SubResource("Resource_hyhjn"), SubResource("Resource_hp3pa"), SubResource("Resource_5k22w"), SubResource("Resource_d636w"), SubResource("Resource_pp5p5"), SubResource("Resource_8cktx"), SubResource("Resource_ahn8u"), SubResource("Resource_sq8gf"), SubResource("Resource_r5uah"), SubResource("Resource_xp1mo"), SubResource("Resource_8tobh"), SubResource("Resource_uef2a"), SubResource("Resource_x6h8f"), SubResource("Resource_tma8s"), SubResource("Resource_o73a6"), SubResource("Resource_0q65d"), SubResource("Resource_8e33i"), SubResource("Resource_al0tc"), SubResource("Resource_qvxmp"), SubResource("Resource_pr4dm"), SubResource("Resource_sujdi"), SubResource("Resource_vu1h8"), SubResource("Resource_egnxw"), SubResource("Resource_tac66"), SubResource("Resource_5eunv"), SubResource("Resource_6vv7q"), SubResource("Resource_tggwl"), SubResource("Resource_kcmox"), SubResource("Resource_pa8o6"), SubResource("Resource_adqno"), SubResource("Resource_xo1nh"), SubResource("Resource_0bukn"), SubResource("Resource_0fvoo"), SubResource("Resource_r1oyr"), SubResource("Resource_o32l7"), SubResource("Resource_cyg40"), SubResource("Resource_vyld8"), SubResource("Resource_2jq3k"), SubResource("Resource_4ex48"), SubResource("Resource_b5amj"), SubResource("Resource_ukee8"), SubResource("Resource_42vyo"), SubResource("Resource_ruh2x"), SubResource("Resource_fggpv"), SubResource("Resource_dshwg"), SubResource("Resource_4owrd"), SubResource("Resource_5us7m"), SubResource("Resource_1qngj"), SubResource("Resource_5qie6"), SubResource("Resource_ewrgr"), SubResource("Resource_u4ubl"), SubResource("Resource_mi1tt"), SubResource("Resource_rx6wq"), SubResource("Resource_lpcou"), SubResource("Resource_nmrsd"), SubResource("Resource_o1k2y"), SubResource("Resource_54ysb"), SubResource("Resource_narpj"), SubResource("Resource_uo6hv"), SubResource("Resource_dg2c2"), SubResource("Resource_3frbw"), SubResource("Resource_c8wha"), SubResource("Resource_yw80b"), SubResource("Resource_qp4hd"), SubResource("Resource_2g1c1"), SubResource("Resource_lmow8"), SubResource("Resource_5cyfj"), SubResource("Resource_ox468"), SubResource("Resource_16sv4"), SubResource("Resource_x1rr1")])
+entries = Array[ExtResource("1_5fyfp")]([SubResource("Resource_2woyv"), SubResource("Resource_d18p2"), SubResource("Resource_o6odg"), SubResource("Resource_qjpsi"), SubResource("Resource_8hpxx"), SubResource("Resource_iu6ju"), SubResource("Resource_xxjd7"), SubResource("Resource_2u5yj"), SubResource("Resource_8jum6"), SubResource("Resource_qb42j"), SubResource("Resource_p70og"), SubResource("Resource_r30dm"), SubResource("Resource_kejka"), SubResource("Resource_kyjv3"), SubResource("Resource_3sjhw"), SubResource("Resource_15pcx"), SubResource("Resource_dji1g"), SubResource("Resource_hyhjn"), SubResource("Resource_hp3pa"), SubResource("Resource_5k22w"), SubResource("Resource_d636w"), SubResource("Resource_pp5p5"), SubResource("Resource_8cktx"), SubResource("Resource_ahn8u"), SubResource("Resource_sq8gf"), SubResource("Resource_r5uah"), SubResource("Resource_xp1mo"), SubResource("Resource_8tobh"), SubResource("Resource_uef2a"), SubResource("Resource_x6h8f"), SubResource("Resource_tma8s"), SubResource("Resource_o73a6"), SubResource("Resource_0q65d"), SubResource("Resource_8e33i"), SubResource("Resource_al0tc"), SubResource("Resource_qvxmp"), SubResource("Resource_pr4dm"), SubResource("Resource_sujdi"), SubResource("Resource_vu1h8"), SubResource("Resource_egnxw"), SubResource("Resource_tac66"), SubResource("Resource_5eunv"), SubResource("Resource_6vv7q"), SubResource("Resource_tggwl"), SubResource("Resource_kcmox"), SubResource("Resource_pa8o6"), SubResource("Resource_adqno"), SubResource("Resource_xo1nh"), SubResource("Resource_0bukn"), SubResource("Resource_0fvoo"), SubResource("Resource_r1oyr"), SubResource("Resource_o32l7"), SubResource("Resource_cyg40"), SubResource("Resource_vyld8"), SubResource("Resource_2jq3k"), SubResource("Resource_4ex48"), SubResource("Resource_b5amj"), SubResource("Resource_ukee8"), SubResource("Resource_42vyo"), SubResource("Resource_ruh2x"), SubResource("Resource_fggpv"), SubResource("Resource_dshwg"), SubResource("Resource_4owrd"), SubResource("Resource_5us7m"), SubResource("Resource_1qngj"), SubResource("Resource_5qie6"), SubResource("Resource_ipmmc"), SubResource("Resource_7v4xt"), SubResource("Resource_c0kd3"), SubResource("Resource_umla4"), SubResource("Resource_vjani"), SubResource("Resource_tjl3e"), SubResource("Resource_oeyvm"), SubResource("Resource_ma1yv"), SubResource("Resource_fleqf"), SubResource("Resource_gbgv2"), SubResource("Resource_ewrgr"), SubResource("Resource_u4ubl"), SubResource("Resource_mi1tt"), SubResource("Resource_rx6wq"), SubResource("Resource_lpcou"), SubResource("Resource_nmrsd"), SubResource("Resource_o1k2y"), SubResource("Resource_54ysb"), SubResource("Resource_narpj"), SubResource("Resource_uo6hv"), SubResource("Resource_dg2c2"), SubResource("Resource_3frbw"), SubResource("Resource_c8wha"), SubResource("Resource_yw80b"), SubResource("Resource_qp4hd"), SubResource("Resource_2g1c1"), SubResource("Resource_lmow8"), SubResource("Resource_5cyfj"), SubResource("Resource_ox468"), SubResource("Resource_16sv4"), SubResource("Resource_x1rr1")])

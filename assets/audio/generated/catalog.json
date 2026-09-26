@@ -89,6 +89,11 @@
   "description": "Laboratoire : ventilation et bourdonnement électrique à 50 Hz (13 s, J5).",
   "loop": true
  },
+ "amb_rain_loop": {
+  "category": "ambience",
+  "description": "Pluie d'orage : rideau de pluie et gouttes (boucle de 12 s, intro).",
+  "loop": true
+ },
  "amb_shaft_loop": {
   "category": "ambience",
   "description": "Puits : grondement très grave, air qui circule (13 s, J5).",
@@ -432,6 +437,71 @@
  "rewind_release": {
   "category": "sfx",
   "description": "Reprise après un rembobinage : souffle vers l'avant et coup sourd (provisoire J4).",
+  "loop": false
+ },
+ "sfx_airlock": {
+  "category": "sfx",
+  "description": "Sas pneumatique : air, glissement, butée (intro, plan 4).",
+  "loop": false
+ },
+ "sfx_bio_scan": {
+  "category": "sfx",
+  "description": "Lecteur biométrique : balayage et deux bips « accepté » (intro, plan 4).",
+  "loop": false
+ },
+ "sfx_flash_breath": {
+  "category": "sfx",
+  "description": "Après le flash : souffle grave qui s'éteint (intro, plan 11).",
+  "loop": false
+ },
+ "sfx_glider_pass": {
+  "category": "sfx",
+  "description": "Glisseur électrique qui arrive et se pose (intro, plan 3).",
+  "loop": false
+ },
+ "sfx_key_01": {
+  "category": "sfx",
+  "description": "Touche de clavier, variante 1 (intro, plan 7).",
+  "loop": false
+ },
+ "sfx_key_02": {
+  "category": "sfx",
+  "description": "Touche de clavier, variante 2 (intro, plan 7).",
+  "loop": false
+ },
+ "sfx_key_03": {
+  "category": "sfx",
+  "description": "Touche de clavier, variante 3 (intro, plan 7).",
+  "loop": false
+ },
+ "sfx_lightning_strike": {
+  "category": "sfx",
+  "description": "La foudre frappe le laboratoire : claquement, infra-basse, grondement (intro, plan 9).",
+  "loop": false
+ },
+ "sfx_paper_fall": {
+  "category": "sfx",
+  "description": "La photo tombe au sol (intro, plan 11).",
+  "loop": false
+ },
+ "sfx_portal_charge": {
+  "category": "sfx",
+  "description": "L'anneau se charge : bourdonnement qui monte, arcs (intro, plan 8).",
+  "loop": false
+ },
+ "sfx_terminal_rise": {
+  "category": "sfx",
+  "description": "Le terminal lance l'expérience : bips qui montent (intro, plan 7).",
+  "loop": false
+ },
+ "sfx_thunder_01": {
+  "category": "sfx",
+  "description": "Tonnerre lointain qui roule, variante 1 (intro).",
+  "loop": false
+ },
+ "sfx_thunder_02": {
+  "category": "sfx",
+  "description": "Tonnerre lointain qui roule, variante 2 (intro).",
   "loop": false
  },
  "shield_break": {
