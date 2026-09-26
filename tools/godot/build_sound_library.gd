@@ -46,6 +46,9 @@ const OVERRIDES: Dictionary = {
 	&"mus_chase_loop": {"volume_db": -5.5},
 	&"mus_sting_death": {"volume_db": -9.5},
 	&"mus_theme_end": {"volume_db": -8.0},
+	# Intro (J8) : les bips ne doivent pas dominer la scène.
+	&"sfx_bio_scan": {"volume_db": -10.0},
+	&"sfx_terminal_rise": {"volume_db": -10.0},
 	&"foley_step_stone": {"volume_db": -6.0, "noise_radius": 300.0},
 	&"foley_step_metal": {"volume_db": -2.5, "noise_radius": 420.0},
 	&"foley_step_plant": {"volume_db": 1.5, "noise_radius": 240.0},

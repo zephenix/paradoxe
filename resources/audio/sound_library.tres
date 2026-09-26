@@ -806,7 +806,7 @@ description = "Sas pneumatique : air, glissement, butée (intro, plan 4)."
 script = ExtResource("1_5fyfp")
 id = &"sfx_bio_scan"
 streams = Array[AudioStream]([ExtResource("91_uef2a")])
-volume_db = -6.0
+volume_db = -10.0
 pitch_random = 0.0
 description = "Lecteur biométrique : balayage et deux bips « accepté » (intro, plan 4)."
 
@@ -862,7 +862,7 @@ description = "L'anneau se charge : bourdonnement qui monte, arcs (intro, plan 8
 script = ExtResource("1_5fyfp")
 id = &"sfx_terminal_rise"
 streams = Array[AudioStream]([ExtResource("100_2jq3k")])
-volume_db = -6.0
+volume_db = -10.0
 pitch_random = 0.0
 description = "Le terminal lance l'expérience : bips qui montent (intro, plan 7)."
 

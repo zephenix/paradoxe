@@ -36,12 +36,13 @@ const FLASHES: Array = [["Cliff", 7.0, 0.6], ["Cliff", 10.9, 0.4], ["Strike", 54
 ##   "music" : lance un thème ;
 ##   "cut"   : SILENCE TOTAL, tout est coupé (plan 10).
 const CUES: Array = [
-	[0.0, "loop", &"amb_rain_loop", -10.0],
+	[0.0, "loop", &"amb_rain_loop", -6.0],     # noir : la pluie, lointaine
+	[5.0, "loop", &"amb_rain_loop", 0.0],      # dehors
 	[3.5, "sfx", &"sfx_thunder", -8.0],
 	[7.25, "sfx", &"sfx_thunder", 0.0],
 	[11.2, "sfx", &"sfx_thunder", -4.0],
 	[13.2, "sfx", &"sfx_glider_pass", 0.0],
-	[20.0, "loop", &"amb_rain_loop", -24.0],   # à l'intérieur : la pluie s'éloigne
+	[20.0, "loop", &"amb_rain_loop", -14.0],   # à l'intérieur : la pluie s'éloigne
 	[21.4, "sfx", &"sfx_bio_scan", 0.0],
 	[23.6, "sfx", &"sfx_airlock", 0.0],
 	[24.0, "loop", &"amb_lab_loop", -6.0],     # ventilation
@@ -53,7 +54,7 @@ const CUES: Array = [
 	[41.2, "sfx", &"sfx_key", 0.0], [41.6, "sfx", &"sfx_key", -2.0], [42.0, "sfx", &"sfx_key", 0.0],
 	[42.9, "sfx", &"sfx_terminal_rise", 0.0],
 	[46.0, "sfx", &"sfx_portal_charge", 0.0],
-	[54.0, "loop", &"amb_rain_loop", -8.0],    # dehors
+	[54.0, "loop", &"amb_rain_loop", 2.0],     # dehors, sous l'orage
 	[54.35, "sfx", &"sfx_lightning_strike", 0.0],
 	[58.0, "cut", &"", 0.0],
 	[61.0, "sfx", &"sfx_flash_breath", 0.0],
