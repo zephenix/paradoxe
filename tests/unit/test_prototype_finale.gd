@@ -124,6 +124,37 @@ func test_cells_exit_leads_to_the_ruins_and_marek_leaves() -> void:
 	assert_ne(marek.machine.current_name, &"Activate", "parti : il ne reçoit plus d'ordres")
 
 
+func test_cells_exit_needs_the_weapon_back() -> void:
+	# Sans son arme, Élias arriverait désarmé au combat de l'écran 7, sans pouvoir revenir.
+	GameState.remove_item(&"pistol")  # confisquée à la capture, pas encore reprise au casier
+	var exit: ExitZone = level.get_node("Room5/Exit")
+	var hint: Label = level.get_node("LabelsLayer/ExitHint")
+	marek.global_position = exit.global_position + Vector2(40.0, 0.0)
+	await place(exit.global_position + Vector2(20.0, 0.0))
+	await wait_physics(10)
+	assert_false(exit.reached, "sans l'arme : on ne sort pas")
+	assert_false(level.cutscenes.playing)
+	assert_eq(exit.blocked_reason, &"item")
+	assert_true(hint.visible and hint.text.contains("casier"), "un texte dit où est l'arme")
+	GameState.add_item(&"pistol")
+	assert_true(await wait_for(func() -> bool: return exit.reached, 30), "avec l'arme : la sortie s'ouvre")
+	assert_false(hint.visible, "le texte disparaît")
+	await wait_for(func() -> bool: return not level.cutscenes.playing, 1800)
+
+
+func test_cells_exit_waits_for_marek() -> void:
+	var exit: ExitZone = level.get_node("Room5/Exit")
+	var hint: Label = level.get_node("LabelsLayer/ExitHint")
+	await place(exit.global_position + Vector2(20.0, 0.0))  # Marek est resté dans sa cellule
+	await wait_physics(10)
+	assert_false(exit.reached, "seul : on ne sort pas")
+	assert_eq(exit.blocked_reason, &"companion")
+	assert_true(hint.visible and hint.text.contains("Marek"), "un texte dit d'attendre Marek")
+	await place(exit.global_position + Vector2(-400.0, 0.0))
+	await wait_physics(2)
+	assert_false(hint.visible, "hors de la sortie : plus de texte")
+
+
 # --- Écran 6 ---------------------------------------------------------------------
 
 func test_ruins_are_crossed_by_the_catwalk_unseen() -> void:

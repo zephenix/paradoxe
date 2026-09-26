@@ -612,6 +612,17 @@ position = Vector2(1200, 240)
 script = ExtResource("20_exit")
 width = 90.0
 cutscene = NodePath("../../Story/Passage")
+needs_item = &"pistol"
+hint = NodePath("../ExitHint")
+
+[node name="ExitHint" type="Label" parent="Room5"]
+offset_left = 1060
+offset_top = 110
+offset_right = 1860
+offset_bottom = 150
+theme_override_colors/font_color = Color(1, 0.8, 0.45, 1)
+theme_override_font_sizes/font_size = 19
+text = ""
 
 [node name="Hint" type="Label" parent="Room5"]
 offset_left = 60
@@ -620,7 +631,7 @@ offset_right = 1180
 offset_bottom = 204
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
-text = "ÉCRAN 5 : CELLULES. E : interagir (levier, casier, terminal).\nQ (A en AZERTY) : ordre au compagnon. Appui bref : suis-moi / attends.\nMaintenir Q (A) jusqu'à remplir l'anneau : « Active ça » sur la spirale verte entourée.\nLes deux leviers des cellules doivent être tirés ensemble."
+text = "ÉCRAN 5 : CELLULES. E : interagir (levier, casier, terminal).\nQ (A en AZERTY) : ordre au compagnon. Appui bref : suis-moi / attends.\nMaintenir Q (A) jusqu'à remplir l'anneau : « Active ça » sur la spirale verte entourée.\nLes deux leviers des cellules doivent être tirés ensemble. Votre arme est dans un casier (E)."
 
 [node name="Room6" type="Node2D" parent="."]
 position = Vector2(0.0, 2400.0)
