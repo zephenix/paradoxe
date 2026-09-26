@@ -730,6 +730,71 @@ def ui_back(rng: np.random.Generator) -> np.ndarray:
 
 
 # =============================================================================
+# Infiltration (J6) : lampe brisée, pierre lancée
+# =============================================================================
+
+@sound("lamp_break", "sfx", description="Lampe brisée par un tir : verre qui éclate, grésillement qui meurt (J6).")
+def lamp_break(rng: np.random.Generator) -> np.ndarray:
+    # --- Paramètres ---
+    duration = 0.9
+    # ------------------
+    pop = _thump(rng, duration, 180.0, 0.03, 4000.0, 0.9) * 0.8          # l'ampoule éclate
+    glass = np.zeros(dsp.n_samples(duration))
+    for k in range(9):                                                    # éclats de verre qui tintent
+        start = dsp.n_samples(rng.uniform(0.0, 0.35))
+        d = 0.18
+        f = rng.uniform(2600, 6200)
+        shard = dsp.modal_body(d, [(f, 1.0, 0.04), (f * 1.47, 0.5, 0.03)]) * rng.uniform(0.2, 0.7)
+        glass[start:start + len(shard)] += shard[: len(glass) - start]
+    fizz = dsp.bandpass(dsp.crackle(duration, rng, 400.0), 2500, 9000, order=1)
+    fizz *= dsp.ramp(duration, 1.0, 0.0, 2.0)                             # le filament grésille et meurt
+    out = pop + 0.6 * glass + 0.25 * dsp.normalize(fizz)
+    return dsp.fade(dsp.normalize(out, 0.9), 0.0005, 0.1)
+
+
+@sound("stone_throw", "foley", description="Pierre lancée : bras qui fouette l'air (J6).")
+def stone_throw(rng: np.random.Generator) -> np.ndarray:
+    d = 0.25
+    whoosh = dsp.bandpass(dsp.pink_noise(d, rng), 600, 3500) * dsp.adsr(d, 0.06, 0.06, 0.3, 0.1)
+    return dsp.fade(dsp.normalize(whoosh, 0.45))
+
+
+@sound("stone_pickup", "foley", description="Ramasser des pierres : cailloux qui s'entrechoquent (J6).")
+def stone_pickup(rng: np.random.Generator) -> np.ndarray:
+    d = 0.3
+    out = np.zeros(dsp.n_samples(d))
+    for k in range(3):
+        start = dsp.n_samples(0.03 + 0.07 * k)
+        clack = _thump(rng, 0.12, rng.uniform(900, 1500), 0.015, 6000.0, 0.6)
+        out[start:start + len(clack)] += clack[: len(out) - start]
+    return dsp.fade(dsp.normalize(out, 0.5))
+
+
+def _register_stone_impacts() -> None:
+    def impact(rng: np.random.Generator, i: int) -> np.ndarray:
+        # La pierre frappe le sol, rebondit deux fois (de plus en plus faible), puis roule.
+        d = 0.8
+        out = np.zeros(dsp.n_samples(d))
+        t = 0.0
+        for k, level in enumerate((1.0, 0.45, 0.2)):
+            hit = _thump(rng, 0.2, 260.0 + 60 * i + 40 * k, 0.03, 5000.0, 0.7) * level
+            start = dsp.n_samples(t)
+            out[start:start + len(hit)] += hit[: len(out) - start]
+            t += 0.14 - 0.03 * k + 0.01 * i
+        roll = dsp.bandpass(dsp.crackle(d, rng, 120.0), 1500, 6000, order=1) * dsp.ramp(d, 0.3, 0.0)
+        return dsp.fade(dsp.normalize(out + 0.2 * dsp.normalize(roll), 0.9), 0.0005, 0.08)
+
+    for i in range(1, 4):
+        def build(rng: np.random.Generator, i: int = i) -> np.ndarray:
+            return impact(rng, i)
+        sound(f"stone_impact_{i:02d}", "foley",
+              description=f"Pierre qui retombe et rebondit, variante {i} (diversion, J6).")(build)
+
+
+_register_stone_impacts()
+
+
+# =============================================================================
 # Programme principal
 # =============================================================================
 

@@ -6,8 +6,8 @@ extends Node2D
 ## Instants montrés pour chaque animation (fractions de sa durée).
 ## (Trois instants : toutes les animations tiennent sur un écran de 1280×720.)
 const SAMPLES: Array[float] = [0.0, 0.5, 1.0]
-const CELL := Vector2(79, 142)
-const COLUMNS: int = 16
+const CELL := Vector2(71, 142)
+const COLUMNS: int = 18
 const FIGURE_SCALE: float = 1.25
 
 

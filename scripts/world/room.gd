@@ -21,9 +21,11 @@ enum Transition { SLIDE, CUT }
 @export var transition: Transition = Transition.SLIDE
 ## Nom affiché dans l'éditeur et les journaux de débogage.
 @export var title: String = ""
-## Zone acoustique (J5) et éclairage ambiant (J6).
+## Zone acoustique (J5) : resources/audio/zones/<zone>.tres.
 @export var acoustic_zone: StringName = &"lab"
-@export var ambient_light: float = 0.5
+## Lumière ambiante (J6) : 1 = plein jour (tout est visible), 0,2 = pénombre.
+## Elle teinte l'écran et compte dans ce que voient les Sentinelles (Lighting).
+@export_range(0.0, 1.0, 0.05) var ambient_light: float = 1.0
 
 
 func _ready() -> void:

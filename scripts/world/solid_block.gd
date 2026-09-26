@@ -49,6 +49,13 @@ func _rebuild() -> void:
 	shape.shape = rect
 	shape.position = size * 0.5
 	_add_generated(shape)
+	# Occulteur (J6) : le bloc projette une ombre quand une lampe l'éclaire. Le
+	# calcul de lumière des Sentinelles (Lighting) fait de même avec un rayon.
+	var occluder := LightOccluder2D.new()
+	var polygon := OccluderPolygon2D.new()
+	polygon.polygon = PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y)])
+	occluder.occluder = polygon
+	_add_generated(occluder)
 	# Face principale, arête supérieure éclairée, bas plus sombre.
 	_add_generated(_polygon([Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y)], color))
 	var lip: float = minf(6.0, size.y)

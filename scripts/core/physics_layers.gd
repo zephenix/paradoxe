@@ -16,3 +16,4 @@ const COMPANION: int = 8    # compagnon (J7)
 const PROJECTILES: int = 16 # tirs (J3)
 const TRIGGERS: int = 32    # zones de déclenchement (salles, checkpoints…)
 const SHIELDS: int = 64     # boucliers d'énergie (J3) : arrêtent les tirs
+const PROPS: int = 128      # objets qu'un tir peut toucher : lampes (J6)

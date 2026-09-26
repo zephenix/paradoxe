@@ -930,3 +930,153 @@ volumes. C'est pourquoi le niveau effectif d'un son est simplement « niveau du 
 volume de la bibliothèque » : un fichier mesuré à -25 dB, joué avec un volume de +3 dB,
 sonne à -22 dB. Dans Excel, ce serait une colonne en `=20*LOG10(amplitude)`, où les
 multiplications deviennent des additions.
+
+---
+
+## J6 — L'infiltration : lumière et son (v0.6)
+
+### Ce qui a été fait
+
+- **Lumière** :
+  - chaque salle a une lumière ambiante (`Room.ambient_light` : 1 = plein jour,
+    0,15 = nuit), qui teinte l'écran ;
+  - les **lampes** (`LightSource`) éclairent un disque, et le décor projette des ombres ;
+  - un tir ou une pierre brise une lampe : elle s'éteint, dans un bruit de verre que les
+    Sentinelles entendent.
+- **Ce que voient les Sentinelles** : c'est la même lumière que celle de l'écran, calculée
+  par `Lighting.level_at`. Leur perception combine :
+  - un **cône de vision** (±35°) ;
+  - la **lumière** sur Élias ;
+  - sa **posture** : accroupi, il est moins visible ;
+  - la **distance** ;
+  - et, tout près, elles le remarquent même dans le noir.
+- **Jauge de suspicion** : chaque indice la remplit, et ses seuils décident de l'état de la
+  Sentinelle :
+  - 0,25 : **alerte**, elle s'arrête et fixe l'indice ;
+  - 0,5 : **recherche**, elle va voir ;
+  - 1 : **combat**, si elle le voit.
+
+  Une silhouette nette la remplit d'un coup. Une silhouette dans la pénombre la remplit peu
+  à peu, et une silhouette trop vague ne l'inquiète jamais.
+- **Ouïe** : chaque mur entre un bruit et une Sentinelle divise le rayon par deux. Un bruit
+  proche inquiète plus qu'un bruit lointain.
+- **Pierres** (touche F) :
+  - on en ramasse jusqu'à 3 sur les tas de gravats ;
+  - Élias les lance en cloche, debout ou accroupi ;
+  - là où la pierre retombe, les Sentinelles vont voir : c'est la **diversion**.
+- **« Voir les sons »** (interrupteur de l'écran titre, sauvegardé) : un cercle montre
+  jusqu'où porte chaque bruit d'Élias, exactement le rayon perçu par les ennemis.
+- **Niveau d'alerte global** : c'est le plus inquiet des ennemis ; il est transmis à la
+  musique de tension de J8.
+- **Mode classique** : ni lumière ni jauge, comme dans les jeux d'origine.
+- **Salle G, de nuit** : une patrouille sous un réverbère, une passerelle au-dessus d'elle,
+  un pilier, une seconde patrouille, une passerelle haute et la sortie. Les textes des
+  salles restent lisibles dans le noir.
+- **Sons** : lampe brisée, pierre (lancer, ramasser, 3 impacts), ajoutés à la bibliothèque
+  et équilibrés (nouvelle famille « Bruits de diversion »).
+- **Tests** : 263 au total (32 nouveaux), dont **« la salle G se traverse sans être
+  repéré »**. Le test joue la partie comme un joueur prudent : pierres ramassées, attente
+  que la patrouille tourne le dos, passerelles traversées accroupi.
+
+### Comment tester
+
+1. Écran titre : activer **Voir les sons**, puis « Salle de test ». Traverser les salles
+   jusqu'à la **salle G** (après le combat, à droite), ou y mourir pour reprendre à son
+   checkpoint.
+2. À essayer :
+
+| À essayer | Ce qui doit se passer |
+|---|---|
+| Entrer debout dans la lumière du réverbère | La Sentinelle vous voit aussitôt (cri aigu, combat) |
+| Rester accroupi dans le noir, loin d'elle | Rien : elle ne vous voit pas |
+| Rester debout dans le noir, assez près | Elle s'arrête, vous fixe (cri montant), puis finit par vous reconnaître |
+| Courir, puis marcher, puis avancer accroupi | Les cercles rétrécissent, puis disparaissent : accroupi, vos pas sont muets |
+| Tirer dans le réverbère | Il s'éteint (et partout, pas seulement à l'écran) ; le verre fait venir la Sentinelle |
+| Passer sur le tas de gravats, puis F | Une pierre part en cloche ; la Sentinelle va voir là où elle retombe |
+| Grimper sur une passerelle (Haut au pied du bord) | Là-haut, elles ne vous voient plus ; marcher sur le métal s'entend, accroupi non |
+| Rejoindre la sortie, en haut à droite | Sans combat, c'est réussi |
+
+### Ce qu'il faut écouter
+
+| Moment | Ce que tu dois entendre |
+|---|---|
+| Pas sur les passerelles | Le métal, plus sonore que la pierre |
+| Lampe brisée | Verre qui éclate, grésillement du filament qui meurt |
+| Pierre lancée | Le bras qui fouette l'air, puis la pierre qui rebondit deux fois |
+| Sentinelle alertée | L'intonation montante (« curieuse »), puis grave (« recherche »), puis descendante (« rien trouvé ») |
+
+### Décisions prises (et pourquoi)
+
+- **La lumière calculée et la lumière affichée ont la même source** : même rayon, même
+  pente, mêmes murs qui arrêtent la lumière. Ce que le joueur voit à l'écran, les
+  Sentinelles le voient aussi : on peut se fier à ses yeux.
+- **Lumière perçue = lumière^1,5** : avec une perception proportionnelle, la pénombre ne
+  cachait presque rien. L'exposant rend la nuit vraiment protectrice, sans changer la
+  pleine lumière (1^1,5 = 1).
+- **Oubli en patrouille** : une silhouette trop vague ne s'accumule pas. Sinon, un joueur
+  immobile dans le noir finissait toujours par être repéré, ce qui rendait l'attente
+  impossible.
+- **Hauteur plutôt que cachettes** : dans un couloir, on ne peut pas « contourner » une
+  Sentinelle. Les passerelles (hors de sa vue au-dessus de 2,5 blocs) donnent une vraie
+  seconde voie. C'est aussi pourquoi un pilier sépare les deux patrouilles.
+- **Une Sentinelle revenue à son poste reprend sa surveillance** dans son sens de départ.
+- **Tirs ennemis et lampes** : un tir de Sentinelle peut aussi briser une lampe. Je l'ai
+  constaté en capture et je l'ai gardé : c'est cohérent.
+
+### Vérifications effectuées
+
+- **263 tests** au vert. Nouveaux fichiers :
+  - `test_perception.gd` (21 tests) : lumière et ombres, pleine lumière, pénombre, lampe,
+    posture, cône, proximité, murs, jauge, retour au poste, mode classique, lampe brisée par
+    un tir, rembobinage et réapparition des lampes ;
+  - `test_stealth_tools.gd` (10 tests) : pierres, diversion, cercles, réglage sauvegardé,
+    niveau d'alerte ;
+  - `test_infiltration_room.gd` : la traversée de la salle G.
+- **Contrôle par mutation** : 11 erreurs réintroduites, 11 détectées. Au premier essai,
+  « la garde ne reprend pas son guet » passait : j'ai ajouté le test manquant.
+- **Captures** :
+  - salle G, avec le réverbère et la passerelle ;
+  - lampe brisée ;
+  - pierre ;
+  - cercles de « Voir les sons » ;
+  - planche des poses (lancer debout et accroupi) ;
+  - visite guidée (captures 14 et 15).
+
+  Elles m'ont montré que les textes étaient illisibles dans le noir : corrigé.
+- **Web** : export vérifié dans Chromium (démarrage, son, salle de test). **À vérifier de ton
+  côté** : la salle G dans le navigateur (lumières et ombres). Le moteur de rendu est le même
+  que celui de mes captures, mais je n'ai pas pu y amener Élias dans le navigateur de test.
+
+### Reste à faire / points d'attention
+
+- **À régler en jouant**, dans `resources/enemies/sentinel.tres` (groupe « Lumière et
+  suspicion »), dans les lampes de la salle G et dans `resources/player/throw.tres` :
+  - la sévérité de la pénombre ;
+  - la vitesse de la jauge ;
+  - la portée du lancer.
+- La musique de tension qui suit le niveau d'alerte arrive en **J8**. « Voir les sons » ira
+  dans le menu d'options en **J9**.
+- Jalon suivant : **J7, le compagnon et les interactions**.
+
+### Concepts Godot expliqués
+
+**1. La lumière 2D : CanvasModulate, PointLight2D et LightOccluder2D**
+
+Trois nœuds travaillent ensemble :
+- le **CanvasModulate** multiplie la couleur de tout ce qui est dessiné (le « variateur » de
+  la pièce). À 0,15, tout devient sombre ;
+- le **PointLight2D** ajoute de la lumière autour de lui, selon une texture : ici un disque
+  qui va du blanc au transparent ;
+- le **LightOccluder2D** est un polygone qui arrête la lumière : chaque bloc du décor en a
+  un, d'où les ombres.
+
+Les textes, eux, sont dans un **CanvasLayer** à part : la teinte ne touche pas ce calque.
+
+**2. Lancer un rayon pour « voir »**
+
+Pour savoir si une Sentinelle voit Élias, ou si une lampe éclaire un point, on demande au
+moteur physique : « si je tire un trait d'ici à là, qu'est-ce qu'il touche en premier ? »
+(`intersect_ray`). Rien ? La vue (ou la lumière) passe. Un mur ? Elle est arrêtée. Pour
+compter les murs traversés par un bruit, on recommence en excluant chaque mur déjà touché.
+C'est comme une RECHERCHEV répétée : on cherche le premier obstacle, on l'écarte, on
+cherche le suivant.

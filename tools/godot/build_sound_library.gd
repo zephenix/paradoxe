@@ -81,6 +81,10 @@ const OVERRIDES: Dictionary = {
 	&"creature_search": {"volume_db": -6.5},
 	&"amb_debris": {"volume_db": -6.0},
 	&"amb_electric_loop": {"volume_db": 6.5},
+	&"lamp_break": {"volume_db": -2.5, "noise_radius": 450.0},
+	&"stone_impact": {"volume_db": 0.5, "noise_radius": 520.0},
+	&"stone_throw": {"volume_db": -12.0, "noise_radius": 60.0},
+	&"stone_pickup": {"volume_db": -12.0, "noise_radius": 60.0},
 }
 
 

@@ -108,6 +108,25 @@ func _tour() -> void:
 	death.rewind_held = false
 	await _frames(20)
 	await _shot("tour_13_resumed")
+	# 7) Salle G (J6) : infiltration de nuit. Élias sur la passerelle basse,
+	#    accroupi au-dessus de la patrouille, puis « Voir les sons » en courant.
+	await _teleport(Vector2(8320 + 700, 384))
+	_player.input.down = true
+	_player.input.move = 1
+	await _frames(40)
+	_player.input.move = 0
+	await _frames(10)
+	await _shot("tour_14_walkway")
+	_player.input.down = false
+	root.get_node("Settings").set("show_sounds", true)
+	await _teleport(Vector2(8320 + 150, 528))
+	_player.input.move = 1
+	_player.input.run = true
+	await _frames(30)
+	await _shot("tour_15_see_sounds")
+	_player.input.move = 0
+	_player.input.run = false
+	root.get_node("Settings").set("show_sounds", false)
 	# Sons arrêtés avant de quitter (sinon « fuite » affichée, voir tests/run_tests.gd).
 	for node in root.find_children("*", "AudioStreamPlayer", true, false):
 		(node as AudioStreamPlayer).stop()

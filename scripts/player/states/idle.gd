@@ -13,6 +13,8 @@ func physics_update(delta: float) -> void:
 		return
 	if handle_combat_actions():
 		return
+	if handle_throw_action():
+		return
 	if p.input.move != 0:
 		if p.input.move != p.facing:
 			machine.transition_to(&"Turn")

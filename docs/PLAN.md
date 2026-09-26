@@ -367,6 +367,28 @@ stateDiagram-v2
   champ de vision, comme dans les jeux d'origine.
 - Option d'accessibilité **« Voir les sons »** : un cercle s'affiche quand Élias fait du bruit,
   de la taille exacte du rayon perçu par les ennemis (utile aussi pour régler le jeu).
+- *Précisions de J6* (réglages dans `sentinel.tres`, groupe « Lumière et suspicion ») :
+  - **visibilité** (0 à 1) = lumière perçue × posture × distance. La lumière perçue vaut
+    lumière^1,5 (l'œil distingue mal la pénombre) ; accroupi : × 0,6 ; distance :
+    1 - (d / 620 px)². Cône de vision de ±35°, portée 620 px, écart de hauteur 120 px au
+    plus (en hauteur, sur une passerelle de 3 blocs, Élias est invisible d'en bas). À moins
+    de 90 px, elle le remarque même dans le noir ;
+  - **jauge** : visibilité ≥ 0,35 = reconnu d'un coup ; en dessous, la jauge monte de
+    visibilité × 3 par seconde (moins 0,08 par seconde en patrouille : une silhouette trop
+    vague ne l'inquiète jamais). Seuils : 0,25 alerte (elle fixe l'indice), 0,5 recherche à
+    la fin de l'alerte, 1 combat. Tant qu'elle l'entrevoit, elle continue de le fixer ;
+  - **bruit** : chaque mur traversé divise le rayon par deux. Un bruit apporte de 0,3 (au
+    bord du rayon) à 0,8 (tout près) de suspicion ;
+  - **lampes** (`LightSource`) : un disque de lumière (énergie × (1 - d / rayon)), arrêté par
+    le décor. Un tir ou une pierre les brise (bruit de verre, 450 px) ; elles suivent le
+    rembobinage et sont réparées à la réapparition (sauf si brisées avant le checkpoint).
+    La lumière ambiante est un réglage de chaque salle (`Room.ambient_light`) ;
+  - **pierres** : on en ramasse (3 au plus) sur les tas de gravats ; lancer en cloche
+    (≈ 7 blocs) ; l'impact fait du bruit (520 px) : les Sentinelles vont voir ;
+  - **niveau d'alerte global** : le plus inquiet des ennemis (`Level.alert_level`, signal
+    `Events.alert_level_changed`), pour la musique de J8 ;
+  - **mode classique** : ni lumière ni jauge (dans le champ de vision = vu tout de suite) ;
+    l'ouïe reste la même.
 
 ### 5.5 Rembobinage temporel (J4)
 - Le `RewindManager` enregistre **5 s** d'historique (≈ 30 captures par seconde) de tous
@@ -428,6 +450,7 @@ Un interrupteur unique, `Settings.classic_mode` (réglage du joueur, lu via
 (5.5) et la perception (5.4). Il est testé automatiquement.
 *État en J4* : un interrupteur « Mode classique » sur l'écran titre (en attendant le menu
 d'options de J9) ; il coupe le rembobinage, et les six aides du parkour de J2.
+*J6* : il coupe aussi la lumière et la jauge de suspicion des Sentinelles.
 
 ### 5.10 Interface diégétique : le bracelet (J9)
 - **Aucun HUD permanent.** Le poignet gauche d'Élias porte un bracelet.

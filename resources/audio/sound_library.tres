@@ -59,6 +59,7 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_turn.wav" id="57_vyld8"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/impact_body.wav" id="58_2jq3k"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/impact_wall.wav" id="59_4ex48"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/lamp_break.wav" id="60_1onq0"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/portal_hum_loop.wav" id="60_b5amj"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/rewind_loop.wav" id="61_ukee8"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/rewind_release.wav" id="62_42vyo"]
@@ -68,11 +69,16 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/shield_loop.wav" id="66_r30dm"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/shield_up.wav" id="67_ipmmc"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/test_impact.wav" id="68_7v4xt"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/foley/stone_impact_01.wav" id="69_05f6h"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ui/ui_back.wav" id="69_c0kd3"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/foley/stone_impact_02.wav" id="70_di1ih"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ui/ui_confirm.wav" id="70_umla4"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/foley/stone_impact_03.wav" id="71_21utm"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ui/ui_move.wav" id="71_vjani"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/foley/stone_pickup.wav" id="72_spmsd"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_charge.wav" id="72_tjl3e"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_charge_ready.wav" id="73_oeyvm"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/foley/stone_throw.wav" id="73_ye2fn"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_draw.wav" id="74_ma1yv"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_empty.wav" id="75_fleqf"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_holster.wav" id="76_gbgv2"]
@@ -460,6 +466,15 @@ pitch_random = 0.04
 noise_radius = 250.0
 description = "Tir qui frappe le décor : choc et grésillement (provisoire J3)."
 
+[sub_resource type="Resource" id="Resource_o32l7"]
+script = ExtResource("1_5fyfp")
+id = &"lamp_break"
+streams = Array[AudioStream]([ExtResource("60_1onq0")])
+volume_db = -2.5
+pitch_random = 0.0
+noise_radius = 450.0
+description = "Lampe brisée par un tir : verre qui éclate, grésillement qui meurt (J6)."
+
 [sub_resource type="Resource" id="Resource_5us7m"]
 script = ExtResource("1_5fyfp")
 id = &"portal_hum_loop"
@@ -537,6 +552,36 @@ streams = Array[AudioStream]([ExtResource("67_ipmmc")])
 volume_db = -16.0
 pitch_random = 0.04
 description = "Le bouclier s'allume : montée brève (provisoire J3)."
+
+[sub_resource type="Resource" id="Resource_nmrsd"]
+script = ExtResource("1_5fyfp")
+id = &"stone_impact"
+category = &"foley"
+streams = Array[AudioStream]([ExtResource("69_05f6h"), ExtResource("70_di1ih"), ExtResource("71_21utm")])
+volume_db = 0.5
+pitch_random = 0.08
+noise_radius = 520.0
+description = "Pierre qui retombe et rebondit (diversion, J6)."
+
+[sub_resource type="Resource" id="Resource_o1k2y"]
+script = ExtResource("1_5fyfp")
+id = &"stone_pickup"
+category = &"foley"
+streams = Array[AudioStream]([ExtResource("72_spmsd")])
+volume_db = -12.0
+pitch_random = 0.08
+noise_radius = 60.0
+description = "Ramasser des pierres : cailloux qui s'entrechoquent (J6)."
+
+[sub_resource type="Resource" id="Resource_54ysb"]
+script = ExtResource("1_5fyfp")
+id = &"stone_throw"
+category = &"foley"
+streams = Array[AudioStream]([ExtResource("73_ye2fn")])
+volume_db = -12.0
+pitch_random = 0.08
+noise_radius = 60.0
+description = "Pierre lancée : bras qui fouette l'air (J6)."
 
 [sub_resource type="Resource" id="Resource_uo6hv"]
 script = ExtResource("1_5fyfp")
@@ -653,4 +698,4 @@ description = "Tir des Sentinelles : plus grave et bourdonnant, pour le distingu
 
 [resource]
 script = ExtResource("80_bwg7w")
-entries = Array[ExtResource("1_5fyfp")]([SubResource("Resource_2woyv"), SubResource("Resource_o6odg"), SubResource("Resource_qjpsi"), SubResource("Resource_8hpxx"), SubResource("Resource_iu6ju"), SubResource("Resource_xxjd7"), SubResource("Resource_2u5yj"), SubResource("Resource_8jum6"), SubResource("Resource_p70og"), SubResource("Resource_kejka"), SubResource("Resource_kyjv3"), SubResource("Resource_15pcx"), SubResource("Resource_dji1g"), SubResource("Resource_hyhjn"), SubResource("Resource_hp3pa"), SubResource("Resource_sq8gf"), SubResource("Resource_r5uah"), SubResource("Resource_xp1mo"), SubResource("Resource_8tobh"), SubResource("Resource_x6h8f"), SubResource("Resource_8e33i"), SubResource("Resource_al0tc"), SubResource("Resource_qvxmp"), SubResource("Resource_pr4dm"), SubResource("Resource_sujdi"), SubResource("Resource_vu1h8"), SubResource("Resource_egnxw"), SubResource("Resource_tac66"), SubResource("Resource_5eunv"), SubResource("Resource_6vv7q"), SubResource("Resource_tggwl"), SubResource("Resource_kcmox"), SubResource("Resource_pa8o6"), SubResource("Resource_adqno"), SubResource("Resource_xo1nh"), SubResource("Resource_0bukn"), SubResource("Resource_0fvoo"), SubResource("Resource_5us7m"), SubResource("Resource_1qngj"), SubResource("Resource_5qie6"), SubResource("Resource_ewrgr"), SubResource("Resource_u4ubl"), SubResource("Resource_mi1tt"), SubResource("Resource_rx6wq"), SubResource("Resource_lpcou"), SubResource("Resource_uo6hv"), SubResource("Resource_dg2c2"), SubResource("Resource_3frbw"), SubResource("Resource_c8wha"), SubResource("Resource_yw80b"), SubResource("Resource_qp4hd"), SubResource("Resource_2g1c1"), SubResource("Resource_lmow8"), SubResource("Resource_5cyfj"), SubResource("Resource_ox468"), SubResource("Resource_16sv4"), SubResource("Resource_x1rr1")])
+entries = Array[ExtResource("1_5fyfp")]([SubResource("Resource_2woyv"), SubResource("Resource_o6odg"), SubResource("Resource_qjpsi"), SubResource("Resource_8hpxx"), SubResource("Resource_iu6ju"), SubResource("Resource_xxjd7"), SubResource("Resource_2u5yj"), SubResource("Resource_8jum6"), SubResource("Resource_p70og"), SubResource("Resource_kejka"), SubResource("Resource_kyjv3"), SubResource("Resource_15pcx"), SubResource("Resource_dji1g"), SubResource("Resource_hyhjn"), SubResource("Resource_hp3pa"), SubResource("Resource_sq8gf"), SubResource("Resource_r5uah"), SubResource("Resource_xp1mo"), SubResource("Resource_8tobh"), SubResource("Resource_x6h8f"), SubResource("Resource_8e33i"), SubResource("Resource_al0tc"), SubResource("Resource_qvxmp"), SubResource("Resource_pr4dm"), SubResource("Resource_sujdi"), SubResource("Resource_vu1h8"), SubResource("Resource_egnxw"), SubResource("Resource_tac66"), SubResource("Resource_5eunv"), SubResource("Resource_6vv7q"), SubResource("Resource_tggwl"), SubResource("Resource_kcmox"), SubResource("Resource_pa8o6"), SubResource("Resource_adqno"), SubResource("Resource_xo1nh"), SubResource("Resource_0bukn"), SubResource("Resource_0fvoo"), SubResource("Resource_o32l7"), SubResource("Resource_5us7m"), SubResource("Resource_1qngj"), SubResource("Resource_5qie6"), SubResource("Resource_ewrgr"), SubResource("Resource_u4ubl"), SubResource("Resource_mi1tt"), SubResource("Resource_rx6wq"), SubResource("Resource_lpcou"), SubResource("Resource_nmrsd"), SubResource("Resource_o1k2y"), SubResource("Resource_54ysb"), SubResource("Resource_uo6hv"), SubResource("Resource_dg2c2"), SubResource("Resource_3frbw"), SubResource("Resource_c8wha"), SubResource("Resource_yw80b"), SubResource("Resource_qp4hd"), SubResource("Resource_2g1c1"), SubResource("Resource_lmow8"), SubResource("Resource_5cyfj"), SubResource("Resource_ox468"), SubResource("Resource_16sv4"), SubResource("Resource_x1rr1")])

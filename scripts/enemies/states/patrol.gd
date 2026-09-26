@@ -4,7 +4,8 @@ extends SentinelState
 ## départ), marque une pause à chaque bout, puis repart dans l'autre sens.
 ## Trajet nul : elle monte la garde sur place, dans son sens de départ.
 ## Elle s'arrête aussi devant un mur ou un vide.
-## Elle voit Élias -> Combat ; elle entend un bruit -> Suspicious.
+## Elle voit nettement Élias -> Combat ; un indice (bruit, silhouette entrevue
+## dans la pénombre) fait monter sa suspicion au-dessus du seuil d'alerte -> Suspicious.
 
 var _pause: float = 0.0
 
@@ -28,8 +29,12 @@ func physics_update(delta: float) -> void:
 	var s: Sentinel = sentinel
 	if check_sight():
 		return
+	if s.suspicion >= s.config.suspicious_threshold:
+		machine.transition_to(&"Suspicious", {"clue": s.last_clue})
+		return
 	if is_equal_approx(_left(), _right()) and absf(s.global_position.x - s.home.x) < 4.0:
-		_stand(delta)  # poste de garde fixe
+		s.facing = s.start_facing  # de retour à son poste de garde : elle reprend sa surveillance
+		_stand(delta)
 		return
 	if _pause > 0.0:
 		_pause -= delta

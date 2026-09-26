@@ -60,6 +60,18 @@ func handle_combat_actions() -> bool:
 	return false
 
 
+## Lancer une pierre (J6), debout ou accroupi, s'il en a une. Renvoie vrai si
+## une transition a eu lieu.
+func handle_throw_action() -> bool:
+	var p: Player = player
+	if not p.is_on_floor() or not p.wants(&"throw"):
+		return false
+	if p.stones <= 0:
+		return false
+	machine.transition_to(&"Throw", {"crouched": p.is_crouched})
+	return true
+
+
 ## Garde-bord : en marchant, Élias s'arrête devant un vide dangereux (plus
 ## profond qu'une chute sans conséquence). Désactivé en mode classique.
 func edge_guard_stops() -> bool:

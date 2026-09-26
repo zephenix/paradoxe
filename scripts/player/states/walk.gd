@@ -13,6 +13,8 @@ func physics_update(delta: float) -> void:
 		return
 	if handle_combat_actions():
 		return
+	if handle_throw_action():
+		return
 	if p.input.move == 0 or edge_guard_stops():
 		machine.transition_to(&"Idle")
 		return

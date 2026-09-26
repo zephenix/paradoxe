@@ -9,16 +9,18 @@ var sentinel: Sentinel:
 		return actor as Sentinel
 
 
-## Un bruit a été entendu pendant cet état. Par défaut : elle s'alerte et se
-## tourne vers lui (état Suspicious). Les états déjà en alerte redéfinissent ceci.
+## Un bruit a été entendu pendant cet état (la suspicion a déjà monté). Par
+## défaut : si la jauge dépasse le seuil d'alerte, elle s'alerte et se tourne
+## vers lui (état Suspicious). Les états déjà en alerte redéfinissent ceci.
 func on_noise(at: Vector2) -> void:
-	machine.transition_to(&"Suspicious", {"clue": at})
+	if sentinel.suspicion >= sentinel.config.suspicious_threshold:
+		machine.transition_to(&"Suspicious", {"clue": at})
 
 
-## Si elle voit Élias, ou si un tir arrive sur elle DE FACE (elle le voit
-## venir), elle passe au combat ; l'état Combat décide alors de lever le
-## bouclier. Un tir dans le dos la surprend : elle ne réagit pas.
-## Renvoie vrai s'il y a eu transition.
+## Si elle voit Élias et que sa jauge de suspicion est pleine, ou si un tir
+## arrive sur elle DE FACE (elle le voit venir), elle passe au combat ; l'état
+## Combat décide alors de lever le bouclier. Un tir dans le dos la surprend :
+## elle ne réagit pas. Renvoie vrai s'il y a eu transition.
 func check_sight() -> bool:
 	var s: Sentinel = sentinel
 	var incoming: Projectile = s.incoming_projectile()
@@ -29,7 +31,8 @@ func check_sight() -> bool:
 		var shooter: Node2D = incoming.shooter as Node2D
 		s.last_seen_position = shooter.global_position if is_instance_valid(shooter) else incoming.global_position
 		s.time_since_seen = 0.0
-	if s.sees_target or seen_coming:
+	if (s.sees_target and s.suspicion >= 1.0) or seen_coming:
+		s.suspicion = 1.0
 		machine.transition_to(&"Combat")
 		return true
 	return false

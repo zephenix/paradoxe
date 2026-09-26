@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scripts/fx/skyline.gd" id="6_skyline"]
 [ext_resource type="PackedScene" path="res://scenes/props/checkpoint.tscn" id="7_checkpoint"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/sentinel.tscn" id="8_sentinel"]
+[ext_resource type="Script" path="res://scripts/world/light_source.gd" id="9_light"]
+[ext_resource type="Script" path="res://scripts/props/rubble_pile.gd" id="10_rubble"]
 
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
@@ -356,7 +358,7 @@ color = Color(0.33, 0.37, 0.42, 1)
 [node name="Block1" type="StaticBody2D" parent="RoomF"]
 position = Vector2(1872, 0)
 script = ExtResource("3_block")
-size_blocks = Vector2(1, 14)
+size_blocks = Vector2(1, 10.5)
 
 [node name="Sentinel1" parent="RoomF" instance=ExtResource("8_sentinel")]
 position = Vector2(816, 672)
@@ -380,7 +382,115 @@ text = "SALLE F : COMBAT
 J ou X : tirer (1 unité d'énergie). Maintenir après un tir : tir chargé, qui brise un bouclier
 K ou W (Z en QWERTY) : bouclier, tant que la touche est maintenue (il consomme de l'énergie)
 Bas : s'accroupir derrière un muret. Les tirs debout passent au-dessus, pas les tirs à genou
-C : roulade d'esquive. Un seul tir tue, Élias comme les Sentinelles"
+C : roulade d'esquive. Un seul tir tue, Élias comme les Sentinelles
+Salle suivante (à droite) : infiltration, de nuit"
+
+[node name="RoomG" type="Node2D" parent="."]
+position = Vector2(8320, -144)
+script = ExtResource("2_room")
+room_size = Vector2(1920, 720)
+camera_zoom = 1.0
+title = "G - Infiltration"
+acoustic_zone = &"ruins"
+ambient_light = 0.15
+
+[node name="Checkpoint" parent="RoomG" instance=ExtResource("7_checkpoint")]
+position = Vector2(96, 672)
+
+[node name="Spawn" type="Marker2D" parent="RoomG"]
+position = Vector2(96, 672)
+
+[node name="Floor" type="StaticBody2D" parent="RoomG"]
+position = Vector2(0, 672)
+script = ExtResource("3_block")
+size_blocks = Vector2(40, 2)
+
+[node name="Ceiling" type="StaticBody2D" parent="RoomG"]
+position = Vector2(0, 0)
+script = ExtResource("3_block")
+size_blocks = Vector2(40, 1)
+color = Color(0.2, 0.23, 0.27, 1)
+
+[node name="RightWall" type="StaticBody2D" parent="RoomG"]
+position = Vector2(1872, 48)
+script = ExtResource("3_block")
+size_blocks = Vector2(1, 13)
+
+[node name="Rubble" type="Area2D" parent="RoomG"]
+position = Vector2(240, 672)
+script = ExtResource("10_rubble")
+
+[node name="LowWalkway" type="StaticBody2D" parent="RoomG"]
+position = Vector2(432, 528)
+script = ExtResource("3_block")
+size_blocks = Vector2(17.25, 0.5)
+color = Color(0.3, 0.33, 0.37, 1)
+surface = &"metal"
+
+[node name="Lamp1" type="StaticBody2D" parent="RoomG"]
+position = Vector2(792, 596)
+script = ExtResource("9_light")
+radius = 300.0
+energy = 0.9
+cord_length = 0.0
+post_length = 76.0
+
+[node name="Sentinel1" parent="RoomG" instance=ExtResource("8_sentinel")]
+position = Vector2(768, 672)
+patrol_left_blocks = 4.0
+patrol_right_blocks = 3.5
+rng_seed = 3
+
+[node name="Pillar" type="StaticBody2D" parent="RoomG"]
+position = Vector2(1212, 552)
+script = ExtResource("3_block")
+size_blocks = Vector2(1, 2.5)
+color = Color(0.33, 0.37, 0.42, 1)
+
+[node name="HighWalkway" type="StaticBody2D" parent="RoomG"]
+position = Vector2(1488, 528)
+script = ExtResource("3_block")
+size_blocks = Vector2(8, 0.5)
+color = Color(0.3, 0.33, 0.37, 1)
+surface = &"metal"
+
+[node name="Lamp2" type="StaticBody2D" parent="RoomG"]
+position = Vector2(1776, 598)
+script = ExtResource("9_light")
+radius = 260.0
+energy = 0.85
+cord_length = 46.0
+
+[node name="Sentinel2" parent="RoomG" instance=ExtResource("8_sentinel")]
+position = Vector2(1584, 672)
+start_facing = 1
+patrol_left_blocks = 3.5
+patrol_right_blocks = 3.5
+rng_seed = 4
+
+[node name="Exit" type="Label" parent="RoomG"]
+offset_left = 1744
+offset_top = 440
+offset_right = 1868
+offset_bottom = 520
+theme_override_colors/font_color = Color(0.45, 1, 0.75, 1)
+theme_override_font_sizes/font_size = 20
+text = "SORTIE
+-->"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="RoomG"]
+offset_left = 48
+offset_top = 64
+offset_right = 1248
+offset_bottom = 244
+theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
+theme_override_font_sizes/font_size = 17
+text = "SALLE G : INFILTRATION (nuit)
+Dans le noir, les Sentinelles voient mal. Accroupi (Bas), Élias est moins visible et ses pas sont muets.
+Sous une lampe, elles le voient. Un tir brise une lampe... mais le verre fait du bruit.
+F : lancer une pierre (ramassées sur le tas de gravats) pour attirer une Sentinelle ailleurs.
+En hauteur, sur les passerelles, elles ne voient pas Élias. Objectif : la sortie, en haut à droite"
 
 [node name="Elias" parent="." instance=ExtResource("5_elias")]
 position = Vector2(144, 624)
