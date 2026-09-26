@@ -795,6 +795,144 @@ _register_stone_impacts()
 
 
 # =============================================================================
+# Compagnon, mécanismes, cellules (J7)
+# =============================================================================
+# Le compagnon (un vieil homme) parle une langue qu'on ne comprend pas : comme
+# pour les Sentinelles, l'intonation porte le sens. Voix humaine, grave et
+# voilée (plus de souffle, hauteur plus basse que celle des créatures).
+
+def _old_voice(rng: np.random.Generator, syllables: list[tuple[float, float, float, str]]) -> np.ndarray:
+    return _phrase(rng, [(d, a * 0.62, b * 0.62, v, 0.45) for d, a, b, v in syllables], gap=0.05)
+
+
+@sound("companion_ok", "voice", description="Compagnon : « d'accord », deux syllabes affirmatives (J7).")
+def companion_ok(rng: np.random.Generator) -> np.ndarray:
+    return _old_voice(rng, [(0.14, 200, 190, "o"), (0.2, 185, 150, "a")])
+
+
+@sound("companion_follow", "voice", description="Compagnon : « je te suis », montée légère (J7).")
+def companion_follow(rng: np.random.Generator) -> np.ndarray:
+    return _old_voice(rng, [(0.12, 170, 175, "e"), (0.16, 180, 215, "o")])
+
+
+@sound("companion_wait", "voice", description="Compagnon : « j'attends ici », posé et descendant (J7).")
+def companion_wait(rng: np.random.Generator) -> np.ndarray:
+    return _old_voice(rng, [(0.18, 190, 170, "a"), (0.26, 165, 135, "u")])
+
+
+@sound("companion_no", "voice", description="Compagnon : refus, « rien à faire ici » (J7).")
+def companion_no(rng: np.random.Generator) -> np.ndarray:
+    return _old_voice(rng, [(0.12, 210, 170, "e"), (0.12, 200, 160, "e")])
+
+
+@sound("companion_surprise", "voice", description="Compagnon : stupeur, souffle coupé puis murmure (rencontre, J7).")
+def companion_surprise(rng: np.random.Generator) -> np.ndarray:
+    gasp = dsp.bandpass(dsp.white_noise(0.3, rng), 700, 3500) * dsp.adsr(0.3, 0.05, 0.1, 0.4, 0.12)
+    words = _old_voice(rng, [(0.3, 230, 170, "o"), (0.45, 160, 120, "a")])
+    return dsp.fade(dsp.normalize(np.concatenate([0.6 * dsp.normalize(gasp), np.zeros(dsp.n_samples(0.25)), words]), 0.8))
+
+
+@sound("creature_menace", "creature", description="Sentinelle menaçante : grognement grave et long (capture, J7).")
+def creature_menace(rng: np.random.Generator) -> np.ndarray:
+    return _phrase(rng, [(0.5, 110, 95, "o", 0.6), (0.4, 100, 80, "u", 0.7)], gap=0.08)
+
+
+@sound("lever_pull", "sfx", description="Levier : frottement métallique et claquement (J7).")
+def lever_pull(rng: np.random.Generator) -> np.ndarray:
+    d = 0.35
+    scrape = dsp.bandpass(dsp.white_noise(d, rng), 1200, 5000) * dsp.adsr(d, 0.01, 0.1, 0.2, 0.1) * 0.4
+    clack = np.concatenate([np.zeros(dsp.n_samples(0.12)), dsp.modal_body(0.2, [(620, 1.0, 0.05), (1480, 0.5, 0.03)])])
+    return dsp.fade(dsp.normalize(dsp.mix(scrape, clack), 0.8))
+
+
+@sound("plate_click", "sfx", description="Plaque de pression : déclic sourd (J7).")
+def plate_click(rng: np.random.Generator) -> np.ndarray:
+    return dsp.fade(dsp.normalize(_thump(rng, 0.2, 140.0, 0.03, 2500.0, 0.2), 0.6))
+
+
+@sound("door_slide", "sfx", description="Porte qui coulisse : glissement mécanique et butée (J7).")
+def door_slide(rng: np.random.Generator) -> np.ndarray:
+    d = 0.8
+    rumble = dsp.lowpass(dsp.brown_noise(d, rng), 400) * dsp.adsr(d, 0.05, 0.1, 0.8, 0.2)
+    whine = dsp.sine(dsp.ramp(d, 180, 240), d) * dsp.adsr(d, 0.1, 0.1, 0.4, 0.2) * 0.3
+    stop = np.concatenate([np.zeros(dsp.n_samples(0.65)), _thump(rng, 0.15, 90.0, 0.04, 1500.0, 0.3)])
+    return dsp.fade(dsp.normalize(dsp.normalize(rumble) + whine + stop[: dsp.n_samples(d)], 0.8))
+
+
+@sound("bars_clank", "sfx", description="Porte de cellule : barreaux qui coulissent et claquent (J7).")
+def bars_clank(rng: np.random.Generator) -> np.ndarray:
+    d = 0.7
+    ring = dsp.modal_body(d, [(410, 1.0, 0.25), (1030, 0.6, 0.18), (2210, 0.35, 0.1)])
+    scrape = dsp.bandpass(dsp.white_noise(d, rng), 800, 4000) * dsp.adsr(d, 0.02, 0.2, 0.3, 0.2) * 0.5
+    return dsp.fade(dsp.normalize(0.6 * ring + scrape, 0.85))
+
+
+@sound("elevator_loop", "sfx", loop=True, description="Ascenseur en mouvement : moteur et câbles (boucle de 2 s, J7).")
+def elevator_loop(rng: np.random.Generator) -> np.ndarray:
+    crossfade = 0.3
+    d = 2.0 + crossfade
+    hum = dsp.sine(55.0, d) + 0.5 * dsp.sine(110.0, d) + 0.2 * dsp.sine(165.0, d)
+    rattle = dsp.bandpass(dsp.crackle(d, rng, 40.0), 1500, 5000, order=1) * 0.3
+    return _loop(dsp.normalize(hum) + rattle, crossfade, 0.6)
+
+
+@sound("elevator_stop", "sfx", description="Ascenseur qui s'arrête : butée lourde (J7).")
+def elevator_stop(rng: np.random.Generator) -> np.ndarray:
+    return dsp.fade(dsp.normalize(_thump(rng, 0.5, 70.0, 0.12, 1200.0, 0.4), 0.8))
+
+
+@sound("terminal_beep", "sfx", description="Terminal : deux bips montants (J7).")
+def terminal_beep(rng: np.random.Generator) -> np.ndarray:
+    def blip(f: float) -> np.ndarray:
+        return dsp.sine(f, 0.09) * dsp.adsr(0.09, 0.003, 0.03, 0.5, 0.04)
+    return dsp.fade(dsp.normalize(np.concatenate([blip(990.0), np.zeros(dsp.n_samples(0.04)), blip(1480.0)]), 0.5))
+
+
+@sound("item_pickup", "sfx", description="Objet ramassé : déclic et tissu (J7).")
+def item_pickup(rng: np.random.Generator) -> np.ndarray:
+    clack = dsp.modal_body(0.15, [(1800, 1.0, 0.03), (2900, 0.4, 0.02)])
+    cloth = dsp.bandpass(dsp.pink_noise(0.25, rng), 900, 5000) * dsp.adsr(0.25, 0.03, 0.05, 0.3, 0.12)
+    return dsp.fade(dsp.normalize(dsp.mix(clack, np.concatenate([np.zeros(dsp.n_samples(0.05)), 0.5 * cloth])), 0.6))
+
+
+@sound("amb_jungle_loop", "ambience", loop=True,
+       description="Clairière : insectes qui stridulent, bourdonnement lumineux, souffle (15 s, J7).")
+def amb_jungle_loop(rng: np.random.Generator) -> np.ndarray:
+    crossfade = 1.5
+    d = 15.0 + crossfade
+    t = dsp.time_axis(d)
+    air = dsp.lowpass(dsp.pink_noise(d, rng), 900) * 0.5
+    insects = np.zeros(dsp.n_samples(d))
+    for k in range(5):
+        f = rng.uniform(3500, 6500)
+        rate = rng.uniform(9, 22)
+        gate = (np.sin(2 * np.pi * rate * t) > 0.3).astype(float) * (0.5 + 0.5 * np.sin(2 * np.pi * t / rng.uniform(3, 7)))
+        insects += dsp.sine(f, d) * gate * 0.15
+    glow = dsp.sine(96.0, d) * (0.5 + 0.5 * np.sin(2 * np.pi * t / 5.0)) * 0.3
+    return _loop(dsp.normalize(air) + insects + glow, crossfade, 0.6)
+
+
+def _register_chains() -> None:
+    def chain(rng: np.random.Generator, i: int) -> np.ndarray:
+        d = 0.9
+        out = np.zeros(dsp.n_samples(d))
+        for k in range(6 + i):
+            start = dsp.n_samples(rng.uniform(0.0, 0.5))
+            f = rng.uniform(1800, 3400)
+            link = dsp.modal_body(0.2, [(f, 1.0, 0.03), (f * 1.33, 0.5, 0.02)]) * rng.uniform(0.3, 1.0)
+            out[start:start + len(link)] += link[: len(out) - start]
+        return dsp.fade(dsp.normalize(out, 0.5), 0.001, 0.1)
+
+    for i in range(1, 3):
+        def build(rng: np.random.Generator, i: int = i) -> np.ndarray:
+            return chain(rng, i)
+        sound(f"amb_chain_{i:02d}", "ambience", description=f"Chaînes qui tintent, variante {i} (événement d'ambiance, J7).")(build)
+
+
+_register_chains()
+
+
+# =============================================================================
 # Programme principal
 # =============================================================================
 

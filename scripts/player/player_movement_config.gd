@@ -99,6 +99,14 @@ extends Resource
 ## Après avoir lâché un rebord : délai pendant lequel on ne peut pas s'y raccrocher.
 @export var regrab_cooldown: float = 0.35
 
+@export_group("Interactions (J7)")
+## Portée de la main : un objet interactif à moins de tant de pixels devant les
+## pieds d'Élias réagit à « Interagir ».
+@export var interact_reach: float = 44.0
+## Durée du geste (engagé) et instant où la main touche l'objet.
+@export var interact_duration: float = 0.35
+@export var interact_time: float = 0.15
+
 @export_group("Roulade et glissade")
 ## Distance parcourue par une roulade (en blocs) et sa durée (secondes).
 @export var roll_distance_blocks: float = 2.5

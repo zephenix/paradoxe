@@ -49,7 +49,7 @@ func handle_ground_actions() -> bool:
 ## transition a eu lieu.
 func handle_combat_actions() -> bool:
 	var p: Player = player
-	if not p.is_on_floor() or not p.can_stand():
+	if not p.is_on_floor() or not p.can_stand() or GameState.unarmed:
 		return false
 	if p.wants(&"shield") or p.input.shield:
 		machine.transition_to(&"Aim", {"then": &"shield"})
@@ -58,6 +58,19 @@ func handle_combat_actions() -> bool:
 		machine.transition_to(&"Aim", {"then": &"fire"})
 		return true
 	return false
+
+
+## Interagir (J7) : si un objet interactif est à portée de main devant Élias,
+## il fait le geste (état Interact). Renvoie vrai si une transition a eu lieu.
+func handle_interact_action() -> bool:
+	var p: Player = player
+	if not p.is_on_floor() or not p.wants(&"interact"):
+		return false
+	var target: Interactable = Interactable.find_for(p, p.facing, p.config.interact_reach)
+	if target == null:
+		return false
+	machine.transition_to(&"Interact", {"target": target})
+	return true
 
 
 ## Lancer une pierre (J6), debout ou accroupi, s'il en a une. Renvoie vrai si

@@ -25,6 +25,7 @@
 [ext_resource type="Script" path="res://scripts/player/states/charge.gd" id="s18_charge"]
 [ext_resource type="Script" path="res://scripts/player/states/shield.gd" id="s19_shield"]
 [ext_resource type="Script" path="res://scripts/player/states/throw.gd" id="s20_throw"]
+[ext_resource type="Script" path="res://scripts/player/states/interact.gd" id="s21_interact"]
 [ext_resource type="Script" path="res://scripts/combat/energy_pool.gd" id="5_energy"]
 [ext_resource type="Script" path="res://scripts/combat/weapon.gd" id="6_weapon"]
 [ext_resource type="Script" path="res://scripts/player/energy_gauge.gd" id="7_gauge"]
@@ -114,3 +115,6 @@ script = ExtResource("s19_shield")
 
 [node name="Throw" type="Node" parent="StateMachine"]
 script = ExtResource("s20_throw")
+
+[node name="Interact" type="Node" parent="StateMachine"]
+script = ExtResource("s21_interact")

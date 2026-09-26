@@ -3,7 +3,9 @@
 [ext_resource type="Script" path="res://scripts/audio/sound_entry.gd" id="1_5fyfp"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_buzz_01.wav" id="2_kq1by"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_buzz_02.wav" id="3_n6xs0"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_chain_01.wav" id="4_3c28i"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_city_loop.wav" id="4_afmb2"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_chain_02.wav" id="5_bel33"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_creak_01.wav" id="5_hrod6"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_creak_02.wav" id="6_rc8cy"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_cry_01.wav" id="7_1onq0"]
@@ -17,11 +19,13 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_hall_loop.wav" id="15_o1k2y"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_lab_loop.wav" id="16_54ysb"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_shaft_loop.wav" id="17_te1qc"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_jungle_loop.wav" id="18_t17c2"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ambience/amb_wind_loop.wav" id="18_t172r"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_calm_01.wav" id="19_3w4ty"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_calm_02.wav" id="20_gyt7b"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_effort_01.wav" id="21_ef6w0"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_effort_02.wav" id="22_3cngm"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/bars_clank.wav" id="22_ev7q6"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_exhausted_01.wav" id="23_f36r0"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/voice/breath_exhausted_02.wav" id="24_3c28i"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/checkpoint_on.wav" id="25_bel33"]
@@ -30,18 +34,27 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/creature/creature_curious.wav" id="28_rqio4"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/creature/creature_death.wav" id="29_60iwk"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/creature/creature_search.wav" id="30_kyg1b"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/voice/companion_follow.wav" id="30_rqio4"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/voice/companion_no.wav" id="31_60iwk"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_body_fall.wav" id="31_palq4"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/voice/companion_ok.wav" id="32_kyg1b"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_climb.wav" id="32_vpl5h"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_crouch.wav" id="33_k5iau"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/voice/companion_surprise.wav" id="33_palq4"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_grab.wav" id="34_gh5ba"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/voice/companion_wait.wav" id="34_vpl5h"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_jump.wav" id="35_ed374"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_land.wav" id="36_0rrfb"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_land_heavy.wav" id="37_6hwpi"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_roll.wav" id="38_11y14"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_skid.wav" id="39_8cxli"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/creature/creature_menace.wav" id="39_k5iau"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_slide.wav" id="40_t87jo"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_metal_01.wav" id="41_d18p2"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/door_slide.wav" id="41_gh5ba"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/elevator_loop.wav" id="42_ed374"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_metal_02.wav" id="42_qb42j"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/elevator_stop.wav" id="43_0rrfb"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_metal_03.wav" id="43_3sjhw"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_metal_04.wav" id="44_5k22w"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/foley_step_plant_01.wav" id="45_d636w"]
@@ -77,15 +90,19 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/ui/ui_move.wav" id="71_vjani"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/stone_pickup.wav" id="72_spmsd"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_charge.wav" id="72_tjl3e"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/item_pickup.wav" id="73_6hwpi"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_charge_ready.wav" id="73_oeyvm"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/foley/stone_throw.wav" id="73_ye2fn"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_draw.wav" id="74_ma1yv"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/lever_pull.wav" id="75_11y14"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_empty.wav" id="75_fleqf"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/plate_click.wav" id="76_8cxli"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_holster.wav" id="76_gbgv2"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_shot.wav" id="77_ev643"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_shot_charged.wav" id="78_t32yr"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/combat/weapon_shot_sentinel.wav" id="79_dym4n"]
 [ext_resource type="Script" path="res://scripts/audio/sound_library.gd" id="80_bwg7w"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/sfx/terminal_beep.wav" id="90_t87jo"]
 
 [sub_resource type="Resource" id="Resource_2woyv"]
 script = ExtResource("1_5fyfp")
@@ -97,6 +114,17 @@ volume_db = -14.0
 pitch_random = 0.12
 volume_random_db = 3.0
 description = "Grésillement de lampe (événement d'ambiance, J5)."
+
+[sub_resource type="Resource" id="Resource_d18p2"]
+script = ExtResource("1_5fyfp")
+id = &"amb_chain"
+category = &"ambience"
+streams = Array[AudioStream]([ExtResource("4_3c28i"), ExtResource("5_bel33")])
+bus = &"Ambiance"
+volume_db = -4.5
+pitch_random = 0.12
+volume_random_db = 3.0
+description = "Chaînes qui tintent (événement d'ambiance, J7)."
 
 [sub_resource type="Resource" id="Resource_o6odg"]
 script = ExtResource("1_5fyfp")
@@ -175,6 +203,17 @@ pitch_random = 0.12
 volume_random_db = 0.0
 description = "Grand hall : présence de la pièce et machinerie lointaine (17 s, J5)."
 
+[sub_resource type="Resource" id="Resource_qb42j"]
+script = ExtResource("1_5fyfp")
+id = &"amb_jungle_loop"
+category = &"ambience"
+streams = Array[AudioStream]([ExtResource("18_t17c2")])
+bus = &"Ambiance"
+volume_db = -14.0
+pitch_random = 0.12
+volume_random_db = 0.0
+description = "Clairière : insectes qui stridulent, bourdonnement lumineux, souffle (15 s, J7)."
+
 [sub_resource type="Resource" id="Resource_p70og"]
 script = ExtResource("1_5fyfp")
 id = &"amb_lab_loop"
@@ -207,6 +246,15 @@ volume_db = -14.0
 pitch_random = 0.12
 volume_random_db = 0.0
 description = "Vent dans les ruines : souffle grave qui enfle et retombe (17 s, J5)."
+
+[sub_resource type="Resource" id="Resource_3sjhw"]
+script = ExtResource("1_5fyfp")
+id = &"bars_clank"
+streams = Array[AudioStream]([ExtResource("22_ev7q6")])
+volume_db = -4.0
+pitch_random = 0.0
+noise_radius = 300.0
+description = "Porte de cellule : barreaux qui coulissent et claquent (J7)."
 
 [sub_resource type="Resource" id="Resource_15pcx"]
 script = ExtResource("1_5fyfp")
@@ -242,6 +290,51 @@ streams = Array[AudioStream]([ExtResource("25_bel33")])
 volume_db = -8.0
 pitch_random = 0.0
 description = "Checkpoint atteint : trois notes douces qui montent (provisoire J3)."
+
+[sub_resource type="Resource" id="Resource_5k22w"]
+script = ExtResource("1_5fyfp")
+id = &"companion_follow"
+category = &"voice"
+streams = Array[AudioStream]([ExtResource("30_rqio4")])
+bus = &"Voix"
+volume_db = -6.0
+description = "Compagnon : « je te suis », montée légère (J7)."
+
+[sub_resource type="Resource" id="Resource_d636w"]
+script = ExtResource("1_5fyfp")
+id = &"companion_no"
+category = &"voice"
+streams = Array[AudioStream]([ExtResource("31_60iwk")])
+bus = &"Voix"
+volume_db = -6.0
+description = "Compagnon : refus, « rien à faire ici » (J7)."
+
+[sub_resource type="Resource" id="Resource_pp5p5"]
+script = ExtResource("1_5fyfp")
+id = &"companion_ok"
+category = &"voice"
+streams = Array[AudioStream]([ExtResource("32_kyg1b")])
+bus = &"Voix"
+volume_db = -6.0
+description = "Compagnon : « d'accord », deux syllabes affirmatives (J7)."
+
+[sub_resource type="Resource" id="Resource_8cktx"]
+script = ExtResource("1_5fyfp")
+id = &"companion_surprise"
+category = &"voice"
+streams = Array[AudioStream]([ExtResource("33_palq4")])
+bus = &"Voix"
+volume_db = -6.0
+description = "Compagnon : stupeur, souffle coupé puis murmure (rencontre, J7)."
+
+[sub_resource type="Resource" id="Resource_ahn8u"]
+script = ExtResource("1_5fyfp")
+id = &"companion_wait"
+category = &"voice"
+streams = Array[AudioStream]([ExtResource("34_vpl5h")])
+bus = &"Voix"
+volume_db = -6.0
+description = "Compagnon : « j'attends ici », posé et descendant (J7)."
 
 [sub_resource type="Resource" id="Resource_sq8gf"]
 script = ExtResource("1_5fyfp")
@@ -287,6 +380,17 @@ pitch_random = 0.0
 volume_random_db = 0.0
 description = "Sentinelle touchée : cri qui retombe (provisoire J3)."
 
+[sub_resource type="Resource" id="Resource_uef2a"]
+script = ExtResource("1_5fyfp")
+id = &"creature_menace"
+category = &"creature"
+streams = Array[AudioStream]([ExtResource("39_k5iau")])
+bus = &"Voix"
+volume_db = -6.0
+pitch_random = 0.0
+volume_random_db = 0.0
+description = "Sentinelle menaçante : grognement grave et long (capture, J7)."
+
 [sub_resource type="Resource" id="Resource_x6h8f"]
 script = ExtResource("1_5fyfp")
 id = &"creature_search"
@@ -297,6 +401,33 @@ volume_db = -6.5
 pitch_random = 0.0
 volume_random_db = 0.0
 description = "Sentinelle qui cherche : grognement grave, interrogatif (provisoire J3)."
+
+[sub_resource type="Resource" id="Resource_tma8s"]
+script = ExtResource("1_5fyfp")
+id = &"door_slide"
+streams = Array[AudioStream]([ExtResource("41_gh5ba")])
+volume_db = -12.5
+pitch_random = 0.0
+noise_radius = 250.0
+description = "Porte qui coulisse : glissement mécanique et butée (J7)."
+
+[sub_resource type="Resource" id="Resource_o73a6"]
+script = ExtResource("1_5fyfp")
+id = &"elevator_loop"
+streams = Array[AudioStream]([ExtResource("42_ed374")])
+volume_db = -16.0
+pitch_random = 0.0
+volume_random_db = 0.0
+description = "Ascenseur en mouvement : moteur et câbles (boucle de 2 s, J7)."
+
+[sub_resource type="Resource" id="Resource_0q65d"]
+script = ExtResource("1_5fyfp")
+id = &"elevator_stop"
+streams = Array[AudioStream]([ExtResource("43_0rrfb")])
+volume_db = -9.0
+pitch_random = 0.0
+noise_radius = 250.0
+description = "Ascenseur qui s'arrête : butée lourde (J7)."
 
 [sub_resource type="Resource" id="Resource_8e33i"]
 script = ExtResource("1_5fyfp")
@@ -466,6 +597,14 @@ pitch_random = 0.04
 noise_radius = 250.0
 description = "Tir qui frappe le décor : choc et grésillement (provisoire J3)."
 
+[sub_resource type="Resource" id="Resource_r1oyr"]
+script = ExtResource("1_5fyfp")
+id = &"item_pickup"
+streams = Array[AudioStream]([ExtResource("73_6hwpi")])
+volume_db = 7.0
+pitch_random = 0.0
+description = "Objet ramassé : déclic et tissu (J7)."
+
 [sub_resource type="Resource" id="Resource_o32l7"]
 script = ExtResource("1_5fyfp")
 id = &"lamp_break"
@@ -474,6 +613,23 @@ volume_db = -2.5
 pitch_random = 0.0
 noise_radius = 450.0
 description = "Lampe brisée par un tir : verre qui éclate, grésillement qui meurt (J6)."
+
+[sub_resource type="Resource" id="Resource_cyg40"]
+script = ExtResource("1_5fyfp")
+id = &"lever_pull"
+streams = Array[AudioStream]([ExtResource("75_11y14")])
+volume_db = -2.0
+pitch_random = 0.0
+noise_radius = 150.0
+description = "Levier : frottement métallique et claquement (J7)."
+
+[sub_resource type="Resource" id="Resource_4owrd"]
+script = ExtResource("1_5fyfp")
+id = &"plate_click"
+streams = Array[AudioStream]([ExtResource("76_8cxli")])
+volume_db = -1.0
+pitch_random = 0.0
+description = "Plaque de pression : déclic sourd (J7)."
 
 [sub_resource type="Resource" id="Resource_5us7m"]
 script = ExtResource("1_5fyfp")
@@ -582,6 +738,14 @@ volume_db = -12.0
 pitch_random = 0.08
 noise_radius = 60.0
 description = "Pierre lancée : bras qui fouette l'air (J6)."
+
+[sub_resource type="Resource" id="Resource_narpj"]
+script = ExtResource("1_5fyfp")
+id = &"terminal_beep"
+streams = Array[AudioStream]([ExtResource("90_t87jo")])
+volume_db = -12.0
+pitch_random = 0.0
+description = "Terminal : deux bips montants (J7)."
 
 [sub_resource type="Resource" id="Resource_uo6hv"]
 script = ExtResource("1_5fyfp")
@@ -698,4 +862,4 @@ description = "Tir des Sentinelles : plus grave et bourdonnant, pour le distingu
 
 [resource]
 script = ExtResource("80_bwg7w")
-entries = Array[ExtResource("1_5fyfp")]([SubResource("Resource_2woyv"), SubResource("Resource_o6odg"), SubResource("Resource_qjpsi"), SubResource("Resource_8hpxx"), SubResource("Resource_iu6ju"), SubResource("Resource_xxjd7"), SubResource("Resource_2u5yj"), SubResource("Resource_8jum6"), SubResource("Resource_p70og"), SubResource("Resource_kejka"), SubResource("Resource_kyjv3"), SubResource("Resource_15pcx"), SubResource("Resource_dji1g"), SubResource("Resource_hyhjn"), SubResource("Resource_hp3pa"), SubResource("Resource_sq8gf"), SubResource("Resource_r5uah"), SubResource("Resource_xp1mo"), SubResource("Resource_8tobh"), SubResource("Resource_x6h8f"), SubResource("Resource_8e33i"), SubResource("Resource_al0tc"), SubResource("Resource_qvxmp"), SubResource("Resource_pr4dm"), SubResource("Resource_sujdi"), SubResource("Resource_vu1h8"), SubResource("Resource_egnxw"), SubResource("Resource_tac66"), SubResource("Resource_5eunv"), SubResource("Resource_6vv7q"), SubResource("Resource_tggwl"), SubResource("Resource_kcmox"), SubResource("Resource_pa8o6"), SubResource("Resource_adqno"), SubResource("Resource_xo1nh"), SubResource("Resource_0bukn"), SubResource("Resource_0fvoo"), SubResource("Resource_o32l7"), SubResource("Resource_5us7m"), SubResource("Resource_1qngj"), SubResource("Resource_5qie6"), SubResource("Resource_ewrgr"), SubResource("Resource_u4ubl"), SubResource("Resource_mi1tt"), SubResource("Resource_rx6wq"), SubResource("Resource_lpcou"), SubResource("Resource_nmrsd"), SubResource("Resource_o1k2y"), SubResource("Resource_54ysb"), SubResource("Resource_uo6hv"), SubResource("Resource_dg2c2"), SubResource("Resource_3frbw"), SubResource("Resource_c8wha"), SubResource("Resource_yw80b"), SubResource("Resource_qp4hd"), SubResource("Resource_2g1c1"), SubResource("Resource_lmow8"), SubResource("Resource_5cyfj"), SubResource("Resource_ox468"), SubResource("Resource_16sv4"), SubResource("Resource_x1rr1")])
+entries = Array[ExtResource("1_5fyfp")]([SubResource("Resource_2woyv"), SubResource("Resource_d18p2"), SubResource("Resource_o6odg"), SubResource("Resource_qjpsi"), SubResource("Resource_8hpxx"), SubResource("Resource_iu6ju"), SubResource("Resource_xxjd7"), SubResource("Resource_2u5yj"), SubResource("Resource_8jum6"), SubResource("Resource_qb42j"), SubResource("Resource_p70og"), SubResource("Resource_kejka"), SubResource("Resource_kyjv3"), SubResource("Resource_3sjhw"), SubResource("Resource_15pcx"), SubResource("Resource_dji1g"), SubResource("Resource_hyhjn"), SubResource("Resource_hp3pa"), SubResource("Resource_5k22w"), SubResource("Resource_d636w"), SubResource("Resource_pp5p5"), SubResource("Resource_8cktx"), SubResource("Resource_ahn8u"), SubResource("Resource_sq8gf"), SubResource("Resource_r5uah"), SubResource("Resource_xp1mo"), SubResource("Resource_8tobh"), SubResource("Resource_uef2a"), SubResource("Resource_x6h8f"), SubResource("Resource_tma8s"), SubResource("Resource_o73a6"), SubResource("Resource_0q65d"), SubResource("Resource_8e33i"), SubResource("Resource_al0tc"), SubResource("Resource_qvxmp"), SubResource("Resource_pr4dm"), SubResource("Resource_sujdi"), SubResource("Resource_vu1h8"), SubResource("Resource_egnxw"), SubResource("Resource_tac66"), SubResource("Resource_5eunv"), SubResource("Resource_6vv7q"), SubResource("Resource_tggwl"), SubResource("Resource_kcmox"), SubResource("Resource_pa8o6"), SubResource("Resource_adqno"), SubResource("Resource_xo1nh"), SubResource("Resource_0bukn"), SubResource("Resource_0fvoo"), SubResource("Resource_r1oyr"), SubResource("Resource_o32l7"), SubResource("Resource_cyg40"), SubResource("Resource_4owrd"), SubResource("Resource_5us7m"), SubResource("Resource_1qngj"), SubResource("Resource_5qie6"), SubResource("Resource_ewrgr"), SubResource("Resource_u4ubl"), SubResource("Resource_mi1tt"), SubResource("Resource_rx6wq"), SubResource("Resource_lpcou"), SubResource("Resource_nmrsd"), SubResource("Resource_o1k2y"), SubResource("Resource_54ysb"), SubResource("Resource_narpj"), SubResource("Resource_uo6hv"), SubResource("Resource_dg2c2"), SubResource("Resource_3frbw"), SubResource("Resource_c8wha"), SubResource("Resource_yw80b"), SubResource("Resource_qp4hd"), SubResource("Resource_2g1c1"), SubResource("Resource_lmow8"), SubResource("Resource_5cyfj"), SubResource("Resource_ox468"), SubResource("Resource_16sv4"), SubResource("Resource_x1rr1")])

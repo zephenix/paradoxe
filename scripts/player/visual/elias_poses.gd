@@ -118,6 +118,14 @@ const POSES: Dictionary = {
 		"torso": 25, "head": -18, "arm_f": -120, "fore_f": 70, "arm_b": 20, "fore_b": 30, "coat": -40},
 	"crouch_throw_release": {"hips_y": 24, "thigh_f": 75, "shin_f": -125, "thigh_b": 60, "shin_b": -120,
 		"torso": 45, "head": -25, "arm_f": 105, "fore_f": 10, "arm_b": 10, "fore_b": 30, "coat": -40},
+	# Interactions et gestes (J7), partagés avec le compagnon.
+	"reach": {"torso": 10, "head": 4, "hips_y": 2, "arm_f": 78, "fore_f": 18, "arm_b": 10, "fore_b": 20,
+		"thigh_f": 10, "shin_f": -6, "thigh_b": -8, "shin_b": -4},
+	"beckon": {"torso": -4, "head": -4, "arm_f": 70, "fore_f": 95, "arm_b": 6, "fore_b": 12},
+	"halt": {"torso": -2, "head": -2, "arm_f": 95, "fore_f": -35, "arm_b": 8, "fore_b": 12},
+	"touch_chest": {"torso": 8, "head": 14, "arm_f": 45, "fore_f": 125, "arm_b": 4, "fore_b": 10},
+	"cower": {"hips_y": 20, "thigh_f": 70, "shin_f": -115, "thigh_b": 55, "shin_b": -110,
+		"torso": 30, "head": -10, "arm_f": 150, "fore_f": 70, "arm_b": 140, "fore_b": 75, "coat": -35},
 	# À genou (tir bas des Sentinelles) : jambes de l'accroupi, buste droit.
 	"kneel_aim": {"hips_y": 24, "thigh_f": 75, "shin_f": -125, "thigh_b": 60, "shin_b": -120,
 		"torso": 8, "head": -4, "arm_f": 82, "fore_f": 0, "arm_b": 40, "fore_b": 70, "coat": -40},
@@ -167,6 +175,15 @@ const ANIMATIONS: Dictionary = {
 	"throw": {"length": 0.4, "keys": [[0.0, "stand"], [0.12, "throw_back"], [0.2, "throw_release"], [0.4, "stand"]]},
 	"crouch_throw": {"length": 0.4,
 		"keys": [[0.0, "crouch"], [0.12, "crouch_throw_back"], [0.2, "crouch_throw_release"], [0.4, "crouch"]]},
+	# Interactions et gestes (J7).
+	"interact": {"length": 0.35, "keys": [[0.0, "stand"], [0.15, "reach"], [0.35, "stand"]]},
+	"beckon": {"length": 0.8, "keys": [[0.0, "stand"], [0.2, "beckon"], [0.4, "beckon", false, {"fore_f": 55}],
+		[0.6, "beckon"], [0.8, "stand"]]},
+	"halt": {"length": 0.8, "keys": [[0.0, "stand"], [0.2, "halt"], [0.6, "halt"], [0.8, "stand"]]},
+	"touch_pendant": {"length": 2.0, "keys": [[0.0, "stand"], [0.4, "touch_chest"], [1.6, "touch_chest"], [2.0, "stand"]]},
+	"cower": {"length": 0.3, "keys": [[0.0, "stand"], [0.3, "cower"]]},
+	"lie": {"length": 1.0, "loop": true, "keys": [[0.0, "lying"], [1.0, "lying"]]},
+	"get_up": {"length": 1.3, "keys": [[0.0, "lying"], [0.5, "collapse"], [0.9, "crouch"], [1.3, "stand"]]},
 	"death": {"length": 0.8, "keys": [[0.0, "land_heavy"], [0.25, "collapse"], [0.7, "lying"], [0.8, "lying"]],
 		"events": [[0.62, "body_fall"]]},
 }

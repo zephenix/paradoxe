@@ -9,6 +9,16 @@
   "description": "Grésillement de lampe, variante 2 (événement d'ambiance, J5).",
   "loop": false
  },
+ "amb_chain_01": {
+  "category": "ambience",
+  "description": "Chaînes qui tintent, variante 1 (événement d'ambiance, J7).",
+  "loop": false
+ },
+ "amb_chain_02": {
+  "category": "ambience",
+  "description": "Chaînes qui tintent, variante 2 (événement d'ambiance, J7).",
+  "loop": false
+ },
  "amb_city_loop": {
   "category": "ambience",
   "description": "Ville morte au loin : rumeur sourde, tintements métalliques rares (13 s, J5).",
@@ -69,6 +79,11 @@
   "description": "Grand hall : présence de la pièce et machinerie lointaine (17 s, J5).",
   "loop": true
  },
+ "amb_jungle_loop": {
+  "category": "ambience",
+  "description": "Clairière : insectes qui stridulent, bourdonnement lumineux, souffle (15 s, J7).",
+  "loop": true
+ },
  "amb_lab_loop": {
   "category": "ambience",
   "description": "Laboratoire : ventilation et bourdonnement électrique à 50 Hz (13 s, J5).",
@@ -83,6 +98,11 @@
   "category": "ambience",
   "description": "Vent dans les ruines : souffle grave qui enfle et retombe (17 s, J5).",
   "loop": true
+ },
+ "bars_clank": {
+  "category": "sfx",
+  "description": "Porte de cellule : barreaux qui coulissent et claquent (J7).",
+  "loop": false
  },
  "breath_calm_01": {
   "category": "voice",
@@ -119,6 +139,31 @@
   "description": "Checkpoint atteint : trois notes douces qui montent (provisoire J3).",
   "loop": false
  },
+ "companion_follow": {
+  "category": "voice",
+  "description": "Compagnon : « je te suis », montée légère (J7).",
+  "loop": false
+ },
+ "companion_no": {
+  "category": "voice",
+  "description": "Compagnon : refus, « rien à faire ici » (J7).",
+  "loop": false
+ },
+ "companion_ok": {
+  "category": "voice",
+  "description": "Compagnon : « d'accord », deux syllabes affirmatives (J7).",
+  "loop": false
+ },
+ "companion_surprise": {
+  "category": "voice",
+  "description": "Compagnon : stupeur, souffle coupé puis murmure (rencontre, J7).",
+  "loop": false
+ },
+ "companion_wait": {
+  "category": "voice",
+  "description": "Compagnon : « j'attends ici », posé et descendant (J7).",
+  "loop": false
+ },
  "creature_alert": {
   "category": "creature",
   "description": "Sentinelle en alerte : aiguë et hachée (provisoire J3).",
@@ -139,9 +184,29 @@
   "description": "Sentinelle touchée : cri qui retombe (provisoire J3).",
   "loop": false
  },
+ "creature_menace": {
+  "category": "creature",
+  "description": "Sentinelle menaçante : grognement grave et long (capture, J7).",
+  "loop": false
+ },
  "creature_search": {
   "category": "creature",
   "description": "Sentinelle qui cherche : grognement grave, interrogatif (provisoire J3).",
+  "loop": false
+ },
+ "door_slide": {
+  "category": "sfx",
+  "description": "Porte qui coulisse : glissement mécanique et butée (J7).",
+  "loop": false
+ },
+ "elevator_loop": {
+  "category": "sfx",
+  "description": "Ascenseur en mouvement : moteur et câbles (boucle de 2 s, J7).",
+  "loop": true
+ },
+ "elevator_stop": {
+  "category": "sfx",
+  "description": "Ascenseur qui s'arrête : butée lourde (J7).",
   "loop": false
  },
  "foley_body_fall": {
@@ -289,9 +354,24 @@
   "description": "Tir qui frappe le décor : choc et grésillement (provisoire J3).",
   "loop": false
  },
+ "item_pickup": {
+  "category": "sfx",
+  "description": "Objet ramassé : déclic et tissu (J7).",
+  "loop": false
+ },
  "lamp_break": {
   "category": "sfx",
   "description": "Lampe brisée par un tir : verre qui éclate, grésillement qui meurt (J6).",
+  "loop": false
+ },
+ "lever_pull": {
+  "category": "sfx",
+  "description": "Levier : frottement métallique et claquement (J7).",
+  "loop": false
+ },
+ "plate_click": {
+  "category": "sfx",
+  "description": "Plaque de pression : déclic sourd (J7).",
   "loop": false
  },
  "portal_hum_loop": {
@@ -357,6 +437,11 @@
  "stone_throw": {
   "category": "foley",
   "description": "Pierre lancée : bras qui fouette l'air (J6).",
+  "loop": false
+ },
+ "terminal_beep": {
+  "category": "sfx",
+  "description": "Terminal : deux bips montants (J7).",
   "loop": false
  },
  "test_impact": {

@@ -67,11 +67,17 @@ FAMILIES: dict[str, tuple[float, float, list[str]]] = {
     "Bouclier levé / baissé": (-28.0, 2.0, ["shield_up", "shield_down"]),
     "Signaux de l'arme": (-31.5, 2.0, ["weapon_charge_ready", "weapon_empty"]),
     "Voix des Sentinelles": (-21.0, 1.5, [
-        "creature_alert", "creature_calm", "creature_curious", "creature_death", "creature_search"]),
+        "creature_alert", "creature_calm", "creature_curious", "creature_death", "creature_search",
+        "creature_menace"]),
+    "Voix du compagnon": (-22.0, 1.5, [
+        "companion_ok", "companion_follow", "companion_wait", "companion_no", "companion_surprise"]),
+    "Mécanismes (J7)": (-27.0, 2.0, [
+        "lever_pull", "plate_click", "door_slide", "bars_clank", "elevator_stop", "elevator_loop",
+        "terminal_beep", "item_pickup"]),
     "Couches d'ambiance": (-32.0, 2.5, [
         "amb_city_loop", "amb_electric_loop", "amb_hall_loop", "amb_lab_loop",
-        "amb_shaft_loop", "amb_wind_loop"]),
-    "Évènements d'ambiance": (-32.5, 2.0, ["amb_buzz", "amb_creak", "amb_cry", "amb_debris", "amb_drip"]),
+        "amb_shaft_loop", "amb_wind_loop", "amb_jungle_loop"]),
+    "Évènements d'ambiance": (-32.5, 2.0, ["amb_buzz", "amb_creak", "amb_cry", "amb_debris", "amb_drip", "amb_chain"]),
     "Interface": (-20.0, 1.5, ["ui_confirm", "ui_back"]),
 }
 
