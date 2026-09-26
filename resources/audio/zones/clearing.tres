@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AcousticZone" format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/acoustic_zone.gd" id="1_zone"]
+
+[resource]
+script = ExtResource("1_zone")
+id = &"clearing"
+title = "Clairière"
+layers = Array[StringName]([&"amb_jungle_loop", &"amb_wind_loop"])
+layer_volumes_db = Array[float]([0.0, -8.0])
+swell_depth_db = 3.0
+swell_period = 19.0
+events = Array[StringName]([&"amb_cry", &"amb_creak"])
+event_interval_min = 5.0
+event_interval_max = 12.0
+event_distance_min = 500.0
+event_distance_max = 1500.0
+event_volume_db = -4.0
+reverb_wet = 0.03
+reverb_room_size = 0.3
+reverb_damping = 0.7
+lowpass_hz = 20500.0

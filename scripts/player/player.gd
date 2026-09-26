@@ -103,8 +103,39 @@ func _physics_process(delta: float) -> void:
 		time_since_grounded += delta
 		air_top_y = minf(air_top_y, global_position.y)
 	machine.physics_update(delta)
+	_update_orders(delta)
 	if not is_dead and global_position.y > kill_y:
 		kill(&"fall")
+
+
+# --------------------------------------------------------------------------
+# Ordres au compagnon (J7)
+# --------------------------------------------------------------------------
+
+## Durée d'appui en cours sur « Ordre » (secondes), et vrai une fois l'ordre
+## long donné (pour ne pas le répéter tant que la touche reste enfoncée).
+var _order_held: float = 0.0
+var _order_long_done: bool = false
+
+
+## Appui court sur « Ordre » (relâché avant long_press_time) : le compagnon
+## bascule entre suivre et attendre. Appui long : il actionne le mécanisme
+## marqué le plus proche d'Élias (« Active ça »), ou refuse s'il n'y en a pas.
+func _update_orders(delta: float) -> void:
+	var buddy: Companion = get_tree().get_first_node_in_group(&"companion") as Companion
+	if buddy == null or is_dead:
+		_order_held = 0.0
+		return
+	if input.order:
+		_order_held += delta
+		if not _order_long_done and _order_held >= buddy.config.long_press_time:
+			_order_long_done = true
+			buddy.order_activate(Interactable.nearest_for_companion(self, global_position, buddy.config.order_range))
+		return
+	if _order_held > 0.0 and not _order_long_done:
+		buddy.order_toggle()
+	_order_held = 0.0
+	_order_long_done = false
 
 
 # --------------------------------------------------------------------------

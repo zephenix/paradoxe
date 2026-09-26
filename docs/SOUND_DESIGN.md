@@ -297,6 +297,34 @@ le bruit et une Sentinelle divise le rayon par deux** (deux murs : par quatre). 
 | `stone_throw` | Bras qui fouette l'air | Lancer une pierre | SFX | 60 px |
 | `stone_pickup` | Cailloux qui s'entrechoquent | Ramasser des pierres | SFX | 60 px |
 
+### Compagnon, mécanismes, cellules (J7)
+
+Le compagnon, un vieil homme, parle une langue qu'on ne comprend pas : comme pour les
+Sentinelles, **l'intonation porte le sens**. Sa voix est humaine, plus grave et plus voilée.
+
+| Son | Rôle | Déclencheur | Bus | Rayon |
+|---|---|---|---|---|
+| `companion_ok` | « D'accord » : deux syllabes affirmatives | Ordre « Active ça » accepté | Voix | — |
+| `companion_follow` | « Je te suis » : montée légère | Ordre court : suivre | Voix | — |
+| `companion_wait` | « J'attends ici » : posé, descendant | Ordre court : attendre | Voix | — |
+| `companion_no` | « Rien à faire ici » : deux syllabes brèves | Ordre long sans mécanisme marqué | Voix | — |
+| `companion_surprise` | Souffle coupé, puis murmure | Cinématique de la rencontre | Voix | — |
+| `creature_menace` | Grognement grave et long | Cinématique de la capture | Voix | — |
+| `lever_pull` | Frottement métallique et claquement | Levier actionné | SFX | 150 px |
+| `plate_click` | Déclic sourd | Plaque enfoncée ou relâchée | SFX | — |
+| `door_slide` | Glissement mécanique et butée | Porte pleine qui s'ouvre ou se ferme | SFX | 250 px |
+| `bars_clank` | Barreaux qui coulissent et claquent | Porte de cellule | SFX | 300 px |
+| `elevator_loop` | Moteur et câbles (boucle de 2 s) | Ascenseur en mouvement | SFX | — |
+| `elevator_stop` | Butée lourde | Ascenseur arrivé | SFX | 250 px |
+| `terminal_beep` | Deux bips montants | Terminal | SFX | — |
+| `item_pickup` | Déclic et tissu | Objet ramassé (casier) | SFX | — |
+| `amb_jungle_loop` (15 s) | Insectes, bourdonnement lumineux, souffle | Zone `clearing` (écran 4) | Ambiance | — |
+| `amb_chain` (2 variantes) | Chaînes qui tintent | Zone `cells` (écran 5) | Ambiance | — |
+
+Zones : `clearing` (clairière : jungle, vent léger, cris lointains, très peu d'écho) et
+`cells` (cellules : grondement, grésillement, gouttes, chaînes, écho modéré). À la capture,
+l'ambiance s'éteint d'un coup (`set_zone(&"")`) : le **silence** annonce le danger.
+
 ### Interface (J5)
 
 | Son (`ui/`) | Rôle | Bus |

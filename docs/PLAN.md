@@ -242,6 +242,9 @@ setup.sh, export_presets.cfg, project.godot, README.md, CLAUDE.md, CREDITS.md
 `cutscenes/intro.tscn` (cinématique d'ouverture), `cutscenes/capture.tscn`, `cutscenes/meeting.tscn`, `cutscenes/ending.tscn`,
 `levels/prototype.tscn` (le niveau complet), `levels/test_level.tscn` (salle de test J2–J3).
 
+*État en J7 :* s'ajoutent `characters/companion.tscn` et `levels/prototype.tscn` (écrans 4
+et 5 ; les écrans 6 à 8 viendront en J8). Les objets interactifs (leviers, portes,
+ascenseur…) n'ont pas de scène : ce sont des scripts posés sur des nœuds du niveau.
 *État en J3 :* existent `player/elias.tscn`, `enemies/sentinel.tscn`,
 `props/checkpoint.tscn`, `levels/test_level.tscn` et `ui/title_screen.tscn`. Les
 projectiles, les boucliers et l'arme n'ont pas de scène : ils sont créés par le code
@@ -427,6 +430,18 @@ stateDiagram-v2
   vocalisation (pas de texte).
 - Énigmes à deux (écran 5) : deux leviers éloignés à actionner ensemble ; une plaque de
   pression qui tient une porte ouverte ; un ascenseur manœuvré par l'un pour l'autre.
+- *Précisions de J7* (réglages dans `resources/characters/companion.tres`) :
+  - appui long = 0,45 s ; le mécanisme désigné est le plus proche d'Élias parmi ceux
+    marqués d'une **spirale verte** (à 340 px au plus). Sans mécanisme marqué, il refuse
+    (« rien à faire ici ») ;
+  - après avoir actionné un mécanisme, il **attend sur place** ; sur une plaque de
+    pression, il la tient donc ;
+  - pour rejoindre Élias à un autre étage, il monte sur l'ascenseur à son niveau et attend
+    qu'on le fasse partir. Il ne grimpe pas (pas de points de passage : l'écran 5 n'en a
+    pas besoin) ;
+  - les tirs le traversent (il n'est pas une cible) ;
+  - il est rembobinable, comme les mécanismes (leviers, plaques, portes, ascenseur,
+    objets ramassés).
 
 ### 5.7 Interactions, checkpoints, mort (J3, J7)
 - Une seule touche « Interagir » : le premier objet interactif à portée devant Élias réagit.
@@ -438,6 +453,12 @@ stateDiagram-v2
   poste, sauf celles tuées **avant** le dernier checkpoint atteint. Charger un niveau
   commence une nouvelle partie. Le ralenti et le choix « rembobiner » arrivent en J4 ; la
   touche « Interagir » attendra les premiers objets interactifs (J7).
+- *Précisions de J7* : « Interagir » actionne l'objet le plus proche **devant** Élias, à
+  portée de main (44 px). Objets : levier (à bascule, ou à ressort : il revient seul après
+  quelques secondes), plaque de pression, porte (un ou tous ses interrupteurs, verrouillée
+  ouverte ou non), ascenseur (une impulsion l'envoie à l'autre arrêt), terminal (envoie une
+  impulsion), casier (objet à ramasser). À la capture, l'arme d'Élias est confisquée ; il
+  la retrouve dans un casier de l'écran 5.
 
 ### 5.8 Mode chrono et fantôme (J9)
 - Chrono de l'écran 2 à la fin (les cinématiques sont passées automatiquement).
@@ -488,6 +509,13 @@ parole compréhensible. On reprend cette grammaire, avec nos propres images.
   une touche 1 s, avec une jauge discrète) et rend la main au jeu à la fin.
 - Les cinématiques « dans le décor » (capture, rencontre avec Marek, fin) utilisent le
   même lecteur, mais leurs plans filment directement les salles du niveau.
+- *Précisions de J7* : les cinématiques dans le décor sont écrites comme un **scénario en
+  étapes** (`Cutscene.run`, une suite d'`await ctx.wait(…)`, `ctx.walk(…)`…), plus simple
+  à lire et à modifier qu'une piste d'`AnimationPlayer` pour des scènes aussi courtes.
+  Chaque cinématique dit aussi son **état final** (`Cutscene.finish`), appliqué même si le
+  joueur la passe. L'`AnimationPlayer` reste prévu pour l'intro de J8 (plans détaillés).
+  Figurants : `Puppet` (un personnage sans IA). Passer : maintenir 1 s. Pendant une
+  cinématique, Échap ne quitte pas le niveau.
 
 **Découpage de la cinématique d'ouverture** (≈ 75 s, 11 plans)
 

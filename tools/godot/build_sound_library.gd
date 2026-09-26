@@ -85,6 +85,21 @@ const OVERRIDES: Dictionary = {
 	&"stone_impact": {"volume_db": 0.5, "noise_radius": 520.0},
 	&"stone_throw": {"volume_db": -12.0, "noise_radius": 60.0},
 	&"stone_pickup": {"volume_db": -12.0, "noise_radius": 60.0},
+	&"lever_pull": {"volume_db": -2.0, "noise_radius": 150.0},
+	&"plate_click": {"volume_db": -1.0},
+	&"door_slide": {"volume_db": -12.5, "noise_radius": 250.0},
+	&"bars_clank": {"volume_db": -4.0, "noise_radius": 300.0},
+	&"elevator_loop": {"volume_db": -16.0, "pitch_random": 0.0, "volume_random_db": 0.0},
+	&"elevator_stop": {"volume_db": -9.0, "noise_radius": 250.0},
+	&"terminal_beep": {"volume_db": -12.0},
+	&"item_pickup": {"volume_db": 7.0},
+	&"companion_ok": {"volume_db": -6.0},
+	&"companion_follow": {"volume_db": -6.0},
+	&"companion_wait": {"volume_db": -6.0},
+	&"companion_no": {"volume_db": -6.0},
+	&"companion_surprise": {"volume_db": -6.0},
+	&"creature_menace": {"volume_db": -6.0},
+	&"amb_chain": {"volume_db": -4.5},
 }
 
 

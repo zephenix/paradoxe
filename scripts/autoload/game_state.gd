@@ -20,6 +20,9 @@ var rewinds_left: int = 0
 
 ## Objets possédés, par identifiant (J7).
 var inventory: Array[StringName] = []
+## Élias a-t-il perdu son arme (J7 : confisquée à la capture, écran 4) ? Il la
+## retrouve en ramassant l'objet « pistol ». Par défaut, il est armé.
+var unarmed: bool = false
 
 ## Partie en mode chrono (J9).
 var time_trial: bool = false
@@ -68,3 +71,28 @@ func new_game() -> void:
 	checkpoint_facing = 1
 	reset_rewinds()
 	inventory.clear()
+	unarmed = false
+
+
+# --------------------------------------------------------------------------
+# Inventaire (J7)
+# --------------------------------------------------------------------------
+
+## Vrai si Élias possède l'objet « item ».
+func has_item(item: StringName) -> bool:
+	return inventory.has(item)
+
+
+## Ajoute un objet. Ramasser son arme (« pistol ») la lui rend.
+func add_item(item: StringName) -> void:
+	if not inventory.has(item):
+		inventory.append(item)
+	if item == &"pistol":
+		unarmed = false
+
+
+## Retire un objet (rembobinage d'un ramassage, confiscation…).
+func remove_item(item: StringName) -> void:
+	inventory.erase(item)
+	if item == &"pistol":
+		unarmed = true

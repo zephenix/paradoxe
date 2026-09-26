@@ -15,6 +15,8 @@ func physics_update(delta: float) -> void:
 		return
 	if handle_throw_action():
 		return
+	if handle_interact_action():
+		return
 	if p.input.move != 0:
 		if p.input.move != p.facing:
 			machine.transition_to(&"Turn")

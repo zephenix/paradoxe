@@ -91,6 +91,12 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   Lancer (J6) : `player.stones = n` puis `input.press(&"throw")`.
   Combat : `input.press(&"fire")` + `input.fire = true` pour charger, `input.shield = true`
   pour le bouclier. Un tir ennemi se crée directement (`Projectile.new()` puis `setup()`).
+- Compagnon et objets (J7) : `player.input.order = true/false` (appui court ou long,
+  long = `config.long_press_time`) ; `player.input.press(&"interact")`. Un mécanisme créé
+  dans un test après ses interrupteurs doit être relié : `door.connect_switches()`.
+- Cinématiques (J7) : `level.cutscenes.input_from_devices = false`, puis
+  `level.cutscenes.skip_held = true` pour passer. Remettre `SceneTransition.fade_in(0.0)`
+  et `GameState.new_game()` dans `after_each()` (la capture désarme Élias).
 - Mort d'Élias (J4) : en mode moderne, avec assez d'historique, la séquence de mort
   (`level.death`, un `DeathController`) ralentit, **met le jeu en pause** et attend un choix.
   Dans un test : `level.death.input_from_devices = false`, puis `rewind_held = true/false`
@@ -140,6 +146,11 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   dans les salles et les cercles de « Voir les sons » sont dans des `CanvasLayer` qui suivent
   la caméra, sinon la pénombre les rendrait illisibles. Les lampes sont sur la couche
   physique `PROPS` (128), que visent tirs et pierres.
+- **Interactions (J7)** : un objet interactif hérite d'`Interactable` (groupe
+  `interactables`) et redéfinit `_on_interact(by)`. Portes et ascenseurs se relient à leurs
+  interrupteurs par `NodePath` (`switches`) et écoutent leur signal `changed`. Les
+  Controls d'un `CanvasLayer` (bandes noires…) se règlent par leurs `offset_*`, pas par
+  `size` (sinon avertissement « non-equal opposite anchors »).
 - **Perception (J6)** : dans un test, `sentinel.hear(position, quantité)` simule un indice ;
   `sentinel.visibility` et `sentinel.suspicion` se lisent directement. Une salle de test
   doit contenir une `Room` pour que sa lumière ambiante compte (sinon 1 : plein jour).

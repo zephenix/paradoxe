@@ -59,7 +59,7 @@ func test_time_in_state_counts_and_resets() -> void:
 func test_every_player_state_has_a_script_and_animation() -> void:
 	var elias: Node = load("res://scenes/player/elias.tscn").instantiate()
 	var states: Node = elias.get_node("StateMachine")
-	assert_eq(states.get_child_count(), 21, "16 états de déplacement + 4 de combat + le lancer (J6)")
+	assert_eq(states.get_child_count(), 22, "16 états de déplacement + 4 de combat + lancer (J6) + interagir (J7)")
 	for child in states.get_children():
 		assert_true(child is PlayerState, "%s hérite de PlayerState" % child.name)
 	elias.free()

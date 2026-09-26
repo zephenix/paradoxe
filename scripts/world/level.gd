@@ -31,6 +31,8 @@ const AMBIENT_FADE: float = 0.8
 
 ## Séquence de mort et rembobinage.
 var death: DeathController
+## Lecteur de cinématiques (J7).
+var cutscenes: CutscenePlayer
 ## Teinte de la lumière ambiante (J6) : une pour le monde, une pour le ciel.
 var ambient_tint: CanvasModulate
 var _sky_tint: CanvasModulate
@@ -66,6 +68,9 @@ func _ready() -> void:
 	death = DeathController.new()
 	death.name = "DeathController"
 	add_child(death)
+	cutscenes = CutscenePlayer.new()
+	cutscenes.name = "Cutscenes"
+	add_child(cutscenes)
 	# Pendant le défilement arrière, le jeu est en pause : la caméra ne suit plus
 	# d'elle-même, on la recadre à chaque image.
 	death.scrubbed.connect(camera.snap_to_target)
@@ -167,7 +172,8 @@ func _create_tints() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"pause"):
+	# Pendant une cinématique, Échap sert à la passer (maintenue), pas à quitter.
+	if event.is_action_pressed(&"pause") and not (cutscenes and cutscenes.playing):
 		get_viewport().set_input_as_handled()
 		SceneTransition.change_scene("res://scenes/ui/title_screen.tscn")
 
