@@ -78,8 +78,12 @@ func new_game() -> void:
 # Inventaire (J7)
 # --------------------------------------------------------------------------
 
-## Vrai si Élias possède l'objet « item ».
+## Vrai si Élias possède l'objet « item ». L'arme (« pistol ») est un cas à part :
+## Élias l'a dès le début, sans qu'elle soit rangée dans l'inventaire ; il ne la
+## perd que si on la lui confisque (« unarmed »).
 func has_item(item: StringName) -> bool:
+	if item == &"pistol":
+		return not unarmed
 	return inventory.has(item)
 
 

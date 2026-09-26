@@ -1254,7 +1254,7 @@ laisserait Élias « tomber vers le haut » à travers elle.
 - **Banc d'écoute** : catégorie Musique et curseur « tension ».
 - **Sons** : 26 nouveaux fichiers (9 musiques, 14 bruitages de l'intro, 3 pour le Traqueur),
   deux zones (`arrival`, `canopy`).
-- **Tests** : 312 au total (24 nouveaux).
+- **Tests** : 314 au total (26 nouveaux).
 
 ### Comment tester
 
@@ -1307,18 +1307,24 @@ laisserait Élias « tomber vers le haut » à travers elle.
 - **Pas de cinématique pendant la poursuite** : Marek ouvre la porte sans bloquer Élias.
 - **Le plan final est une composition dessinée** (comme les plans de l'intro) : le recul de
   la caméra est un agrandissement qui diminue.
+- **Après tes premiers essais** : on pouvait quitter l'écran 5 sans avoir repris son arme
+  au casier, et arriver désarmé au combat de l'écran 7, sans pouvoir revenir. La sortie des
+  cellules exige maintenant l'arme, et un texte dit ce qui manque (« Votre arme est restée
+  dans le casier », ou « Pas sans Marek »). Le message « attendre Marek » annoncé en J7
+  n'existait pas en réalité : il est fait maintenant.
 
 ### Vérifications effectuées
 
-- **312 tests** au vert. Nouveaux fichiers :
+- **314 tests** au vert. Nouveaux fichiers :
   - `test_music.gd` (6) : bibliothèque, couches calées, un thème à la fois, couches qui
     suivent l'alerte, silence sous un thème, arrêt en quittant le niveau ;
   - `test_intro.gd` (5) : table de montage, plans à l'heure, sons, silence du plan 10,
     passer l'intro sans laisser de son ;
   - `test_prototype_arrival.gd` (7) : arrivée, fuite, rattrapé en marchant, rembobinage,
     traversée de la canopée, trous mortels ;
-  - `test_prototype_finale.gd` (5) : passage vers les ruines, départ de Marek, passerelle
-    sans être vu, combat du hall et ascenseur, poursuite, porte, plan final, rattrapé.
+  - `test_prototype_finale.gd` (7) : sortie des cellules (arme et Marek exigés), passage
+    vers les ruines, départ de Marek, passerelle sans être vu, combat du hall et ascenseur,
+    poursuite, porte, plan final, rattrapé.
 - **Le prototype de bout en bout** : chaque test de parcours finit là où commence le
   suivant (arrivée, canopée, clairière, cellules, ruines, hall, poursuite, fin).
 - **Contrôle par mutation** : 5 erreurs réintroduites, 5 détectées (Traqueur trop lent,
