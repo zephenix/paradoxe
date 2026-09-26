@@ -126,6 +126,9 @@ func test_screens_4_and_5_end_to_end() -> void:
 	level.cutscenes.skip_held = false
 	await wait_physics(10)
 	var rx: float = room5.global_position.x
+	# Dès le réveil, au fond de sa cellule, Élias peut désigner le levier de Marek.
+	assert_eq(Interactable.nearest_for_companion(player, player.global_position, buddy.config.order_range),
+			room5.get_node("LeverB"), "levier de Marek à portée d'ordre depuis le réveil")
 	# --- Cellules : les deux leviers ensemble ---
 	assert_true(await walk_to(350.0, rx), "près de son levier")
 	await face(1)

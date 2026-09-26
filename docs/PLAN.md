@@ -432,7 +432,9 @@ stateDiagram-v2
   pression qui tient une porte ouverte ; un ascenseur manœuvré par l'un pour l'autre.
 - *Précisions de J7* (réglages dans `resources/characters/companion.tres`) :
   - appui long = 0,45 s ; le mécanisme désigné est le plus proche d'Élias parmi ceux
-    marqués d'une **spirale verte** (à 340 px au plus). Sans mécanisme marqué, il refuse
+    marqués d'une **spirale verte** (à 500 px au plus). Pendant l'appui, un **anneau** se
+    remplit au-dessus d'Élias et la spirale visée s'entoure d'un cercle (anneau gris :
+    rien à portée). Sans mécanisme marqué, il refuse
     (« rien à faire ici ») ;
   - après avoir actionné un mécanisme, il **attend sur place** ; sur une plaque de
     pression, il la tient donc ;

@@ -299,7 +299,7 @@ offset_right = 1180
 offset_bottom = 204
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
-text = "ÉCRAN 5 : CELLULES. E : interagir (levier, casier, terminal).\nQ : ordre au compagnon. Appui court : suivre / attendre.\nAppui long près d'une spirale verte : « Active ça ».\nLes deux leviers des cellules doivent être tirés ensemble."
+text = "ÉCRAN 5 : CELLULES. E : interagir (levier, casier, terminal).\nQ (A en AZERTY) : ordre au compagnon. Appui bref : suis-moi / attends.\nMaintenir Q (A) jusqu'à remplir l'anneau : « Active ça » sur la spirale verte entourée.\nLes deux leviers des cellules doivent être tirés ensemble."
 
 [node name="EndLabel" type="Label" parent="Room5"]
 offset_left = 1150

@@ -1098,7 +1098,8 @@ cherche le suivant.
   - appui court : **suis-moi / attends ici** ;
   - appui long : **« active ça »**, sur le mécanisme marqué d'une **spirale verte** le plus
     proche d'Élias ; il y va, l'actionne, puis attend sur place (donc il tient une plaque
-    de pression) ;
+    de pression). Pendant l'appui, un **anneau** se remplit au-dessus d'Élias et la
+    spirale visée s'entoure d'un cercle vert (anneau gris : rien à portée) ;
   - rien de marqué à portée : il refuse (« rien à faire ici ») ;
   - il suit Élias d'un étage à l'autre par l'ascenseur, s'il est à son niveau ;
   - les tirs le traversent, et il suit le rembobinage comme le reste.
@@ -1135,6 +1136,7 @@ cherche le suivant.
 | Maintenir Échap pendant la cinématique | Une jauge se remplit ; on passe directement en cellule |
 | Tirer (X ou J) en cellule | Rien : l'arme a été confisquée |
 | Tirer son levier (E) seul | Il revient au bout de 3 s ; la porte reste fermée |
+| Maintenir Q (A en AZERTY) | Un anneau se remplit au-dessus d'Élias ; le levier de Marek est entouré |
 | Tirer son levier, puis maintenir Q | Marek tire le sien ; les deux portes s'ouvrent pour de bon |
 | Appui court sur Q | Marek suit, ou attend (sa réplique change) |
 | Maintenir Q loin de tout mécanisme marqué | Il refuse |
@@ -1150,7 +1152,7 @@ cherche le suivant.
 |---|---|
 | La clairière | Insectes, bourdonnement des plantes lumineuses |
 | Juste avant la capture | L'ambiance qui se coupe net, puis un grognement grave |
-| Les cellules | Grondement, gouttes, chaînes qui tintent de temps en temps |
+| Les cellules | Grondement, gouttes, chaînes qui tintent de temps en temps (plus de grésillement électrique) |
 | Ordres à Marek | Quatre intonations : d'accord, je te suis, j'attends, non |
 | Mécanismes | Levier (métal), porte à barreaux (claquement), ascenseur (moteur, puis butée) |
 
@@ -1167,6 +1169,14 @@ cherche le suivant.
   L'`AnimationPlayer` reste prévu pour l'intro détaillée de J8.
 - **L'état final de chaque cinématique** est écrit à part (`finish`) : passer une
   cinématique ou la regarder donne exactement la même situation.
+- **Après tes premiers essais** :
+  - le **grésillement électrique** permanent des cellules est retiré : aucune source à
+    l'écran ne l'expliquait. Il reste dans le laboratoire et le hall de la salle de test ;
+  - l'appui long n'était pas visible, donc on ne le découvrait pas : d'où l'**anneau** et
+    le cercle autour de la spirale visée ;
+  - la portée des ordres passe de 340 à **500 px** : depuis son réveil, au fond de sa
+    cellule, Élias était trop loin du levier de Marek, et l'ordre était refusé ;
+  - le texte de l'écran 5 indique la touche AZERTY (A).
 - **Deux leviers à ressort** pour « actionner ensemble » : un joueur seul ne peut pas
   courir de l'un à l'autre en 3 s, donc Marek est indispensable.
 

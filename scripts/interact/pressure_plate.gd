@@ -21,6 +21,7 @@ var on: bool = false
 
 
 func _init() -> void:
+	mark_offset = Vector2(0.0, -20.0)
 	companion_can_use = true
 	player_can_use = false
 
@@ -82,4 +83,4 @@ func _draw() -> void:
 	var depth: float = 1.0 if on else 4.0
 	draw_rect(Rect2(-half, -depth, width, depth), Color(0.43, 1.0, 0.69) if on else Color(0.55, 0.5, 0.35))
 	draw_rect(Rect2(-half - 3, -1, width + 6, 2), Color(0.2, 0.22, 0.25))
-	draw_companion_mark(Vector2(0, -20))
+	draw_companion_mark()

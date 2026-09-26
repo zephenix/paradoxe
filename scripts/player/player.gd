@@ -90,6 +90,10 @@ func _ready() -> void:
 	facing = start_facing
 	visual.anim_event.connect(func(event_name: StringName) -> void: anim_event.emit(event_name))
 	air_top_y = global_position.y
+	# Anneau d'ordre au compagnon, au-dessus de la tête (J7).
+	order_indicator = OrderIndicator.new()
+	order_indicator.position = Vector2(0.0, -config.stand_height - 26.0)
+	add_child(order_indicator)
 	machine.setup(self)
 
 
@@ -116,22 +120,31 @@ func _physics_process(delta: float) -> void:
 ## long donné (pour ne pas le répéter tant que la touche reste enfoncée).
 var _order_held: float = 0.0
 var _order_long_done: bool = false
+## Retour visuel de l'ordre en cours (anneau, spirale visée) : voir OrderIndicator.
+var order_indicator: OrderIndicator
 
 
 ## Appui court sur « Ordre » (relâché avant long_press_time) : le compagnon
 ## bascule entre suivre et attendre. Appui long : il actionne le mécanisme
 ## marqué le plus proche d'Élias (« Active ça »), ou refuse s'il n'y en a pas.
+## Pendant l'appui, l'indicateur montre l'anneau qui se remplit et le mécanisme
+## visé : le joueur voit qu'il faut maintenir, et sur quoi l'ordre portera.
 func _update_orders(delta: float) -> void:
 	var buddy: Companion = get_tree().get_first_node_in_group(&"companion") as Companion
 	if buddy == null or is_dead:
 		_order_held = 0.0
+		order_indicator.hide_progress()
 		return
 	if input.order:
 		_order_held += delta
+		var target: Interactable = Interactable.nearest_for_companion(self, global_position, buddy.config.order_range)
+		order_indicator.show_progress(_order_held / buddy.config.long_press_time, target)
 		if not _order_long_done and _order_held >= buddy.config.long_press_time:
 			_order_long_done = true
-			buddy.order_activate(Interactable.nearest_for_companion(self, global_position, buddy.config.order_range))
+			buddy.order_activate(target)
+			order_indicator.confirm(target)
 		return
+	order_indicator.hide_progress()
 	if _order_held > 0.0 and not _order_long_done:
 		buddy.order_toggle()
 	_order_held = 0.0
