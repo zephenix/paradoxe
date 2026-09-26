@@ -1219,3 +1219,139 @@ Un ascenseur doit bouger ET porter Élias. Un `AnimatableBody2D` est un solide q
 par le code ; avec `sync_to_physics`, le moteur calcule sa vitesse et la transmet aux
 personnages posés dessus (`CharacterBody2D`). Sans cela, la plate-forme monterait et
 laisserait Élias « tomber vers le haut » à travers elle.
+
+## J8 — La mise en scène : le prototype de bout en bout (v0.8)
+
+### Ce qui a été fait
+
+- **La cinématique d'ouverture** (75 s, 11 plans, tout en polygones) : la nuit d'orage,
+  le laboratoire sur sa falaise, le glisseur, la main sur le lecteur, le couloir aux néons,
+  la photo (Marek et son **pendentif en spirale**), le terminal, l'anneau qui s'allume en
+  vert, la foudre, les yeux d'Élias, **le silence total**, le flash, le labo vide, le titre.
+  On la passe en maintenant Échap ou Espace ; on la revoit depuis l'écran titre.
+- **La musique** (composée par le générateur Python, comme les sons) :
+  - la **tension** : trois couches jouées ensemble (nappe, pulsation grave, percussions)
+    dont le volume suit le niveau d'alerte des ennemis. Au calme : silence ;
+  - des **thèmes courts** : intro, arrivée, rencontre avec Marek, poursuite, mort, fin.
+    Fil rouge : le **motif de la spirale** (six notes qui tournent en montant), dans l'intro,
+    à la rencontre et à la fin.
+- **Les 8 écrans assemblés** dans un seul niveau :
+  2. **l'arrivée** : Élias tombe du ciel dans une ville en ruine envahie par la jungle ; la
+     caméra s'écarte, on devine l'enseigne du labo (le logo de l'intro). Puis le
+     **Traqueur** surgit : il faut courir et grimper sur une corniche ;
+  3. **la canopée** : toits, trous mortels, poutre avec passage bas, balcon, sauts avec élan,
+     descente en roulade ;
+  4. et 5. la clairière et les cellules (J7) ;
+  6. **les ruines, de nuit** : Marek montre un chemin par les hauteurs, puis s'en va par un
+     conduit ; une patrouille sous un réverbère ;
+  7. **le hall** : deux Sentinelles, des murets, un ascenseur de sortie ;
+  8. **la poursuite** : des Sentinelles surgissent derrière Élias ; obstacles, trous, passage
+     bas ; **Marek revient et ouvre la dernière porte**, puis la referme. **Plan final** : la
+     caméra recule et révèle un cratère, l'anneau du portail vert au centre, et une créature
+     qui pose un pendentif en spirale. Fin du prototype, retour au titre.
+- **Écran titre** : « Nouvelle partie » (l'intro, puis l'écran 2), « Revoir l'intro »,
+  « Prototype sans l'intro ».
+- **Banc d'écoute** : catégorie Musique et curseur « tension ».
+- **Sons** : 26 nouveaux fichiers (9 musiques, 14 bruitages de l'intro, 3 pour le Traqueur),
+  deux zones (`arrival`, `canopy`).
+- **Tests** : 312 au total (24 nouveaux).
+
+### Comment tester
+
+1. Écran titre : « **Nouvelle partie** ». Regarder l'intro (ou la passer), puis jouer.
+2. À essayer :
+
+| À essayer | Ce qui doit se passer |
+|---|---|
+| Regarder l'intro jusqu'au plan des yeux | La musique, la pluie, tout se coupe net : silence total |
+| Écran 2 : marcher vers la droite | Un rugissement : le Traqueur. Il faut courir (Maj) et grimper la corniche |
+| Écran 2 : continuer à marcher | Il vous rattrape (rembobiner pour réessayer) |
+| Écran 3 : sauter sans élan | Trop court : on tombe (mortel) ou on se rattrape au bord |
+| Écran 6 : se faire voir par la Sentinelle | La musique de tension monte par couches, puis retombe lentement |
+| Écran 6 : Q (A en AZERTY) | Rien : Marek est parti |
+| Écran 7 : monter sur l'ascenseur | Il part tout seul |
+| Écran 8 : ne pas courir | Les Sentinelles vous rattrapent ; retour au début de la poursuite |
+| Écran 8 : aller jusqu'à la porte | Marek l'ouvre ; au-delà, la fin |
+| Banc d'écoute : curseur « tension » | 0,3 : la nappe ; 0,6 : la pulsation ; 1 : les percussions |
+
+### Ce qu'il faut écouter
+
+| Moment | Ce que tu dois entendre |
+|---|---|
+| Intro, plans 1 à 3 | Pluie, tonnerre qui roule, le glisseur qui se pose |
+| Intro, plan 7 | Le thème, les arpèges, le motif de la spirale en cloches |
+| Intro, plan 10 | Plus rien (c'est voulu) ; puis un souffle grave au flash |
+| Arrivée | Le thème d'arrivée : grand, étrange, cloches clairsemées |
+| Le Traqueur | Son cri : grave, puis un hurlement rauque. Et ses pas lourds |
+| Rencontre avec Marek | Le motif de la spirale, lent, sur une nappe chaude |
+| Alerte (écrans 6-7) | Les trois couches de tension, calées ensemble |
+| Poursuite | Basse obstinée, grosse caisse ; coupée net derrière la porte |
+| Fin | Le motif de la spirale, très lent, un accord qui ne se résout pas |
+
+### Décisions prises (et pourquoi)
+
+- **L'intro est une table de montage écrite en tableaux** (plans, éclairs, sons), qui devient
+  au démarrage une animation d'AnimationPlayer. Changer le rythme = changer des nombres.
+- **Musique de tension : un lecteur par couche**, lancés sur la même image, plutôt que le
+  flux « synchronisé » de Godot : c'est plus simple et chaque volume se règle librement.
+  Les boucles ont exactement la même longueur, donc elles restent calées.
+- **Transitions musicales par fondu enchaîné**, sans l'`AudioStreamInteractive` prévu au
+  PLAN : pour quelques thèmes courts, c'est suffisant.
+- **Les salles restent dans une seule scène** (`prototype.tscn`), comme en J7 : les
+  cinématiques relient des nœuds de plusieurs salles, plus simples à désigner ainsi.
+- **La chute de l'arrivée est jouée par la cinématique** : tombé de si haut, Élias mourrait.
+- **Un seul script de poursuivant** (`Pursuer`) pour le Traqueur et les Sentinelles de
+  l'écran 8, avec deux fichiers de réglages.
+- **Le Traqueur est un peu plus rapide qu'Élias** : c'est son avance qui sauve Élias, il
+  arrive au pied du mur juste après l'escalade. Qui hésite est pris.
+- **Pas de cinématique pendant la poursuite** : Marek ouvre la porte sans bloquer Élias.
+- **Le plan final est une composition dessinée** (comme les plans de l'intro) : le recul de
+  la caméra est un agrandissement qui diminue.
+
+### Vérifications effectuées
+
+- **312 tests** au vert. Nouveaux fichiers :
+  - `test_music.gd` (6) : bibliothèque, couches calées, un thème à la fois, couches qui
+    suivent l'alerte, silence sous un thème, arrêt en quittant le niveau ;
+  - `test_intro.gd` (5) : table de montage, plans à l'heure, sons, silence du plan 10,
+    passer l'intro sans laisser de son ;
+  - `test_prototype_arrival.gd` (7) : arrivée, fuite, rattrapé en marchant, rembobinage,
+    traversée de la canopée, trous mortels ;
+  - `test_prototype_finale.gd` (5) : passage vers les ruines, départ de Marek, passerelle
+    sans être vu, combat du hall et ascenseur, poursuite, porte, plan final, rattrapé.
+- **Le prototype de bout en bout** : chaque test de parcours finit là où commence le
+  suivant (arrivée, canopée, clairière, cellules, ruines, hall, poursuite, fin).
+- **Contrôle par mutation** : 5 erreurs réintroduites, 5 détectées (Traqueur trop lent,
+  chute d'arrivée non protégée, Marek qui n'ouvre pas la porte, passage sans checkpoint,
+  tension qui ne se tait pas sous un thème). Au premier essai, un Traqueur plus rapide
+  qu'Élias passait inaperçu : la poursuite n'était pas menaçante. Je l'ai rendue plus
+  serrée, et le test vérifie maintenant qu'il se rapproche.
+- **Captures** : les 11 plans de l'intro, chaque écran (outil `prototype_tour.gd`), le plan
+  final. Elles m'ont montré des nuages en boules, un câble qui ne partait pas de l'antenne,
+  un panneau de l'écran titre qui débordait, un texte hors du cadre : corrigés.
+- **Web** : export vérifié dans Chromium (démarrage, son, version 0.8.0).
+
+### Reste à faire / points d'attention
+
+- **À régler en jouant** : la vitesse des poursuivants (`resources/enemies/tracker.tres`,
+  `sentinel_pursuer.tres`), les seuils de la tension (`resources/audio/music.tres`), le
+  rythme de l'intro (tableaux de `scripts/cutscene/intro/intro_cutscene.gd`).
+- La musique est synthétisée : à écouter d'abord au banc d'écoute ; dis-moi ce qui ne va pas.
+- Jalon suivant : **J9, les finitions** (menus, options, remappage, manette, bracelet,
+  chrono et fantôme).
+
+### Concepts Godot expliqués
+
+**1. AnimationPlayer construit par le code**
+
+Un `AnimationPlayer` joue des « pistes » : une piste change une propriété dans le temps
+(`visible`, `progress`), une piste d'appels lance une fonction à un instant précis (un son).
+Au lieu de dessiner ces pistes à la souris dans l'éditeur, l'intro les fabrique au démarrage
+à partir de tableaux, comme un graphique Excel construit à partir d'une plage de cellules :
+on modifie les cellules, le graphique suit.
+
+**2. Des boucles musicales calées**
+
+Trois lecteurs démarrés sur la même image, avec trois fichiers de même longueur exacte
+(882 000 échantillons), restent alignés indéfiniment : ils avancent au même rythme, celui de
+la carte son. On peut alors monter ou baisser chaque couche sans jamais les décaler.

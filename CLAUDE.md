@@ -53,6 +53,8 @@ GAME_VERSION=0.2.0 ./tools/export.sh all     # export avec un numéro de version
 ./tools/web/check_update.sh     # vérifie qu'une nouvelle version Web remplace l'ancienne (~2 min)
 ./tools/screenshot.sh res://tools/godot/pose_sheet.tscn build/shots/poses.png 10   # planche de toutes les poses d'Élias
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/level_tour.gd -- build/shots   # visite guidée (captures)
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/prototype_tour.gd -- build/shots   # visite du prototype (écrans 2 à 8)
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/intro_frames.gd -- build/shots [instants…]   # plans de l'intro
 python3 tools/audio/generate_sounds.py       # régénère les sons + catalog.json (puis réimport Godot)
 godot --headless --path . --import           # réimporte les sons
 godot --headless --path . -s res://tools/godot/build_sound_library.gd   # ajoute les nouveaux sons à la bibliothèque
@@ -97,6 +99,13 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
 - Cinématiques (J7) : `level.cutscenes.input_from_devices = false`, puis
   `level.cutscenes.skip_held = true` pour passer. Remettre `SceneTransition.fade_in(0.0)`
   et `GameState.new_game()` dans `after_each()` (la capture désarme Élias).
+- Prototype (J8) : `level.play_opening = false` avant `add_node` (pas de cinématique
+  d'arrivée), puis déposer Élias où l'on veut ; `(level.get_node("Story/Finale") as
+  FinaleCutscene).return_to_title = false` (sinon la fin change de scène). Intro :
+  `scene.auto_leave = false`, `scene.input_from_devices = false`, et `montage.speed_scale`
+  pour l'accélérer. Poursuivants : `Pursuer` (`mode`, `Pursuer.Mode.CHASE`…). Musique :
+  `AudioManager.music` (`theme_id`, `layer_gain(i)`, `theme_started`) ; appeler
+  `AudioManager.music.silence()` dans `after_each()`.
 - Mort d'Élias (J4) : en mode moderne, avec assez d'historique, la séquence de mort
   (`level.death`, un `DeathController`) ralentit, **met le jeu en pause** et attend un choix.
   Dans un test : `level.death.input_from_devices = false`, puis `rewind_held = true/false`
@@ -151,6 +160,15 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   interrupteurs par `NodePath` (`switches`) et écoutent leur signal `changed`. Les
   Controls d'un `CanvasLayer` (bandes noires…) se règlent par leurs `offset_*`, pas par
   `size` (sinon avertissement « non-equal opposite anchors »).
+- **Musique (J8)** : `AudioManager.play_music(&"mus_…")` (un thème à la fois, fondu
+  enchaîné), `stop_music()`, `set_tension(niveau)`. La tension suit
+  `Events.alert_level_changed` (émis par le Level). Les pistes sont composées par
+  `tools/audio/music.py` ; les couches de tension doivent garder exactement la même durée.
+- **Mise en scène (J8)** : une cinématique dans le décor hérite de `Cutscene` (`run`,
+  `finish`). Pendant une poursuite, pas de cinématique (elle bloquerait Élias) : un simple
+  script déclencheur (ex. `CompanionRescue`). Pour un plan dessiné (intro, fin) : hériter
+  d'`IntroShot` et dessiner selon `progress`. Captures : `tools/godot/intro_frames.gd` et
+  `tools/godot/prototype_tour.gd`.
 - **Perception (J6)** : dans un test, `sentinel.hear(position, quantité)` simule un indice ;
   `sentinel.visibility` et `sentinel.suspicion` se lisent directement. Une salle de test
   doit contenir une `Room` pour que sa lumière ambiante compte (sinon 1 : plein jour).
