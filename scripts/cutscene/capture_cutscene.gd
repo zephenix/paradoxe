@@ -54,9 +54,8 @@ func finish(ctx: CutscenePlayer) -> void:
 		var puppet: Node2D = get_node_or_null(path) as Node2D
 		if puppet:
 			puppet.visible = false
-	# Son arme lui est confisquée.
+	# Son arme lui est confisquée (GameState.remove_item le désarme).
 	GameState.remove_item(&"pistol")
-	GameState.unarmed = true
 	# Il se réveillera dans sa cellule : c'est le nouveau point de réapparition.
 	var spawn: Node2D = get_node_or_null(cell_spawn) as Node2D
 	if spawn:

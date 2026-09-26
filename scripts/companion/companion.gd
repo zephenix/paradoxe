@@ -86,11 +86,12 @@ func order_toggle() -> void:
 	machine.transition_to(mode)
 
 
-## Appui long : « Active ça ». null = rien à actionner près d'Élias : refus.
+## Appui long : « Active ça » (Interactable.nearest_for_companion ne propose que
+## les mécanismes marqués). null = rien à actionner près d'Élias : refus.
 func order_activate(item: Interactable) -> void:
 	if machine.current_name == &"Scripted":
 		return
-	if item == null or not item.companion_can_use:
+	if item == null:
 		refuse()
 		return
 	say(&"ok")

@@ -1080,3 +1080,132 @@ moteur physique : « si je tire un trait d'ici à là, qu'est-ce qu'il touche en
 compter les murs traversés par un bruit, on recommence en excluant chaque mur déjà touché.
 C'est comme une RECHERCHEV répétée : on cherche le premier obstacle, on l'écarte, on
 cherche le suivant.
+
+## J7 — Le compagnon et l'évasion (v0.7)
+
+### Ce qui a été fait
+
+- **Les objets interactifs** (touche **E**) : Élias actionne l'objet le plus proche
+  **devant lui**, à portée de main, avec un geste qui va à son terme. Objets :
+  - **levier** : à bascule, ou à ressort (il revient seul après quelques secondes) ;
+  - **plaque de pression** : enfoncée tant que quelqu'un se tient dessus ;
+  - **porte** : pleine ou à barreaux, reliée à un ou plusieurs interrupteurs (tous
+    ensemble ou un seul), verrouillée ouverte ou non ;
+  - **ascenseur** : une impulsion l'envoie à l'autre arrêt, en emportant ce qui est dessus ;
+  - **terminal** : envoie une impulsion (appeler l'ascenseur) ;
+  - **casier** : un objet à ramasser, ici l'arme d'Élias.
+- **Le compagnon, Marek**, un vieux prisonnier (touche **Q**, ou **A** en AZERTY) :
+  - appui court : **suis-moi / attends ici** ;
+  - appui long : **« active ça »**, sur le mécanisme marqué d'une **spirale verte** le plus
+    proche d'Élias ; il y va, l'actionne, puis attend sur place (donc il tient une plaque
+    de pression) ;
+  - rien de marqué à portée : il refuse (« rien à faire ici ») ;
+  - il suit Élias d'un étage à l'autre par l'ascenseur, s'il est à son niveau ;
+  - les tirs le traversent, et il suit le rembobinage comme le reste.
+  Il parle une langue inconnue : c'est l'intonation qui porte le sens.
+- **Les cinématiques** : bandes noires, maintenir **Échap** ou **Espace** 1 s pour passer
+  (une jauge se remplit). Une cinématique est un petit scénario en étapes (marcher,
+  attendre, parler, fondu…) qui dit aussi son **état final**, appliqué même si on la passe.
+- **Le prototype, écrans 4 et 5** (bouton « Prototype » de l'écran titre) :
+  - **écran 4, la clairière** : végétation luminescente, bruits de jungle. Au milieu, le
+    silence tombe d'un coup : trois Sentinelles sortent de l'ombre et encerclent Élias
+    (cinématique de la **capture**). Son arme est confisquée ;
+  - **écran 5, les cellules** : Élias se réveille ; dans la cellule voisine, Marek touche
+    son pendentif (cinématique de la **rencontre**). Puis l'**évasion à deux** :
+    1. deux leviers à ressort à tirer **en même temps**, un dans chaque cellule ;
+    2. une plaque de pression que Marek tient pendant qu'Élias passe la porte, puis un
+       levier qui la bloque ouverte ;
+    3. le casier où Élias retrouve son arme ;
+    4. l'ascenseur : Marek l'envoie en haut avec Élias, Élias le renvoie en bas au
+       terminal, Marek monte dessus, Élias le fait remonter ;
+    5. la sortie, **à deux** (seul, un message rappelle d'attendre Marek).
+- **Sons** : 16 nouveaux (voix du compagnon, mécanismes, jungle, chaînes), deux zones
+  d'ambiance (`clearing`, `cells`), deux nouvelles familles d'équilibrage.
+- **Tests** : 288 au total (25 nouveaux), dont **les écrans 4 et 5 de bout en bout**. Le
+  test joue comme un joueur : Élias est piloté, et le compagnon ne reçoit que des ordres.
+
+### Comment tester
+
+1. Écran titre : « **Prototype** ».
+2. À essayer :
+
+| À essayer | Ce qui doit se passer |
+|---|---|
+| Avancer dans la clairière | Le silence, puis la capture ; les bandes noires |
+| Maintenir Échap pendant la cinématique | Une jauge se remplit ; on passe directement en cellule |
+| Tirer (X ou J) en cellule | Rien : l'arme a été confisquée |
+| Tirer son levier (E) seul | Il revient au bout de 3 s ; la porte reste fermée |
+| Tirer son levier, puis maintenir Q | Marek tire le sien ; les deux portes s'ouvrent pour de bon |
+| Appui court sur Q | Marek suit, ou attend (sa réplique change) |
+| Maintenir Q loin de tout mécanisme marqué | Il refuse |
+| Laisser Marek sur la plaque | La porte reste ouverte ; qu'il en descende et elle se ferme |
+| Ouvrir le casier | L'arme est de retour |
+| Monter seul sur l'ascenseur, puis ordre long | Marek l'envoie en haut |
+| Aller à la sortie sans Marek | Un message : il faut l'attendre |
+| Mourir, puis rembobiner | Leviers, portes, ascenseur et Marek reviennent en arrière aussi |
+
+### Ce qu'il faut écouter
+
+| Moment | Ce que tu dois entendre |
+|---|---|
+| La clairière | Insectes, bourdonnement des plantes lumineuses |
+| Juste avant la capture | L'ambiance qui se coupe net, puis un grognement grave |
+| Les cellules | Grondement, gouttes, chaînes qui tintent de temps en temps |
+| Ordres à Marek | Quatre intonations : d'accord, je te suis, j'attends, non |
+| Mécanismes | Levier (métal), porte à barreaux (claquement), ascenseur (moteur, puis butée) |
+
+### Décisions prises (et pourquoi)
+
+- **Les mécanismes que Marek peut actionner sont marqués** (spirale verte, le motif de son
+  pendentif). Sans marque, le joueur ne saurait pas ce que « active ça » va viser.
+- **Après un ordre, Marek attend sur place** plutôt que de revenir : c'est ce qui lui permet
+  de tenir une plaque de pression, et c'est plus prévisible.
+- **Pas de points de passage pour l'IA** : Marek marche sur un étage et prend l'ascenseur.
+  L'écran 5 n'en demande pas plus ; les points de passage viendront si un écran l'exige.
+- **Cinématiques écrites en code** (une suite d'étapes) plutôt qu'avec des pistes
+  d'`AnimationPlayer` : pour des scènes courtes, c'est plus facile à lire et à modifier.
+  L'`AnimationPlayer` reste prévu pour l'intro détaillée de J8.
+- **L'état final de chaque cinématique** est écrit à part (`finish`) : passer une
+  cinématique ou la regarder donne exactement la même situation.
+- **Deux leviers à ressort** pour « actionner ensemble » : un joueur seul ne peut pas
+  courir de l'un à l'autre en 3 s, donc Marek est indispensable.
+
+### Vérifications effectuées
+
+- **288 tests** au vert. Nouveaux fichiers :
+  - `test_interactables.gd` (10 tests) : leviers, portes, plaque, ascenseur, terminal,
+    casier, geste d'Élias, rembobinage ;
+  - `test_companion.gd` (8 tests) : suivre, attendre, « active ça », refus, ascenseur,
+    tirs, rembobinage ;
+  - `test_cutscenes.gd` (4 tests) : enchaînement, passer, verrouillage des commandes ;
+  - `test_prototype_level.gd` (3 tests) : capture et rencontre, cinématique passée, et
+    **les écrans 4 et 5 de bout en bout**.
+- **Contrôle par mutation** : 10 erreurs réintroduites, 10 détectées. Au premier essai,
+  « Élias actionne l'objet derrière lui » passait : le test a été renforcé.
+- **Captures** : clairière, capture (bandes noires), rencontre, couloir, écran titre. Elles
+  m'ont montré des bandes noires de largeur nulle, puis qui cachaient les pieds : corrigé.
+- **Web** : export vérifié dans Chromium (démarrage, son, version 0.7.0).
+
+### Reste à faire / points d'attention
+
+- **À régler en jouant**, dans `resources/characters/companion.tres` : distance de suivi,
+  durée de l'appui long, portée des ordres ; et dans le niveau : durée des leviers à ressort
+  (3 s), vitesse de l'ascenseur.
+- Les écrans 6 à 8, la musique et l'intro arrivent en **J8** ; les menus en **J9**.
+- Jalon suivant : **J8, la musique et les scènes**.
+
+### Concepts Godot expliqués
+
+**1. `await` : écrire une cinématique comme une recette**
+
+Une fonction qui contient `await` peut s'arrêter en plein milieu et reprendre plus tard,
+sans bloquer le jeu. `await ctx.wait(1.5)` veut dire « reviens ici dans 1,5 s ». Une
+cinématique se lit donc de haut en bas, comme une macro VBA pas à pas : marcher, attendre,
+parler, fondu. Le moteur continue d'afficher et d'animer entre deux étapes.
+
+**2. `AnimatableBody2D` : une plate-forme qui emporte ce qui est dessus**
+
+Un ascenseur doit bouger ET porter Élias. Un `AnimatableBody2D` est un solide qu'on déplace
+par le code ; avec `sync_to_physics`, le moteur calcule sa vitesse et la transmet aux
+personnages posés dessus (`CharacterBody2D`). Sans cela, la plate-forme monterait et
+laisserait Élias « tomber vers le haut » à travers elle.

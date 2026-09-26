@@ -178,8 +178,8 @@ func test_spring_lever_sends_the_elevator() -> void:
 # --- Objet à ramasser et geste d'Élias ---------------------------------------------
 
 func test_elias_interacts_with_what_is_in_front_of_him() -> void:
-	var l: Lever = lever(130.0)
-	var behind: Lever = lever(60.0)
+	var l: Lever = lever(135.0)
+	var behind: Lever = lever(75.0)  # plus près que l'autre, mais derrière lui
 	await spawn_player(100.0, 1)
 	player.input.press(&"interact")
 	await wait_physics(3)

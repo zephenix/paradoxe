@@ -12,16 +12,17 @@ plan. Le tout est modernisé avec du parkour, un rembobinage temporel limité, u
 de l'infiltration par la lumière et le son, et une interface intégrée au personnage.
 Tous les éléments du jeu (images, sons, musique) sont originaux ou générés par du code.
 
-> **État actuel : jalon J6 (v0.6), l'infiltration.** Depuis l'écran titre, une **salle de
-> test** de sept écrans permet d'essayer tous les mouvements d'Élias (marche, course, sauts,
-> rebords, roulade, glissade, chutes), de **combattre deux Sentinelles** (pistolet, tir
-> chargé, bouclier, jauge d'énergie, couverts, checkpoints), de **remonter le temps** à
-> chaque mort (jusqu'à 5 s, 3 fois par checkpoint), et de traverser une **salle de nuit sans
-> se faire voir** : les Sentinelles voient selon la lumière et entendent chaque bruit. On y
-> brise les lampes et on lance des pierres pour faire diversion. Chaque salle a son ambiance
-> sonore ; un **banc d'écoute** permet d'entendre et de régler tous les sons. Deux
-> interrupteurs : **mode classique** (sans rembobinage ni aides) et **Voir les sons**
-> (accessibilité). Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
+> **État actuel : jalon J7 (v0.7), le compagnon.** Depuis l'écran titre :
+> - le **prototype** (écrans 4 et 5) : la capture dans une clairière luminescente
+>   (cinématique), puis l'**évasion à deux** avec un vieux prisonnier, qu'on commande :
+>   suivre, attendre, « active ça ». Leviers à tirer ensemble, plaque de pression, casier,
+>   ascenseur manœuvré par l'un pour l'autre ;
+> - la **salle de test** (sept écrans) : mouvements, combat contre deux Sentinelles,
+>   rembobinage à chaque mort, infiltration de nuit (lumière, bruit, pierres) ;
+> - le **banc d'écoute** de tous les sons ;
+> - deux interrupteurs : **mode classique** et **Voir les sons**.
+>
+> Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
 > avancement : [`docs/JOURNAL.md`](docs/JOURNAL.md).
 
 ---
@@ -92,8 +93,8 @@ touches notées « WASD » (clavier QWERTY) correspondent à **ZQSD** sur un cla
 | Pause | Échap ou P | Start / Menu | J9 |
 | Passer une cinématique (maintenir) | Échap ou Espace | Start ou A | J7 |
 
-Dans la version actuelle (J6), n'importe quelle touche ou un clic active le son. On choisit
-ensuite « Salle de test » ou « Banc d'écoute » au clavier (flèches, Entrée), à la souris ou à la manette. Dans la
+Dans la version actuelle (J7), n'importe quelle touche ou un clic active le son. On choisit
+ensuite « Salle de test », « Prototype » ou « Banc d'écoute » au clavier (flèches, Entrée), à la souris ou à la manette. Dans la
 salle de test, **Haut** (ou Espace à l'arrêt) sert aussi à sauter sur place et à se hisser,
 et **Échap** ramène à l'écran titre.
 
@@ -103,6 +104,12 @@ bouclier consomment l'énergie d'une jauge unique, qui se recharge après une se
 rien consommer. Un seul tir tue, Élias comme les Sentinelles. Accroupi, Élias esquive les
 tirs debout ; derrière un muret, il est aussi à l'abri des tirs à genou. En cas de mort,
 Élias réapparaît au dernier **checkpoint** (balise verte).
+
+**Prototype (écrans 4 et 5)** : **E** (ou Entrée) actionne l'objet devant Élias : levier,
+casier, terminal. **Q** (A en AZERTY) donne un ordre au compagnon. Un appui court le fait **suivre** ou
+**attendre**. Un appui long près d'un mécanisme marqué d'une **spirale verte** l'envoie
+l'actionner (« Active ça ») ; il attend ensuite sur place, par exemple sur une plaque de
+pression. **Maintenir Échap ou Espace** pendant une seconde passe une cinématique.
 
 **Infiltration (salle G, de nuit)** : dans le noir, les Sentinelles voient mal ; sous une
 lampe, elles voient tout. Accroupi (**Bas**), Élias est moins visible et ses pas sont muets ;

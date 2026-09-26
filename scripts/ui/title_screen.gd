@@ -12,6 +12,7 @@ extends Control
 
 const TEST_LEVEL: String = "res://scenes/levels/test_level.tscn"
 const SOUND_BOARD: String = "res://scenes/ui/sound_board.tscn"
+const PROTOTYPE: String = "res://scenes/levels/prototype.tscn"
 const HUM_LOOP_ID: StringName = &"title_portal_hum"
 ## Décalage vers la gauche du portail et du titre quand le banc de test s'ouvre.
 const SHIFT_WHEN_PANEL_OPEN: float = -210.0
@@ -23,6 +24,7 @@ const SHIFT_WHEN_PANEL_OPEN: float = -210.0
 @onready var _diagnostics: Label = %Diagnostics
 @onready var _level_button: Button = %LevelButton
 @onready var _sound_board_button: Button = %SoundBoardButton
+@onready var _prototype_button: Button = %PrototypeButton
 @onready var _classic_toggle: CheckButton = %ClassicToggle
 @onready var _show_sounds_toggle: CheckButton = %ShowSoundsToggle
 @onready var _impact_button: Button = %ImpactButton
@@ -48,6 +50,7 @@ func _ready() -> void:
 
 	_level_button.pressed.connect(_on_level_pressed)
 	_sound_board_button.pressed.connect(_on_sound_board_pressed)
+	_prototype_button.pressed.connect(_on_prototype_pressed)
 	_classic_toggle.set_pressed_no_signal(Settings.classic_mode)
 	_classic_toggle.toggled.connect(_on_classic_toggled)
 	_show_sounds_toggle.set_pressed_no_signal(Settings.show_sounds)
@@ -145,6 +148,13 @@ func _on_level_pressed() -> void:
 	AudioManager.play_sfx(&"ui_confirm")
 	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
 	SceneTransition.change_scene(TEST_LEVEL)
+
+
+func _on_prototype_pressed() -> void:
+	_prototype_button.disabled = true
+	AudioManager.play_sfx(&"ui_confirm")
+	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
+	SceneTransition.change_scene(PROTOTYPE)
 
 
 func _on_sound_board_pressed() -> void:
