@@ -1312,16 +1312,36 @@ laisserait Élias « tomber vers le haut » à travers elle.
   cellules exige maintenant l'arme, et un texte dit ce qui manque (« Votre arme est restée
   dans le casier », ou « Pas sans Marek »). Le message « attendre Marek » annoncé en J7
   n'existait pas en réalité : il est fait maintenant.
+- **Deuxième série de retours** :
+  - *La jambe gauche d'Élias invisible en marchant (intro)* : les membres « arrière » sont
+    dessinés un peu plus loin que le corps (profondeur relative -2 et -3). Dans un plan de
+    l'intro, ils passaient derrière le dessin du plan lui-même. Le même défaut existait en
+    jeu devant les ruines et le fond des cellules (profondeur -1). Tous les personnages
+    sont maintenant dessinés à la profondeur 4 (`EliasVisual.BASE_Z`) : leurs membres
+    arrière restent devant le décor.
+  - *Le labo qui tombe dans un trou (fin de l'intro)* : l'anneau éteint était un anneau
+    sombre couché au sol, et la photo tombait dedans. Le plan est redessiné : l'anneau est
+    un cadre de métal debout sur son socle (on voit le mur à travers), ses dernières braises
+    s'envolent, et la photo tombe à côté puis se pose au premier plan.
+  - *Coincé au fond d'un trou de la canopée (écran 3)* : du balcon, la chute faisait
+    4 blocs : on survivait (roulade), sans pouvoir remonter (4 blocs, on n'escalade que 2,6).
+    Les trous sont maintenant plus profonds (le fond est 8 blocs sous le balcon). Même
+    suspendu au bord puis en lâchant prise, la chute dépasse 5 blocs : elle est mortelle.
+  - *Marek qui « tombe dans la grille » (écran 6)* : c'était voulu, mais mal montré. Marek
+    part par un conduit trop étroit pour Élias et revient à l'écran 8 ouvrir la dernière
+    porte. On le voit maintenant faire signe à Élias de ne pas le suivre, puis entrer à
+    quatre pattes dans une ouverture sombre (la grille arrachée est posée à côté) et
+    disparaître dans le noir. Le texte de l'écran 6 l'explique.
 
 ### Vérifications effectuées
 
-- **314 tests** au vert. Nouveaux fichiers :
+- **315 tests** au vert. Nouveaux fichiers :
   - `test_music.gd` (6) : bibliothèque, couches calées, un thème à la fois, couches qui
     suivent l'alerte, silence sous un thème, arrêt en quittant le niveau ;
   - `test_intro.gd` (5) : table de montage, plans à l'heure, sons, silence du plan 10,
     passer l'intro sans laisser de son ;
-  - `test_prototype_arrival.gd` (7) : arrivée, fuite, rattrapé en marchant, rembobinage,
-    traversée de la canopée, trous mortels ;
+  - `test_prototype_arrival.gd` (8) : arrivée, fuite, rattrapé en marchant, rembobinage,
+    traversée de la canopée, trous mortels (même en se laissant pendre au bord) ;
   - `test_prototype_finale.gd` (7) : sortie des cellules (arme et Marek exigés), passage
     vers les ruines, départ de Marek, passerelle sans être vu, combat du hall et ascenseur,
     poursuite, porte, plan final, rattrapé.
@@ -1329,12 +1349,15 @@ laisserait Élias « tomber vers le haut » à travers elle.
   suivant (arrivée, canopée, clairière, cellules, ruines, hall, poursuite, fin).
 - **Contrôle par mutation** : 5 erreurs réintroduites, 5 détectées (Traqueur trop lent,
   chute d'arrivée non protégée, Marek qui n'ouvre pas la porte, passage sans checkpoint,
-  tension qui ne se tait pas sous un thème). Au premier essai, un Traqueur plus rapide
+  tension qui ne se tait pas sous un thème), puis une 6e : les trous de la canopée remis à
+  leur ancienne profondeur (détectée). Au premier essai, un Traqueur plus rapide
   qu'Élias passait inaperçu : la poursuite n'était pas menaçante. Je l'ai rendue plus
   serrée, et le test vérifie maintenant qu'il se rapproche.
 - **Captures** : les 11 plans de l'intro, chaque écran (outil `prototype_tour.gd`), le plan
   final. Elles m'ont montré des nuages en boules, un câble qui ne partait pas de l'antenne,
-  un panneau de l'écran titre qui débordait, un texte hors du cadre : corrigés.
+  un panneau de l'écran titre qui débordait, un texte hors du cadre : corrigés. Après tes
+  retours : la marche du couloir (les deux jambes), le plan final, le départ de Marek par
+  le conduit, le fond d'un trou de la canopée (nouvel arrêt de `prototype_tour.gd`).
 - **Web** : export vérifié dans Chromium (démarrage, son, version 0.8.0).
 
 ### Reste à faire / points d'attention

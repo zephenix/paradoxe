@@ -15,6 +15,7 @@ const STOPS: Array = [
 	["proto_3b_poutre", -1180.0, 384.0, 30],
 	["proto_3c_balcon", -800.0, 480.0, 30],
 	["proto_3d_descente", -300.0, 480.0, 30],
+	["proto_3e_fond_du_trou", -610.0, 864.0, 30],
 	["proto_4_clairiere", 300.0, 672.0, 30],
 	["proto_5_cellules", 600.0, 1872.0, 30],
 	["proto_6a_ruines", 400.0, 3072.0, 30],
