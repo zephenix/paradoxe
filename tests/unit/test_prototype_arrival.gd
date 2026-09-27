@@ -163,3 +163,45 @@ func test_canopy_gaps_are_deadly() -> void:
 	player.air_top_y = player.global_position.y
 	player.machine.transition_to(&"Fall")
 	assert_true(await wait_for(func() -> bool: return player.is_dead, 300), "chute de plus de 5 blocs : mortelle")
+
+
+## Retour de jeu (v0.8) : en tombant du balcon, Élias survivait au fond d'un trou
+## (4 blocs, une roulade) et y restait coincé, sans issue. Chaque trou doit être
+## mortel, même par la chute la plus courte : suspendu au bord, puis lâcher prise.
+func test_canopy_pits_are_deadly_even_from_a_hang() -> void:
+	await setup(false)
+	# Bords d'où l'on peut descendre dans un trou : [x où se tenir, sens, nom].
+	var edges: Array = [[-1500.0, 1, "toit C, vers le 1er trou"], [-990.0, -1, "balcon, vers le 2e trou"],
+			[-715.0, 1, "balcon, vers le dernier trou"], [-505.0, -1, "toit F, vers le dernier trou"]]
+	for edge: Array in edges:
+		await respawn_after_death()
+		var ledge_y: float = 480.0 if absf(float(edge[0]) + 850.0) < 400.0 else 384.0
+		player.global_position = Vector2(float(edge[0]), ledge_y)
+		player.air_top_y = ledge_y
+		player.velocity = Vector2.ZERO
+		player.facing = int(edge[1])
+		player.machine.transition_to(&"Idle")
+		await wait_physics(3)
+		player.input.down = true
+		var hung: bool = await wait_for(func() -> bool: return player.machine.current_name == &"LedgeHang", 90)
+		assert_true(hung, "suspendu au bord (%s ; état %s)" % [edge[2], player.machine.current_name])
+		player.input.down = false
+		await wait_physics(5)
+		player.input.press(&"move_down")
+		assert_true(await wait_for(func() -> bool: return player.is_dead or (player.is_on_floor() and player.machine.current_name == &"Idle"), 300),
+				"arrivé au fond (%s)" % edge[2])
+		assert_true(player.is_dead, "le fond du trou est mortel (%s ; y = %.0f)" % [edge[2], player.global_position.y])
+	await respawn_after_death()
+
+
+## Après une mort : choisit le checkpoint et attend la fin de la réapparition.
+func respawn_after_death() -> void:
+	if not player.is_dead:
+		return
+	for i in 120:
+		if level.death.phase == &"choice":
+			break
+		await wait_physics(1)
+	if level.death.phase == &"choice":
+		level.death.request_checkpoint()
+	await wait_physics_seconds(level.respawn.total_time() + 0.1)

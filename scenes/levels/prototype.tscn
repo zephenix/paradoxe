@@ -216,14 +216,14 @@ text = "ÉCRAN 2 : ARRIVÉE\nFlèches : marcher. Maj (maintenue) : courir. Espac
 [node name="Room3" type="Node2D" parent="."]
 position = Vector2(-2560.0, -360.0)
 script = ExtResource("2_room")
-room_size = Vector2(2560.0, 1080.0)
+room_size = Vector2(2560.0, 1272.0)
 camera_zoom = 1.0
 title = "3 - Canopée"
 acoustic_zone = &"canopy"
 ambient_light = 0.7
 
 [node name="Ruin1" type="Node2D" parent="Room3"]
-position = Vector2(1060.0, 1032.0)
+position = Vector2(1060.0, 1224.0)
 script = ExtResource("23_ruin")
 z_index = -1
 width = 170.0
@@ -232,7 +232,7 @@ seed_value = 21
 color = Color(0.1, 0.13, 0.15, 1.0)
 
 [node name="Ruin2" type="Node2D" parent="Room3"]
-position = Vector2(1570.0, 1032.0)
+position = Vector2(1570.0, 1224.0)
 script = ExtResource("23_ruin")
 z_index = -1
 width = 280.0
@@ -252,23 +252,23 @@ color = Color(0.1, 0.13, 0.15, 1.0)
 [node name="RoofA" type="StaticBody2D" parent="Room3"]
 position = Vector2(0.0, 936.0)
 script = ExtResource("3_block")
-size_blocks = Vector2(7.5, 3.0)
+size_blocks = Vector2(7.5, 7.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
 
 [node name="RoofB" type="StaticBody2D" parent="Room3"]
 position = Vector2(360.0, 840.0)
 script = ExtResource("3_block")
-size_blocks = Vector2(7.5, 5.0)
+size_blocks = Vector2(7.5, 9.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
 
 [node name="RoofC" type="StaticBody2D" parent="Room3"]
 position = Vector2(720.0, 744.0)
 script = ExtResource("3_block")
-size_blocks = Vector2(7.5, 7.0)
+size_blocks = Vector2(7.5, 11.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
 
 [node name="PitFloor1" type="StaticBody2D" parent="Room3"]
-position = Vector2(1080.0, 1032.0)
+position = Vector2(1080.0, 1224.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(3.0, 1.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
@@ -281,7 +281,7 @@ color = Color(0.3, 0.33, 0.37, 1.0)
 surface = &"metal"
 
 [node name="PitFloor2" type="StaticBody2D" parent="Room3"]
-position = Vector2(1224.0, 1032.0)
+position = Vector2(1224.0, 1224.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(7.0, 1.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
@@ -301,13 +301,13 @@ color = Color(0.3, 0.33, 0.37, 1.0)
 surface = &"metal"
 
 [node name="PitFloor3" type="StaticBody2D" parent="Room3"]
-position = Vector2(1560.0, 1032.0)
+position = Vector2(1560.0, 1224.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(6.25, 1.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
 
 [node name="PitFloor4" type="StaticBody2D" parent="Room3"]
-position = Vector2(1860.0, 1032.0)
+position = Vector2(1860.0, 1224.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(3.75, 1.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
@@ -315,13 +315,13 @@ color = Color(0.1, 0.13, 0.15, 1.0)
 [node name="RoofF" type="StaticBody2D" parent="Room3"]
 position = Vector2(2040.0, 840.0)
 script = ExtResource("3_block")
-size_blocks = Vector2(5.625, 5.0)
+size_blocks = Vector2(5.625, 9.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
 
 [node name="Ground" type="StaticBody2D" parent="Room3"]
 position = Vector2(2310.0, 1032.0)
 script = ExtResource("3_block")
-size_blocks = Vector2(5.2083, 2.0)
+size_blocks = Vector2(5.2083, 5.0)
 color = Color(0.18, 0.24, 0.22, 1.0)
 surface = &"plant"
 
@@ -743,7 +743,7 @@ offset_right = 1140
 offset_bottom = 160
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
-text = "ÉCRAN 6 : RUINES, DE NUIT\nMarek vous montre un chemin par les hauteurs. Accroupi (Bas), vos pas sont muets.\nLes Sentinelles voient mal dans le noir et ne regardent pas en l'air. F : lancer une pierre."
+text = "ÉCRAN 6 : RUINES, DE NUIT\nMarek se glisse dans un conduit, trop étroit pour vous : il vous retrouvera plus loin.\nIl vous a montré un chemin par les hauteurs. Accroupi (Bas), vos pas sont muets.\nLes Sentinelles voient mal dans le noir et ne regardent pas en l'air. F : lancer une pierre."
 
 [node name="Room7" type="Node2D" parent="."]
 position = Vector2(2560.0, 2400.0)

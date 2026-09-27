@@ -17,6 +17,11 @@ extends CharacterVisual
 const BACK_DARKEN := 0.72
 ## Durée du fondu entre deux animations (secondes).
 const BLEND_TIME: float = 0.06
+## Profondeur de dessin du personnage. Ses membres « arrière » sont dessinés un
+## peu plus loin (z_index -2 et -3, relatifs) ; sans ce décalage, ils passeraient
+## DERRIÈRE les décors de fond (ruines, fond des cellules : z_index -1) ou derrière
+## le dessin de leur parent (un plan de l'intro), et disparaîtraient.
+const BASE_Z: int = 4
 ## Animations où l'arme est en main (le pistolet n'est dessiné que pendant celles-ci).
 const WEAPON_ANIMATIONS: Array[StringName] = [&"aim", &"shoot", &"charge", &"shield", &"kneel_aim", &"kneel_shoot"]
 ## Lueur du bracelet : éteint (jauge vide) -> vif (jauge pleine).
@@ -45,6 +50,7 @@ var _joint_paths: Dictionary = {}
 
 
 func _ready() -> void:
+	z_index = BASE_Z
 	_build_rig()
 	_player = AnimationPlayer.new()
 	_player.name = "AnimationPlayer"
