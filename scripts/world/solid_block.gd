@@ -22,6 +22,12 @@ extends StaticBody2D
 		_rebuild()
 ## Nature de la surface (sons de pas en J5) : &"stone", &"metal", &"plant", &"water".
 @export var surface: StringName = &"stone"
+## Matière dessinée (texture et relief, resources/art/surfaces/). Vide : aplats
+## de couleur, comme avant l'essai graphique.
+@export var style: SurfaceStyle:
+	set(value):
+		style = value
+		_rebuild()
 
 
 func _ready() -> void:
@@ -54,14 +60,49 @@ func _rebuild() -> void:
 	var occluder := LightOccluder2D.new()
 	var polygon := OccluderPolygon2D.new()
 	polygon.polygon = PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y)])
+	# Seules les arêtes tournées à l'opposé de la lampe projettent l'ombre : la
+	# face du bloc reste éclairée (sinon le bloc serait dans sa propre ombre, et
+	# une lampe n'éclairerait jamais le sol sous elle).
+	polygon.cull_mode = OccluderPolygon2D.CULL_COUNTER_CLOCKWISE
 	occluder.occluder = polygon
 	_add_generated(occluder)
+	if style:
+		_draw_textured(size)
+		return
 	# Face principale, arête supérieure éclairée, bas plus sombre.
 	_add_generated(_polygon([Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y)], color))
 	var lip: float = minf(6.0, size.y)
 	_add_generated(_polygon([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, lip), Vector2(0, lip)], color.lightened(0.25)))
 	var shade: float = minf(size.y * 0.35, 40.0)
 	_add_generated(_polygon([Vector2(0, size.y - shade), Vector2(size.x, size.y - shade), size, Vector2(0, size.y)], color.darkened(0.25)))
+
+
+## Version texturée : la face reçoit la matière (teintée par « color »), puis deux
+## voiles en dégradé, transparents, qui laissent voir la texture : une arête
+## supérieure éclairée et un bas plus sombre (le volume du bloc).
+func _draw_textured(size: Vector2) -> void:
+	var corners: Array[Vector2] = [Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y)]
+	var face := _polygon(corners, color.lightened(style.lighten))
+	face.texture = style.canvas_texture()
+	face.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	var world := PackedVector2Array()
+	for corner in corners:
+		world.append(corner + (global_position if is_inside_tree() else position))
+	face.uv = style.uvs_for(world)
+	_add_generated(face)
+	var lip: float = minf(5.0, size.y)
+	_add_generated(_gradient([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, lip), Vector2(0, lip)],
+			Color(1.0, 1.0, 1.0, 0.28), Color(1.0, 1.0, 1.0, 0.08)))
+	var shade: float = minf(size.y * 0.5, 60.0)
+	_add_generated(_gradient([Vector2(0, size.y - shade), Vector2(size.x, size.y - shade), size, Vector2(0, size.y)],
+			Color(0.0, 0.0, 0.0, 0.0), Color(0.0, 0.0, 0.0, 0.45)))
+
+
+## Rectangle en dégradé vertical (haut : « top », bas : « bottom »).
+func _gradient(points: Array[Vector2], top: Color, bottom: Color) -> Polygon2D:
+	var p := _polygon(points, Color.WHITE)
+	p.vertex_colors = PackedColorArray([top, top, bottom, bottom])
+	return p
 
 
 func _polygon(points: Array[Vector2], fill: Color) -> Polygon2D:

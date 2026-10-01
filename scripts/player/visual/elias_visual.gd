@@ -22,6 +22,18 @@ const BLEND_TIME: float = 0.06
 ## DERRIÈRE les décors de fond (ruines, fond des cellules : z_index -1) ou derrière
 ## le dessin de leur parent (un plan de l'intro), et disparaîtraient.
 const BASE_Z: int = 4
+## Grain de tissu (avec relief) des vêtements : essai graphique après J8.
+const FABRIC: SurfaceStyle = preload("res://resources/art/surfaces/fabric.tres")
+## Volume des pièces, dans le sens de l'éclairage d'origine du dessin (la
+## blouse a son pan d'ombre devant) : l'arrière et le haut sont plus clairs,
+## l'avant et le bas plus sombres.
+const SHADE_LIGHT: float = 0.12
+const SHADE_DARK: float = 0.14
+## Le tissu est un peu plus sombre que le blanc (en moyenne 0,9) : la couleur
+## est multipliée d'autant pour compenser.
+const FABRIC_GAIN: float = 1.1
+## Contour : la couleur de la pièce, assombrie.
+const OUTLINE_DARKEN: float = 0.55
 ## Animations où l'arme est en main (le pistolet n'est dessiné que pendant celles-ci).
 const WEAPON_ANIMATIONS: Array[StringName] = [&"aim", &"shoot", &"charge", &"shield", &"kneel_aim", &"kneel_shoot"]
 ## Lueur du bracelet : éteint (jauge vide) -> vif (jauge pleine).
@@ -132,16 +144,16 @@ func _build_rig() -> void:
 	# Pans de la blouse, par-dessus les cuisses.
 	var coat: Node2D = _node("Coat", hips, Vector2(0, -2))
 	coat.z_index = 1
-	_poly(coat, [Vector2(-9, 0), Vector2(10, 0), Vector2(12, 24), Vector2(-11, 26)], coat_shade)
-	_poly(coat, [Vector2(-9, 0), Vector2(3, 0), Vector2(2, 25), Vector2(-11, 26)], coat_color)
+	_poly(coat, [Vector2(-9, 0), Vector2(10, 0), Vector2(12, 24), Vector2(-11, 26)], coat_shade, true)
+	_poly(coat, [Vector2(-9, 0), Vector2(3, 0), Vector2(2, 25), Vector2(-11, 26)], coat_color, true, false)
 	_register("coat", coat)
 
 	# Buste (blouse), tête et bras.
 	var torso: Node2D = _node("Torso", hips, Vector2.ZERO)
 	var arm_b: Node2D = _arm("ArmB", torso, true)
 	arm_b.z_index = -3
-	_poly(torso, [Vector2(-9, 2), Vector2(9, 2), Vector2(10, -30), Vector2(3, -34), Vector2(-7, -33), Vector2(-10, -26)], coat_color)
-	_poly(torso, [Vector2(3, 2), Vector2(9, 2), Vector2(10, -30), Vector2(4, -33)], coat_shade)
+	_poly(torso, [Vector2(-9, 2), Vector2(9, 2), Vector2(10, -30), Vector2(3, -34), Vector2(-7, -33), Vector2(-10, -26)], coat_color, true)
+	_poly(torso, [Vector2(3, 2), Vector2(9, 2), Vector2(10, -30), Vector2(4, -33)], coat_shade, true, false)
 	var head: Node2D = _node("Head", torso, Vector2(1, -33))
 	_build_head(head)
 	var arm_f: Node2D = _arm("ArmF", torso, false)
@@ -159,6 +171,10 @@ func _build_head(head: Node2D) -> void:
 	_poly(head, [Vector2(-3, 0), Vector2(3, 0), Vector2(3, -4)], skin_color)  # cou
 	_poly(head, [Vector2(-6, -3), Vector2(5, -4), Vector2(8, -9), Vector2(7, -14), Vector2(1, -17), Vector2(-5, -15), Vector2(-7, -9)], skin_color)
 	_poly(head, [Vector2(-7, -8), Vector2(-6, -15), Vector2(0, -18), Vector2(6, -16), Vector2(7, -13), Vector2(1, -13), Vector2(-3, -9)], hair_color)
+	_poly(head, [Vector2(-3, -15), Vector2(2, -17), Vector2(4, -16), Vector2(-1, -14.5)], hair_color.lightened(0.3), false, false)  # reflet
+	_poly(head, [Vector2(-2, -10), Vector2(0, -11), Vector2(0.5, -8), Vector2(-1.5, -7.5)], skin_color.darkened(0.2), false, false)  # oreille
+	_poly(head, [Vector2(4, -11), Vector2(5.5, -11), Vector2(5.5, -9.8), Vector2(4, -9.8)], Color("1b1416"))  # œil
+	_poly(head, [Vector2(3.5, -12.6), Vector2(6.5, -12.9), Vector2(6.5, -12.2), Vector2(3.5, -12)], hair_color)  # sourcil
 
 
 ## Pistolet dans la main avant. Repère de l'avant-bras : +y va du coude vers la
@@ -178,20 +194,29 @@ func _build_gun(fore: Node2D) -> void:
 ## la lueur suit l'énergie. De profil vers la droite, on voit le côté gauche
 ## d'Élias : son bras gauche est le bras « avant », celui qui tient l'arme ; le
 ## bracelet est donc bien visible quand il tire (PLAN §5.10).
-func _decorate(_back_fore: Node2D, _torso: Node2D, _head: Node2D) -> void:
+func _decorate(_back_fore: Node2D, torso: Node2D, _head: Node2D) -> void:
 	_bracelet = Polygon2D.new()
 	_bracelet.polygon = PackedVector2Array([Vector2(-3.5, 7), Vector2(3.5, 7), Vector2(3.5, 10.5), Vector2(-3.5, 10.5)])
 	_bracelet.color = BRACELET_FULL
 	_gun.get_parent().add_child(_bracelet)
+	# La blouse : col, boutons, poche de poitrine (avec un stylo), et la poche
+	# du pan de devant.
+	_poly(torso, [Vector2(2, -33), Vector2(7, -31), Vector2(4, -24)], coat_color.lightened(0.25), false, false)  # revers du col
+	for y: float in [-19.0, -11.0, -3.0]:
+		_poly(torso, [Vector2(6.2, y), Vector2(7.6, y), Vector2(7.6, y + 1.4), Vector2(6.2, y + 1.4)], coat_shade.darkened(0.45))
+	_poly(torso, [Vector2(-3, -23), Vector2(2, -23), Vector2(2, -19), Vector2(-3, -19)], coat_color.darkened(0.12), false, false)  # poche
+	_poly(torso, [Vector2(-1.5, -25.5), Vector2(-0.5, -25.5), Vector2(-0.5, -22), Vector2(-1.5, -22)], Color("3b6f9e"))  # stylo
+	var coat: Node2D = torso.get_parent().get_node(^"Coat")
+	_poly(coat, [Vector2(-7, 9), Vector2(0, 9), Vector2(0, 15), Vector2(-7, 15)], coat_color.darkened(0.12), false, false)  # poche
 
 
 func _leg(leg_name: String, hips: Node2D, back: bool) -> Node2D:
 	var suffix: String = "b" if back else "f"
 	var dim: float = BACK_DARKEN if back else 1.0
 	var thigh: Node2D = _node(leg_name, hips, Vector2(0, 0))
-	_poly(thigh, [Vector2(-6, -2), Vector2(6, -2), Vector2(5, 23), Vector2(-4, 23)], trousers_color.darkened(1.0 - dim))
+	_poly(thigh, [Vector2(-6, -2), Vector2(6, -2), Vector2(5, 23), Vector2(-4, 23)], trousers_color.darkened(1.0 - dim), true)
 	var shin: Node2D = _node("Shin", thigh, Vector2(0, 23))
-	_poly(shin, [Vector2(-4, 0), Vector2(5, 0), Vector2(4, 21), Vector2(-3, 21)], trousers_color.darkened(1.0 - dim))
+	_poly(shin, [Vector2(-4, 0), Vector2(5, 0), Vector2(4, 21), Vector2(-3, 21)], trousers_color.darkened(1.0 - dim), true)
 	_poly(shin, [Vector2(-4, 20), Vector2(4, 19), Vector2(11, 22), Vector2(11, 24), Vector2(-4, 24)], shoes_color.darkened(1.0 - dim))
 	_register("thigh_" + suffix, thigh)
 	_register("shin_" + suffix, shin)
@@ -202,9 +227,10 @@ func _arm(arm_name: String, torso: Node2D, back: bool) -> Node2D:
 	var suffix: String = "b" if back else "f"
 	var dim: float = BACK_DARKEN if back else 1.0
 	var upper: Node2D = _node(arm_name, torso, Vector2(0, -29))
-	_poly(upper, [Vector2(-4, -2), Vector2(4, -2), Vector2(3, 16), Vector2(-3, 16)], coat_color.darkened(1.0 - dim))
+	_poly(upper, [Vector2(-4, -2), Vector2(4, -2), Vector2(3, 16), Vector2(-3, 16)], coat_color.darkened(1.0 - dim), true)
 	var fore: Node2D = _node("Fore", upper, Vector2(0, 16))
-	_poly(fore, [Vector2(-3, 0), Vector2(3, 0), Vector2(2, 12), Vector2(-2, 12)], coat_color.darkened(1.0 - dim))
+	_poly(fore, [Vector2(-3, 0), Vector2(3, 0), Vector2(2, 12), Vector2(-2, 12)], coat_color.darkened(1.0 - dim), true)
+	_poly(fore, [Vector2(-2.5, 9), Vector2(2.5, 9), Vector2(2.2, 12), Vector2(-2.2, 12)], coat_shade.darkened(1.0 - dim), false, false)  # revers de manche
 	_poly(fore, [Vector2(-2, 11), Vector2(3, 11), Vector2(3, 16), Vector2(-1, 16)], skin_color.darkened(1.0 - dim))
 	_register("arm_" + suffix, upper)
 	_register("fore_" + suffix, fore)
@@ -219,11 +245,43 @@ func _node(node_name: String, parent: Node, offset: Vector2) -> Node2D:
 	return n
 
 
-func _poly(parent: Node, points: Array[Vector2], color: Color) -> void:
+## Une pièce du dessin. Les grandes pièces reçoivent un volume (dégradé : avant
+## et haut plus clairs, arrière et bas plus sombres) et un contour fin ; les
+## vêtements (« cloth ») reçoivent en plus le grain du tissu, avec son relief,
+## que les lampes éclairent. Les petites pièces (yeux, lueurs) restent en aplat.
+func _poly(parent: Node, points: Array[Vector2], color: Color, cloth: bool = false, outlined: bool = true) -> void:
 	var p := Polygon2D.new()
 	p.polygon = PackedVector2Array(points)
 	p.color = color
 	parent.add_child(p)
+	var bounds := Rect2(points[0], Vector2.ZERO)
+	for point in points:
+		bounds = bounds.expand(point)
+	if bounds.size.x * bounds.size.y < 16.0:
+		return
+	# Avec des couleurs par sommet, Polygon2D ignore « color » : la compensation
+	# du tissu se fait ici.
+	var base: Color = Color(color.r * FABRIC_GAIN, color.g * FABRIC_GAIN, color.b * FABRIC_GAIN, color.a) if cloth else color
+	var shades := PackedColorArray()
+	for point in points:
+		var front: float = (point.x - bounds.position.x) / maxf(bounds.size.x, 1.0)  # 0 arrière, 1 avant
+		var low: float = (point.y - bounds.position.y) / maxf(bounds.size.y, 1.0)  # 0 haut, 1 bas
+		var shade: Color = base.darkened(SHADE_DARK * front + 0.1 * low)
+		shades.append(shade.lightened(SHADE_LIGHT * (1.0 - front) * (1.0 - low)))
+	p.vertex_colors = shades
+	if cloth:
+		p.texture = FABRIC.canvas_texture()
+		p.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		p.uv = FABRIC.uvs_for(p.polygon)
+	if not outlined:
+		return
+	var outline := Line2D.new()
+	outline.points = p.polygon
+	outline.closed = true
+	outline.width = 1.0
+	outline.default_color = Color(color.darkened(OUTLINE_DARKEN), 0.7)
+	outline.joint_mode = Line2D.LINE_JOINT_ROUND
+	p.add_child(outline)
 
 
 func _register(joint: String, node: Node) -> void:

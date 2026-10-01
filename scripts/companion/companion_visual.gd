@@ -23,6 +23,9 @@ func _build_head(head: Node2D) -> void:
 	_poly(head, [Vector2(-6, -3), Vector2(5, -4), Vector2(8, -9), Vector2(7, -14), Vector2(1, -17), Vector2(-5, -15), Vector2(-7, -9)], skin_color)
 	_poly(head, [Vector2(-7, -7), Vector2(-7, -14), Vector2(-3, -17), Vector2(0, -16), Vector2(-4, -13), Vector2(-4, -8)], hair_color)
 	_poly(head, [Vector2(-2, -3), Vector2(6, -4), Vector2(7, -7), Vector2(3, -6), Vector2(-1, -6)], hair_color)  # barbe
+	_poly(head, [Vector2(-2, -10), Vector2(0, -11), Vector2(0.5, -8), Vector2(-1.5, -7.5)], skin_color.darkened(0.2), false, false)  # oreille
+	_poly(head, [Vector2(4, -11), Vector2(5.5, -11), Vector2(5.5, -9.8), Vector2(4, -9.8)], Color("1b1416"))  # œil
+	_poly(head, [Vector2(3.2, -12.8), Vector2(6.8, -13.2), Vector2(6.8, -12.3), Vector2(3.2, -12)], hair_color)  # sourcil broussailleux
 
 
 ## Le pendentif en spirale, sur la poitrine.

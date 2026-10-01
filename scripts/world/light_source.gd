@@ -35,6 +35,13 @@ signal broken
 	set(value):
 		color = value
 		_update_light()
+## Hauteur de l'ampoule au-dessus du « plan » du décor (pixels) : elle règle la
+## façon dont la lumière accroche le relief des textures (normal maps). Basse :
+## lumière rasante, relief très marqué ; haute : lumière de face, relief discret.
+@export var light_height: float = 60.0:
+	set(value):
+		light_height = value
+		_update_light()
 ## Un tir peut-il la briser ?
 @export var destructible: bool = true
 ## Longueur du fil (pixels, vers le haut) : lampe suspendue. Pur décor.
@@ -53,6 +60,9 @@ signal broken
 var lit: bool = true
 
 var _light: PointLight2D
+## Halo et cône de lumière (essai graphique), dessinés « en addition » : ils
+## éclaircissent ce qui est derrière, comme une lumière dans l'air humide.
+var _glow: Node2D
 var _stays_broken: bool = false
 
 ## Taille de la texture de lumière (pixels) : elle est ensuite agrandie au rayon.
@@ -75,6 +85,15 @@ func _ready() -> void:
 	_light.shadow_filter = Light2D.SHADOW_FILTER_PCF5
 	_light.shadow_color = Color(0.0, 0.0, 0.0, 0.85)
 	add_child(_light)
+	_glow = Node2D.new()
+	_glow.name = "Glow"
+	var additive := CanvasItemMaterial.new()
+	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	additive.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
+	_glow.material = additive
+	_glow.z_index = 6
+	_glow.draw.connect(_draw_glow)
+	add_child(_glow)
 	_update_light()
 	if Engine.is_editor_hint():
 		return
@@ -151,6 +170,8 @@ func _set_lit(value: bool) -> void:
 	lit = value
 	if _light:
 		_light.enabled = lit
+	if _glow:
+		_glow.visible = lit
 	queue_redraw()
 
 
@@ -159,7 +180,10 @@ func _update_light() -> void:
 		return
 	_light.color = color
 	_light.energy = energy
+	_light.height = light_height
 	_light.texture_scale = radius * 2.0 / TEXTURE_SIZE
+	if _glow:
+		_glow.queue_redraw()
 	queue_redraw()
 
 
@@ -193,3 +217,15 @@ func _draw() -> void:
 		draw_circle(Vector2(0.0, 1.0), 11.0, Color(color, 0.25))
 	else:
 		draw_circle(Vector2(0.0, 1.0), 5.0, Color(0.16, 0.16, 0.17))
+
+
+## Halo autour de l'ampoule (cercles de plus en plus grands et transparents) et
+## cône de lumière vers le bas, qui s'efface en s'éloignant.
+func _draw_glow() -> void:
+	for i in 6:
+		var r: float = 10.0 + i * i * 5.0
+		_glow.draw_circle(Vector2(0.0, 1.0), r, Color(color, 0.09 * energy / (1.0 + i * 0.6)))
+	var reach: float = radius * 0.75
+	var spread: float = radius * 0.45
+	_glow.draw_polygon(PackedVector2Array([Vector2(-12, -2), Vector2(12, -2), Vector2(spread, reach), Vector2(-spread, reach)]),
+			PackedColorArray([Color(color, 0.16 * energy), Color(color, 0.16 * energy), Color(color, 0.0), Color(color, 0.0)]))

@@ -13,7 +13,7 @@ extérieure doit y être ajoutée avant d'être versionnée : source, auteur, li
 |---|---|---|---|
 | [Godot Engine](https://godotengine.org) 4.7.2 | Juan Linietsky, Ariel Manzur et les contributeurs de Godot | MIT | Intégré aux exécutables. La licence doit accompagner le jeu : un écran de crédits l'affichera (J9, via `Engine.get_license_text()`). |
 | Police par défaut de Godot (Open Sans SemiBold) | The Open Sans Project Authors (dessin : Steve Matteson) | SIL Open Font License 1.1 | Utilisée par l'interface tant qu'aucune police dédiée n'est choisie. |
-| numpy, scipy | Communautés NumPy et SciPy | BSD | Servent uniquement à **générer** les sons (outil de développement, non distribué avec le jeu). |
+| numpy, scipy | Communautés NumPy et SciPy | BSD | Servent uniquement à **générer** les sons et les textures (outils de développement, non distribués avec le jeu). |
 | playwright-core | Microsoft | Apache 2.0 | Sert uniquement à **vérifier** la version Web (outil de développement). |
 
 ## Images
@@ -24,6 +24,7 @@ extérieure doit y être ajoutée avant d'être versionnée : source, auteur, li
 | Anneau du portail (écran titre) | Original, dessiné par code (`scripts/fx/portal_ring.gd`). |
 | Silhouette d'Élias et ses animations | Original, polygones et poses définis par code (`scripts/player/visual/`). |
 | Décors de la salle de test, silhouettes de ville | Originaux, générés par code (`scripts/world/solid_block.gd`, `scripts/fx/skyline.gd`). |
+| Textures du décor et des vêtements (`assets/textures/generated/` : béton, briques, tôle, planches, tissu, et leurs cartes de relief) | Originales, calculées par `tools/art/generate_textures.py` (bruit et motifs, numpy). Aucune image extérieure. |
 
 ## Sons
 

@@ -39,6 +39,11 @@ var death: DeathController
 var cutscenes: CutscenePlayer
 ## Teinte de la lumière ambiante (J6) : une pour le monde, une pour le ciel.
 var ambient_tint: CanvasModulate
+## Lumière principale (lune…) et finition de l'image (essai graphique) : réglées
+## par l'ambiance de la salle (Room.atmosphere).
+var key_light: DirectionalLight2D
+var screen_grade: ColorRect
+var _look_tween: Tween
 var _sky_tint: CanvasModulate
 var _tint_tween: Tween
 ## « Voir les sons » (J6) : cercles des bruits d'Élias.
@@ -69,6 +74,7 @@ func _ready() -> void:
 	camera.snap_to_target()
 	if camera.current_room:
 		set_ambient(camera.current_room.ambient_light)  # tout de suite, sans fondu
+		set_atmosphere(camera.current_room.atmosphere)
 	death = DeathController.new()
 	death.name = "DeathController"
 	add_child(death)
@@ -95,6 +101,32 @@ func _exit_tree() -> void:
 func _on_room_changed(room: Room) -> void:
 	AudioManager.set_zone(room.acoustic_zone)
 	set_ambient(room.ambient_light, AMBIENT_FADE)
+	set_atmosphere(room.atmosphere, AMBIENT_FADE)
+
+
+## Applique l'ambiance visuelle d'une salle (null = aucune) en « duration »
+## secondes : lumière principale et finition de l'image. La brume et les
+## poussières, elles, appartiennent à la salle (Room).
+func set_atmosphere(look: RoomAtmosphere, duration: float = 0.0) -> void:
+	var energy: float = look.key_energy if look else 0.0
+	var vignette: float = look.vignette if look else 0.0
+	var grain: float = look.grain if look else 0.0
+	if look:
+		key_light.color = look.key_color
+		key_light.rotation_degrees = -look.key_angle  # 0 : la lumière tombe d'en haut
+		key_light.height = look.key_height
+	var grade: ShaderMaterial = screen_grade.material as ShaderMaterial
+	if _look_tween:
+		_look_tween.kill()
+	if duration <= 0.0:
+		key_light.energy = energy
+		grade.set_shader_parameter(&"vignette", vignette)
+		grade.set_shader_parameter(&"grain", grain)
+		return
+	_look_tween = create_tween().set_parallel()
+	_look_tween.tween_property(key_light, "energy", energy, duration)
+	_look_tween.tween_property(grade, "shader_parameter/vignette", vignette, duration)
+	_look_tween.tween_property(grade, "shader_parameter/grain", grain, duration)
 
 
 ## Teinte l'écran selon la lumière ambiante (0 = pénombre, 1 = plein jour), en
@@ -173,6 +205,24 @@ func _create_tints() -> void:
 	ambient_tint = CanvasModulate.new()
 	ambient_tint.name = "AmbientTint"
 	add_child(ambient_tint)
+	key_light = DirectionalLight2D.new()
+	key_light.name = "KeyLight"
+	key_light.energy = 0.0
+	add_child(key_light)
+	var layer := CanvasLayer.new()
+	layer.name = "ScreenGradeLayer"
+	layer.layer = 3  # au-dessus du jeu, sous les textes des salles (4)
+	add_child(layer)
+	screen_grade = ColorRect.new()
+	screen_grade.name = "ScreenGrade"
+	screen_grade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	screen_grade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var grade := ShaderMaterial.new()
+	grade.shader = preload("res://assets/shaders/screen_grade.gdshader")
+	grade.set_shader_parameter(&"vignette", 0.0)
+	grade.set_shader_parameter(&"grain", 0.0)
+	screen_grade.material = grade
+	layer.add_child(screen_grade)
 	var sky: CanvasLayer = get_node_or_null(^"Sky") as CanvasLayer
 	if sky:
 		_sky_tint = CanvasModulate.new()

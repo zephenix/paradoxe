@@ -56,6 +56,8 @@ xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/prototype_tour.gd -- build/shots   # visite du prototype (écrans 2 à 8)
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/intro_frames.gd -- build/shots [instants…]   # plans de l'intro
 python3 tools/audio/generate_sounds.py       # régénère les sons + catalog.json (puis réimport Godot)
+python3 tools/art/generate_textures.py       # régénère les textures (couleur + relief), puis réimport Godot
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/room_shots.gd -- build/shots/x a:400:3072   # captures rapides d'un endroit (nom:x:y)
 godot --headless --path . --import           # réimporte les sons
 godot --headless --path . -s res://tools/godot/build_sound_library.gd   # ajoute les nouveaux sons à la bibliothèque
 python3 tools/audio/measure_levels.py        # vérifie l'équilibre des niveaux (familles de sons ; lancé par la CI)
@@ -147,6 +149,16 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   `resume_state(état)` (repartir). Un état de machine peut fournir `snapshot()` ; il reçoit
   alors ces données dans `enter(…, data)` avec `"resumed": true` (ne pas rejouer ses sons
   d'entrée). Une photo `"stable": false` n'est jamais un point de reprise.
+- **Matières et ambiance (essai graphique, après J8)** : un `SolidBlock`, une `Ruin` ou un
+  `Duct` texturés reçoivent un `style` (`SurfaceStyle`, `resources/art/surfaces/`) : texture
+  de couleur teintée par `color`, et carte de relief éclairée par les lampes. Un `Polygon2D`
+  compte ses coordonnées de texture en pixels (`uvs_for`), les fonctions `draw_*` en
+  fractions d'image (`draw_uvs_for`, avec `texture_repeat` activé). Avec `vertex_colors`, un
+  `Polygon2D` ignore `color`. Une salle reçoit une `atmosphere` (`RoomAtmosphere`,
+  `resources/art/atmospheres/`) : lumière principale (`Level.key_light`), brume, poussières,
+  vignettage et grain ; **sans effet sur le gameplay**. L'ombre d'un bloc ne part que des
+  arêtes du « dos » (`cull_mode`), sinon le bloc serait dans sa propre ombre. Les textures
+  doivent rester « sans raccord » : un motif doit tomber juste dans l'image.
 - Les Sentinelles trouvent Élias par le groupe `player` et les tirs par le groupe
   `projectiles` (les pierres lancées y sont aussi : réapparition et rembobinage les effacent).
 - **Lumière (J6)** : ce que voit une Sentinelle vient de `Lighting.level_at` (lumière
