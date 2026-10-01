@@ -1384,3 +1384,84 @@ on modifie les cellules, le graphique suit.
 Trois lecteurs démarrés sur la même image, avec trois fichiers de même longueur exacte
 (882 000 échantillons), restent alignés indéfiniment : ils avancent au même rythme, celui de
 la carte son. On peut alors monter ou baisser chaque couche sans jamais les décaler.
+
+## Essai graphique : matières, relief et ambiance (écran 6)
+
+Après la v0.8, tu as trouvé le rendu « 100 % vectoriel » trop pauvre. Nous avons choisi
+d'enrichir le dessin directement (sans sprites, qui auraient figé les animations), et de
+l'essayer d'abord sur un seul écran : les ruines, de nuit (écran 6).
+
+### Ce qui a été fait
+
+- **Des matières** : un générateur (`tools/art/generate_textures.py`, comme celui des sons)
+  calcule cinq textures « sans raccord » : béton (grain, taches d'humidité, fissures),
+  briques, tôle (plaques, rivets, rouille), planches (veinage, clous) et tissu. Chacune a sa
+  **carte de relief** : la lumière d'une lampe accroche les aspérités.
+- **Les blocs et les façades** reçoivent une matière (`style`) : sol et muret en béton,
+  passerelle en tôle, caisse en planches, façades en briques ou en béton, avec fenêtres
+  creusées, fers à béton, mousse le long des arêtes et lianes qui pendent.
+- **L'ambiance de la salle** (`RoomAtmosphere`) : un clair de lune qui vient d'en haut à
+  gauche et fait ressortir le relief partout, une brume au ras du sol, des poussières qui
+  brillent dans la lumière, des bords d'écran assombris et un léger grain.
+- **La lampe** : un halo et un cône de lumière dans l'air humide (ils s'éteignent avec elle).
+- **Les personnages** (Élias, Marek, Sentinelles) : chaque pièce a un volume (dégradé), les
+  vêtements un grain de tissu éclairé par les lampes, un contour fin ; Élias a un col, des
+  boutons, des poches (et un stylo), un œil, une oreille, un sourcil ; Marek aussi.
+- **La ville au loin** (toutes les salles) : arêtes éclairées, rangées de fenêtres, antennes et
+  réservoirs sur les toits, sommets effondrés, brume au pied des immeubles.
+- **Correction au passage** : un bloc était dans sa propre ombre ; une lampe n'éclairait donc
+  jamais le sol sous elle. L'ombre ne part plus que du « dos » des blocs (toutes les salles).
+
+### Comment tester
+
+- « Prototype sans l'intro », jusqu'à l'écran 6 (ou les captures jointes à la PR).
+- Passer sous le réverbère : le mur, le sol et les vêtements prennent la lumière ; les
+  poussières y brillent. Briser la lampe (tir) : le halo s'éteint.
+- Comparer avec l'écran 7 ou 8, restés en aplats (sauf la ville au loin).
+
+### Décisions prises (et pourquoi)
+
+- **Pas de sprites** : les animations restent calculées en continu (fluides, durées
+  imposées par le gameplay) ; on affine le dessin lui-même.
+- **Tout est généré par code** (comme les sons) : aucune licence à vérifier, et tout se règle.
+- **L'ambiance ne touche pas au gameplay** : ce que voient les Sentinelles dépend toujours
+  de `ambient_light` et des lampes. Le clair de lune n'est que visuel.
+- **Rien n'est obligatoire** : un bloc sans `style`, une salle sans `atmosphere` gardent
+  exactement l'aspect d'avant. Les autres écrans ne changent pas tant qu'on ne les règle pas.
+
+### Vérifications effectuées
+
+- **323 tests** au vert, dont 8 nouveaux (`test_art_look.gd`) : textures sans raccord,
+  blocs texturés, faces non ombrées par elles-mêmes, brume et poussières, clair de lune qui
+  suit la salle, halo qui s'éteint avec la lampe, personnages ombrés et habillés.
+- **Contrôle par mutation** : 3 erreurs réintroduites. Le bloc dans sa propre ombre et le
+  clair de lune figé sont détectés par les tests ; des briques qui ne « tombent pas juste »
+  dans l'image passaient : le générateur refuse maintenant un tel motif.
+- **Captures** : écran 6 avant/après, zoom sous la lampe, planche des poses d'Élias, les
+  trois personnages ; les autres écrans (rien de cassé).
+- **Web** : export essayé dans Chromium, écran 6 : textures, relief et lumières s'affichent.
+  La console montre des avertissements WebGL (« INVALID_OPERATION: bindBuffer ») ; ils
+  existent déjà en v0.8 sur cet écran (vérifié) : ils ne viennent pas de l'essai.
+
+### Reste à faire / points d'attention
+
+- Ton avis sur l'essai. S'il te plaît : l'étendre aux autres écrans (matières et ambiance
+  pour chaque salle), puis aux plans de l'intro.
+- Les avertissements WebGL de l'écran 6 (déjà présents en v0.8) : à comprendre.
+
+### Concepts Godot expliqués
+
+**1. La carte de relief (« normal map »)**
+
+Une texture ordinaire dit « de quelle couleur est ce pixel ». Une carte de relief dit « vers
+où ce pixel est tourné » (haut, gauche…), codé en couleurs (rouge = gauche-droite, vert =
+haut-bas). Godot compare cette direction à celle de la lumière : un pixel tourné vers la
+lampe s'éclaire, l'autre reste sombre. Sur une image plate, on obtient l'illusion du relief.
+C'est comme un tableau Excel des pentes d'un terrain, à côté de celui des altitudes.
+
+**2. Une texture « sans raccord »**
+
+Pour couvrir un grand mur avec une petite image, on la répète comme un carrelage. Si le bord
+droit ne continue pas le bord gauche, une couture se voit à chaque carreau. Le générateur
+part d'un bruit calculé par transformée de Fourier : par construction, ce bruit « boucle »
+sur lui-même ; et chaque motif (briques, plaques, planches) doit tomber juste dans l'image.

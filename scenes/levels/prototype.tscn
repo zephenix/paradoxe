@@ -36,6 +36,13 @@
 [ext_resource type="Script" path="res://scripts/cutscene/finale_cutscene.gd" id="34_finale"]
 [ext_resource type="Script" path="res://scripts/cutscene/ending_shot.gd" id="35_ending"]
 
+[ext_resource type="Resource" path="res://resources/art/surfaces/concrete.tres" id="40_concrete"]
+[ext_resource type="Resource" path="res://resources/art/surfaces/brick.tres" id="41_brick"]
+[ext_resource type="Resource" path="res://resources/art/surfaces/metal.tres" id="42_metal"]
+[ext_resource type="Resource" path="res://resources/art/surfaces/planks.tres" id="43_planks"]
+
+[ext_resource type="Resource" path="res://resources/art/atmospheres/ruins_night.tres" id="44_ruins_night"]
+
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
 colors = PackedColorArray(0.03, 0.06, 0.07, 1, 0.08, 0.17, 0.15, 1)
@@ -63,12 +70,14 @@ expand_mode = 1
 scroll_scale = Vector2(0.2, 0.2)
 
 [node name="Skyline" type="Node2D" parent="FarCity"]
+z_index = -10
 script = ExtResource("6_skyline")
 base_y = 760.0
 min_height = 200.0
 max_height = 480.0
 color = Color(0.06, 0.11, 0.11, 1)
 seed_value = 21
+detailed = true
 
 [node name="Room2" type="Node2D" parent="."]
 position = Vector2(-5120.0, -360.0)
@@ -641,6 +650,7 @@ camera_zoom = 1.0
 title = "6 - Ruines"
 acoustic_zone = &"ruins"
 ambient_light = 0.22
+atmosphere = ExtResource("44_ruins_night")
 
 [node name="Ruin1" type="Node2D" parent="Room6"]
 position = Vector2(150.0, 672.0)
@@ -649,7 +659,8 @@ z_index = -1
 width = 300.0
 height = 400.0
 seed_value = 41
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.27, 0.29, 0.31, 1.0)
+style = ExtResource("41_brick")
 
 [node name="Ruin2" type="Node2D" parent="Room6"]
 position = Vector2(900.0, 672.0)
@@ -658,7 +669,8 @@ z_index = -1
 width = 500.0
 height = 520.0
 seed_value = 42
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.27, 0.29, 0.31, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ruin3" type="Node2D" parent="Room6"]
 position = Vector2(1700.0, 672.0)
@@ -667,7 +679,8 @@ z_index = -1
 width = 400.0
 height = 380.0
 seed_value = 43
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.27, 0.29, 0.31, 1.0)
+style = ExtResource("41_brick")
 
 [node name="Ruin4" type="Node2D" parent="Room6"]
 position = Vector2(2150.0, 672.0)
@@ -676,28 +689,33 @@ z_index = -1
 width = 380.0
 height = 450.0
 seed_value = 44
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.27, 0.29, 0.31, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="LeftWall" type="StaticBody2D" parent="Room6"]
 position = Vector2(-48.0, 0.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(1.0, 15.0)
+style = ExtResource("40_concrete")
 
 [node name="Ground" type="StaticBody2D" parent="Room6"]
 position = Vector2(0.0, 672.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(53.3333, 2.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="DuctGrate" type="Node2D" parent="Room6"]
 position = Vector2(300.0, 672.0)
 script = ExtResource("30_duct")
+style = ExtResource("40_concrete")
 
 [node name="Crate" type="StaticBody2D" parent="Room6"]
 position = Vector2(560.0, 576.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(2.0, 2.0)
 color = Color(0.28, 0.23, 0.17, 1.0)
+style = ExtResource("43_planks")
 
 [node name="Catwalk" type="StaticBody2D" parent="Room6"]
 position = Vector2(656.0, 528.0)
@@ -705,6 +723,7 @@ script = ExtResource("3_block")
 size_blocks = Vector2(17.5, 0.4)
 color = Color(0.3, 0.33, 0.37, 1.0)
 surface = &"metal"
+style = ExtResource("42_metal")
 
 [node name="Lamp" type="StaticBody2D" parent="Room6"]
 position = Vector2(1100.0, 598.0)
