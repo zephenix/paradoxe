@@ -166,3 +166,17 @@ func test_character_shading_follows_the_lamp() -> void:
 	lamp.shatter()
 	visual.set_facing(1)
 	assert_false(visual.front_lit, "lampe brisée, pas de lune : le dessin d'origine")
+
+
+## Retour de jeu : le Traqueur « dessin de maternelle », redessiné. Ses
+## animations calculées ne doivent jamais produire une forme impossible à
+## remplir (Godot le signale par une erreur).
+func test_tracker_drawing_survives_every_animation() -> void:
+	var tracker := TrackerVisual.new()
+	add_node(tracker)
+	for animation: StringName in [&"idle", &"run", &"roar"]:
+		tracker.play(animation)
+		for facing: int in [1, -1]:
+			tracker.set_facing(facing)
+			await wait_frames(45)
+	assert_eq(engine_errors().size(), 0, "aucune forme dégénérée")

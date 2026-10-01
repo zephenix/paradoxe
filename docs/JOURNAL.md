@@ -1431,7 +1431,7 @@ l'essayer d'abord sur un seul écran : les ruines, de nuit (écran 6).
 
 ### Vérifications effectuées
 
-- **324 tests** au vert, dont 9 nouveaux (`test_art_look.gd`) : textures sans raccord,
+- **325 tests** au vert, dont 10 nouveaux (`test_art_look.gd`) : textures sans raccord,
   blocs texturés, faces non ombrées par elles-mêmes, brume et poussières, clair de lune qui
   suit la salle, halo qui s'éteint avec la lampe, personnages ombrés et habillés.
 - **Contrôle par mutation** : 3 erreurs réintroduites. Le bloc dans sa propre ombre et le
@@ -1462,6 +1462,14 @@ l'essayer d'abord sur un seul écran : les ruines, de nuit (écran 6).
 - *Le personnage « feuille de papier » quand il se retourne* : à mi-demi-tour, il était
   écrasé à 12 % de sa largeur. Il reste maintenant à 55 %, bras et jambes un peu écartés :
   on lit un corps qui pivote.
+- *Le Traqueur « dessin de maternelle »* : il est redessiné. Corps aux courbes lisses
+  (poitrail profond, taille creusée, croupe), pattes de coureur en trois segments
+  griffus, peau écailleuse avec relief (nouvelle texture `scales`), épines courbes plus
+  longues au garrot, rayures ambrées qui luisent, long crâne avec arcade, dents et œil en
+  fente, queue effilée. En rugissant, il se cabre et le cou pivote. Une planche permet de
+  le juger sans lancer le niveau (`tools/godot/creature_sheet.gd`), et un test fait tourner
+  ses animations pour s'assurer qu'aucune forme n'est impossible à dessiner (contrôlé par
+  mutation : des épines dessinées « en nœud papillon » le font échouer).
 - *Le bruit et le compteur des pierres* : reportés en J9 (le compteur ira dans
   l'hologramme du bracelet), comme tu l'as choisi.
 

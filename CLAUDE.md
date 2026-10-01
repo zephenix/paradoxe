@@ -57,6 +57,7 @@ xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/intro_frames.gd -- build/shots [instants…]   # plans de l'intro
 python3 tools/audio/generate_sounds.py       # régénère les sons + catalog.json (puis réimport Godot)
 python3 tools/art/generate_textures.py       # régénère les textures (couleur + relief), puis réimport Godot
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 -s res://tools/godot/creature_sheet.gd -- build/shots/creature.png   # planche du Traqueur (repos, course, rugissement)
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/room_shots.gd -- build/shots/x a:400:3072   # captures rapides d'un endroit (nom:x:y)
 godot --headless --path . --import           # réimporte les sons
 godot --headless --path . -s res://tools/godot/build_sound_library.gd   # ajoute les nouveaux sons à la bibliothèque
