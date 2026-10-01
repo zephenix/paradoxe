@@ -208,6 +208,7 @@ func _create_tints() -> void:
 	key_light = DirectionalLight2D.new()
 	key_light.name = "KeyLight"
 	key_light.energy = 0.0
+	key_light.add_to_group(&"key_light")  # les personnages y lisent d'où vient la lumière
 	add_child(key_light)
 	var layer := CanvasLayer.new()
 	layer.name = "ScreenGradeLayer"

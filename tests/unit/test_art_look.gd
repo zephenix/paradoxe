@@ -148,3 +148,21 @@ func test_characters_are_shaded_and_dressed() -> void:
 		assert_true(cloth >= 9, "%s : vêtements en tissu (%d pièces)" % [script.resource_path.get_file(), cloth])
 		assert_true(shaded >= 12, "%s : pièces en volume (%d)" % [script.resource_path.get_file(), shaded])
 		assert_true(outlines >= 10, "%s : contours (%d)" % [script.resource_path.get_file(), outlines])
+
+
+## Retour de jeu : « la lumière est toujours dans le dos du personnage ». Le
+## côté clair des pièces suit maintenant la lampe la plus proche.
+func test_character_shading_follows_the_lamp() -> void:
+	var lamp := LightSource.new()
+	lamp.position = Vector2(200, -60)
+	lamp.radius = 400.0
+	add_node(lamp)
+	var visual: EliasVisual = EliasVisual.new()
+	add_node(visual)
+	visual.set_facing(1)  # la lampe est devant lui
+	assert_true(visual.front_lit, "face à la lampe : éclairé de face")
+	visual.set_facing(-1)
+	assert_false(visual.front_lit, "dos à la lampe : éclairé de dos")
+	lamp.shatter()
+	visual.set_facing(1)
+	assert_false(visual.front_lit, "lampe brisée, pas de lune : le dessin d'origine")

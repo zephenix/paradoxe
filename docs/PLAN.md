@@ -499,7 +499,9 @@ d'options de J9) ; il coupe le rembobinage, et les six aides du parkour de J2.
 - **Aucun HUD permanent.** Le poignet gauche d'Élias porte un bracelet.
 - La lueur du bracelet varie avec l'énergie (visible dès qu'on tire).
 - Touche « Bracelet » : un petit hologramme se projette au-dessus du poignet — jauge
-  d'énergie, inventaire (icônes), objectif (flèche / pictogramme), rembobinages restants.
+  d'énergie, inventaire (icônes), pierres portées, objectif (flèche / pictogramme),
+  rembobinages restants. Ramasser une pierre : un son bien audible et un petit geste
+  (retour de jeu après la v0.8).
   Le jeu continue pendant ce temps, comme pour un vrai geste.
 - Seuls les menus (pause, options) sont des écrans classiques.
 

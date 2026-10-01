@@ -1431,7 +1431,7 @@ l'essayer d'abord sur un seul écran : les ruines, de nuit (écran 6).
 
 ### Vérifications effectuées
 
-- **323 tests** au vert, dont 8 nouveaux (`test_art_look.gd`) : textures sans raccord,
+- **324 tests** au vert, dont 9 nouveaux (`test_art_look.gd`) : textures sans raccord,
   blocs texturés, faces non ombrées par elles-mêmes, brume et poussières, clair de lune qui
   suit la salle, halo qui s'éteint avec la lampe, personnages ombrés et habillés.
 - **Contrôle par mutation** : 3 erreurs réintroduites. Le bloc dans sa propre ombre et le
@@ -1448,6 +1448,22 @@ l'essayer d'abord sur un seul écran : les ruines, de nuit (écran 6).
 - Ton avis sur l'essai. S'il te plaît : l'étendre aux autres écrans (matières et ambiance
   pour chaque salle), puis aux plans de l'intro.
 - Les avertissements WebGL de l'écran 6 (déjà présents en v0.8) : à comprendre.
+
+### Après tes retours sur l'essai
+
+- *La lumière toujours dans le dos du personnage* : le volume des pièces était peint une
+  fois pour toutes (côté clair à l'arrière). Chaque pièce a maintenant deux jeux de couleurs,
+  et le personnage regarde toutes les 0,15 s d'où vient la lumière : la lampe allumée la plus
+  proche, sinon la lune de la salle. Face à la lampe, son visage et l'avant de sa blouse
+  s'éclairent. Test ajouté, contrôlé par mutation.
+- *Des bandes noires verticales dans l'arrière-plan* : c'étaient les espaces entre les
+  immeubles de la ville au loin. Les immeubles sont plus bas (on revoit le ciel), et une
+  rangée plus lointaine, noyée dans la brume, comble les espaces.
+- *Le personnage « feuille de papier » quand il se retourne* : à mi-demi-tour, il était
+  écrasé à 12 % de sa largeur. Il reste maintenant à 55 %, bras et jambes un peu écartés :
+  on lit un corps qui pivote.
+- *Le bruit et le compteur des pierres* : reportés en J9 (le compteur ira dans
+  l'hologramme du bracelet), comme tu l'as choisi.
 
 ### Concepts Godot expliqués
 

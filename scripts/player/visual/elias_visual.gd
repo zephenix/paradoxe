@@ -32,6 +32,8 @@ const SHADE_DARK: float = 0.14
 ## Le tissu est un peu plus sombre que le blanc (en moyenne 0,9) : la couleur
 ## est multipliée d'autant pour compenser.
 const FABRIC_GAIN: float = 1.1
+## Tous les combien de secondes on regarde d'où vient la lumière.
+const LIGHT_CHECK: float = 0.15
 ## Contour : la couleur de la pièce, assombrie.
 const OUTLINE_DARKEN: float = 0.55
 ## Animations où l'arme est en main (le pistolet n'est dessiné que pendant celles-ci).
@@ -57,6 +59,12 @@ var _gun: Node2D
 var _bracelet: Polygon2D
 var _rig: Node2D
 var _player: AnimationPlayer
+## Pièces en volume : {"poly", "back", "front"} (couleurs par sommet quand la
+## lumière vient de dos, ou de face).
+var _shaded: Array[Dictionary] = []
+## Vrai quand la lumière arrive de face (sur le visage, l'avant de la blouse).
+var front_lit: bool = false
+var _light_timer: float = 0.0
 ## Chemin (depuis ce nœud) de chaque articulation animée.
 var _joint_paths: Dictionary = {}
 
@@ -91,6 +99,57 @@ func play(animation: StringName, duration: float = -1.0) -> void:
 func set_facing(direction: int) -> void:
 	if _flip:
 		_flip.scale.x = 1.0 if direction >= 0 else -1.0
+	_update_light_side()
+
+
+# --------------------------------------------------------------------------
+# D'où vient la lumière ?
+# --------------------------------------------------------------------------
+
+func _process(delta: float) -> void:
+	_light_timer -= delta
+	if _light_timer <= 0.0:
+		_light_timer = LIGHT_CHECK
+		_update_light_side()
+
+
+## Côté (dans le monde) d'où vient la lumière la plus forte : -1 = gauche,
+## +1 = droite, 0 = on ne sait pas (pas de lampe ni de lune : plan de l'intro…).
+## D'abord la lampe allumée la plus proche, à portée ; sinon la lumière
+## principale de la salle (la lune), si elle brille.
+func light_side() -> float:
+	if not is_inside_tree():
+		return 0.0
+	var best: float = 0.0
+	var side: float = 0.0
+	for node in get_tree().get_nodes_in_group(Lighting.GROUP):
+		var lamp: LightSource = node as LightSource
+		if lamp == null or not lamp.lit:
+			continue
+		var distance: float = lamp.global_position.distance_to(global_position)
+		var strength: float = lamp.energy * (1.0 - distance / lamp.radius)
+		if strength > best and absf(lamp.global_position.x - global_position.x) > 4.0:
+			best = strength
+			side = signf(lamp.global_position.x - global_position.x)
+	if side != 0.0:
+		return side
+	var key: DirectionalLight2D = get_tree().get_first_node_in_group(&"key_light") as DirectionalLight2D
+	if key and key.energy > 0.01 and absf(key.rotation_degrees) > 1.0:
+		return signf(key.rotation_degrees)  # rotation négative : la lumière vient de la droite
+	return 0.0
+
+
+## Repeint le volume des pièces pour que le côté clair soit celui de la lumière.
+func _update_light_side() -> void:
+	if _flip == null:
+		return
+	var side: float = light_side()
+	var lit: bool = side != 0.0 and side * _flip.scale.x > 0.0
+	if lit == front_lit:
+		return
+	front_lit = lit
+	for piece in _shaded:
+		(piece["poly"] as Polygon2D).vertex_colors = piece["front"] if front_lit else piece["back"]
 
 
 ## Le bracelet du poignet gauche brille selon l'énergie (interface « dans le
@@ -259,16 +318,24 @@ func _poly(parent: Node, points: Array[Vector2], color: Color, cloth: bool = fal
 		bounds = bounds.expand(point)
 	if bounds.size.x * bounds.size.y < 16.0:
 		return
-	# Avec des couleurs par sommet, Polygon2D ignore « color » : la compensation
-	# du tissu se fait ici.
-	var base: Color = Color(color.r * FABRIC_GAIN, color.g * FABRIC_GAIN, color.b * FABRIC_GAIN, color.a) if cloth else color
-	var shades := PackedColorArray()
+	# Deux jeux de couleurs par sommet : lumière de dos (le dessin d'origine) et
+	# lumière de face. De face, les pans d'ombre de la blouse s'éclairent et ses
+	# pans clairs passent à l'ombre. (Avec des couleurs par sommet, Polygon2D
+	# ignore « color » : la compensation du tissu se fait ici.)
+	var front_color: Color = color
+	if cloth and color == coat_shade:
+		front_color = coat_color.lightened(0.08)
+	elif cloth and color == coat_color and not outlined:
+		front_color = coat_shade
+	var back := PackedColorArray()
+	var front := PackedColorArray()
 	for point in points:
-		var front: float = (point.x - bounds.position.x) / maxf(bounds.size.x, 1.0)  # 0 arrière, 1 avant
+		var ahead: float = (point.x - bounds.position.x) / maxf(bounds.size.x, 1.0)  # 0 arrière, 1 avant
 		var low: float = (point.y - bounds.position.y) / maxf(bounds.size.y, 1.0)  # 0 haut, 1 bas
-		var shade: Color = base.darkened(SHADE_DARK * front + 0.1 * low)
-		shades.append(shade.lightened(SHADE_LIGHT * (1.0 - front) * (1.0 - low)))
-	p.vertex_colors = shades
+		back.append(_shade(color, cloth, ahead, low))
+		front.append(_shade(front_color, cloth, 1.0 - ahead, low))
+	p.vertex_colors = front if front_lit else back
+	_shaded.append({"poly": p, "back": back, "front": front})
 	if cloth:
 		p.texture = FABRIC.canvas_texture()
 		p.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
@@ -282,6 +349,13 @@ func _poly(parent: Node, points: Array[Vector2], color: Color, cloth: bool = fal
 	outline.default_color = Color(color.darkened(OUTLINE_DARKEN), 0.7)
 	outline.joint_mode = Line2D.LINE_JOINT_ROUND
 	p.add_child(outline)
+
+
+## Couleur d'un sommet : « away » = 0 du côté de la lumière, 1 du côté opposé ;
+## « low » = 0 en haut, 1 en bas.
+func _shade(color: Color, cloth: bool, away: float, low: float) -> Color:
+	var base: Color = Color(color.r * FABRIC_GAIN, color.g * FABRIC_GAIN, color.b * FABRIC_GAIN, color.a) if cloth else color
+	return base.darkened(SHADE_DARK * away + 0.1 * low).lightened(SHADE_LIGHT * (1.0 - away) * (1.0 - low))
 
 
 func _register(joint: String, node: Node) -> void:
