@@ -44,7 +44,8 @@ func _draw() -> void:
 	var far: float = fposmod(scroll * 0.6, 160.0)
 	for i in 10:
 		var x: float = i * 160.0 - far
-		draw_rect(Rect2(x + 4.0, CEILING_Y + 30.0, 152.0, FLOOR_Y - CEILING_Y - 30.0), Color("141a22"))
+		var panel := Rect2(x + 4.0, CEILING_Y + 30.0, 152.0, FLOOR_Y - CEILING_Y - 30.0)
+		tex_poly([panel.position, Vector2(panel.end.x, panel.position.y), panel.end, Vector2(panel.position.x, panel.end.y)], Color("232c38"), METAL)
 		draw_line(Vector2(x + 20.0, 330.0), Vector2(x + 140.0, 330.0), Color("1d2530"), 2.0)
 	# Plafond, sol (caillebotis).
 	draw_rect(Rect2(0, CEILING_Y - 60.0, W, 60.0), Color("07090d"))

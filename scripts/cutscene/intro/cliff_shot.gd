@@ -27,8 +27,8 @@ func _draw() -> void:
 	# Mer au loin, puis la falaise.
 	poly([Vector2(0, 560), Vector2(W, 540), Vector2(W, H + 40), Vector2(0, H + 40)], Color("05080d").lerp(Color("283444"), flash * 0.6))
 	var rock: Color = Color("06090e").lerp(Color("3a4553"), flash * 0.7)
-	poly([Vector2(-40, H + 40), Vector2(-40, 600), Vector2(260, 585), Vector2(520, 500), Vector2(680, 440),
-			Vector2(1010, 430), Vector2(1320, 455), Vector2(1320, H + 40)], rock)
+	tex_poly([Vector2(-40, H + 40), Vector2(-40, 600), Vector2(260, 585), Vector2(520, 500), Vector2(680, 440),
+			Vector2(1010, 430), Vector2(1320, 455), Vector2(1320, H + 40)], rock.lightened(0.12), CONCRETE)
 	draw_polyline(PackedVector2Array([Vector2(520, 500), Vector2(680, 440), Vector2(1010, 430), Vector2(1320, 455)]),
 			Color("1a222c").lerp(Color("aebdd0"), flash), 2.0)
 	draw_lab(Vector2(760.0, 433.0), 1.0, Color("e8d9a6").lerp(Color.WHITE, flash * 0.3), flash)

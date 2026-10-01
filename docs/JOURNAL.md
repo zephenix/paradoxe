@@ -1476,6 +1476,15 @@ l'essayer d'abord sur un seul écran : les ruines, de nuit (écran 6).
   soleil couchant orangé et pollen pour la jungle (écrans 2 et 3), lumière verte et
   lucioles pour la clairière (4), lumière froide du plafond pour les cellules (5), jour
   blafard et poussière pour le hall (7), clair de lune pour la poursuite (8).
+- **L'intro et le plan final dans le nouveau style** : un grain « pellicule » et des bords
+  assombris sur toute l'intro ; matières sur le labo, la falaise, la façade, le couloir,
+  le bureau (bois) et la salle du portail ; fenêtres qui rayonnent ; mains modelées
+  (phalanges, ongles, tendons) au lecteur et au clavier, touches en relief ; le très gros
+  plan des yeux entièrement redessiné (peau modelée, paupières et leur pli, cils, iris
+  strié, reflets, sourcils poil à poil). Plan final : ciel étoilé, ruines à l'horizon,
+  arbres couchés en étoile autour du cratère, cratère de terre éclairé de vert par
+  l'anneau, rochers sur le bord. Nouveaux outils des plans : `tex_poly`, `shade_poly`,
+  `glow_at` (`IntroShot`).
 - *Le bruit et le compteur des pierres* : reportés en J9 (le compteur ira dans
   l'hologramme du bracelet), comme tu l'as choisi.
 

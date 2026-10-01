@@ -39,9 +39,9 @@ func _draw() -> void:
 	fill(Color("07090c"))
 	for i in 9:
 		var x: float = i * 160.0
-		draw_rect(Rect2(x + 6.0, 90.0, 148.0, FLOOR_Y - 90.0), Color("0c1015"))
+		tex_poly([Vector2(x + 6.0, 90.0), Vector2(x + 154.0, 90.0), Vector2(x + 154.0, FLOOR_Y), Vector2(x + 6.0, FLOOR_Y)], Color("161c24"), METAL)
 		draw_line(Vector2(x + 20.0, 250.0), Vector2(x + 140.0, 250.0), Color("121820"), 2.0)
-	draw_rect(Rect2(0.0, FLOOR_Y, W, H - FLOOR_Y), Color("0e1217"))
+	tex_poly([Vector2(0.0, FLOOR_Y), Vector2(W, FLOOR_Y), Vector2(W, H), Vector2(0.0, H)], Color("1a1f26"), CONCRETE)
 	for i in 12:  # joints du sol, en perspective
 		var x: float = -200.0 + i * 150.0
 		draw_line(Vector2(640.0 + (x - 640.0) * 0.6, FLOOR_Y), Vector2(x, H), Color("151a21"), 2.0)

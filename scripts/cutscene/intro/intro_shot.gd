@@ -17,6 +17,11 @@ extends Node2D
 const W: float = 1280.0
 const H: float = 720.0
 const GLOW: Color = Color("6effbf")  # le vert du portail (fil rouge du twist)
+## Matières (les mêmes qu'en jeu) : elles donnent du grain aux surfaces des plans.
+const CONCRETE: SurfaceStyle = preload("res://resources/art/surfaces/concrete.tres")
+const METAL: SurfaceStyle = preload("res://resources/art/surfaces/metal.tres")
+const PLANKS: SurfaceStyle = preload("res://resources/art/surfaces/planks.tres")
+const EARTH: SurfaceStyle = preload("res://resources/art/surfaces/earth.tres")
 
 ## Avancement du plan : 0 au début, 1 à la fin (animé par la table de montage).
 @export_range(0.0, 1.0) var progress: float = 0.0:
@@ -35,6 +40,7 @@ var time: float = 0.0
 
 func _ready() -> void:
 	visible = false
+	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED  # pour les matières (tex_poly)
 	visibility_changed.connect(func() -> void: time = 0.0)
 
 
@@ -57,6 +63,34 @@ func fill(color: Color) -> void:
 func vertical_gradient(top_y: float, bottom_y: float, top: Color, bottom: Color) -> void:
 	draw_polygon(PackedVector2Array([Vector2(0, top_y), Vector2(W, top_y), Vector2(W, bottom_y), Vector2(0, bottom_y)]),
 			PackedColorArray([top, top, bottom, bottom]))
+
+
+## Polygone recouvert d'une matière (béton, tôle…), teintée par « color ».
+func tex_poly(points: Array, color: Color, style: SurfaceStyle) -> void:
+	var p := PackedVector2Array(points)
+	draw_colored_polygon(p, color, style.draw_uvs_for(p), style.canvas_texture())
+
+
+## Polygone en dégradé : couleur « from » du côté opposé à « axis », « to » du
+## côté vers lequel pointe « axis » (vers le bas par défaut). Donne du volume.
+func shade_poly(points: Array, from: Color, to: Color, axis: Vector2 = Vector2.DOWN) -> void:
+	var p := PackedVector2Array(points)
+	var low: float = INF
+	var high: float = -INF
+	for point in p:
+		low = minf(low, point.dot(axis))
+		high = maxf(high, point.dot(axis))
+	var colors := PackedColorArray()
+	for point in p:
+		colors.append(from.lerp(to, (point.dot(axis) - low) / maxf(high - low, 0.001)))
+	draw_polygon(p, colors)
+
+
+## Halo doux : des disques de plus en plus grands et transparents.
+func glow_at(center: Vector2, radius: float, color: Color, layers: int = 6) -> void:
+	for i in layers:
+		var k: float = float(i + 1) / layers
+		draw_circle(center, radius * k, Color(color, color.a * 0.35 * (1.0 - k) + color.a * 0.04))
 
 
 ## Polygone plein à partir d'une liste de points.
@@ -120,9 +154,9 @@ func draw_lab(at: Vector2, k: float, lit: Color, light: float) -> void:
 		var a: float = PI + PI * i / 12.0
 		dome.append(at + Vector2(210.0 + cos(a) * 120.0, -110.0 + sin(a) * 90.0) * k)
 	draw_colored_polygon(dome, wall.darkened(0.15))
-	poly([at, at + Vector2(0, -110) * k, at + Vector2(330, -110) * k, at + Vector2(330, 0) * k], wall)
+	tex_poly([at, at + Vector2(0, -110) * k, at + Vector2(330, -110) * k, at + Vector2(330, 0) * k], wall.lightened(0.15), CONCRETE)
 	# Tour et antenne.
-	poly([at + Vector2(270, -110) * k, at + Vector2(270, -200) * k, at + Vector2(318, -200) * k, at + Vector2(318, -110) * k], wall)
+	tex_poly([at + Vector2(270, -110) * k, at + Vector2(270, -200) * k, at + Vector2(318, -200) * k, at + Vector2(318, -110) * k], wall.lightened(0.15), CONCRETE)
 	draw_line(at + Vector2(294, -200) * k, at + Vector2(294, -262) * k, edge, 3.0 * k)
 	draw_circle(at + Vector2(294, -262) * k, 3.5 * k, Color(1.0, 0.25, 0.2, 0.9))  # feu de balisage
 	draw_line(at + Vector2(0, -110) * k, at + Vector2(330, -110) * k, edge, 2.0)
@@ -133,4 +167,4 @@ func draw_lab(at: Vector2, k: float, lit: Color, light: float) -> void:
 		var c: Color = lit if on else Color("1b2430")
 		draw_rect(Rect2(at + Vector2(x, -78) * k, Vector2(14, 20) * k), c)
 		if on:
-			draw_rect(Rect2(at + Vector2(x - 6, -84) * k, Vector2(26, 32) * k), Color(lit, 0.12))
+			glow_at(at + Vector2(x + 7, -68) * k, 26.0 * k, Color(lit, 0.5))

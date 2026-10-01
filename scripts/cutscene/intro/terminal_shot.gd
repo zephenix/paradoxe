@@ -43,17 +43,28 @@ func _draw() -> void:
 	poly([Vector2(120, 560), Vector2(1160, 560), Vector2(1240, H), Vector2(40, H)], Color("15191f"))
 	for r in 3:
 		for k in 16:
-			draw_rect(Rect2(170.0 + k * 58.0 + r * 12.0, 572.0 + r * 30.0, 48.0, 22.0), Color("22282f"))
+			var key := Rect2(170.0 + k * 58.0 + r * 12.0, 572.0 + r * 30.0, 48.0, 22.0)
+			draw_rect(key.grow(2.0), Color("0c0f13"))  # ombre sous la touche
+			draw_rect(key, Color("262d35"))
+			draw_rect(Rect2(key.position, Vector2(key.size.x, 5.0)), Color("3a434e"))  # arête éclairée par l'écran
+			draw_rect(Rect2(key.position + Vector2(0, key.size.y - 3.0), Vector2(key.size.x, 3.0)), Color("161a20"))
 	var typing: float = 1.0 - phase(0.55, 0.7)  # il tape, puis s'arrête et regarde
 	_draw_hand(Vector2(430.0, 610.0), 1.0, typing)
 	_draw_hand(Vector2(850.0, 610.0), -1.0, typing)
 
 
 func _draw_hand(at: Vector2, side: float, typing: float) -> void:
-	poly([at + Vector2(-70 * side, 110), at + Vector2(-40 * side, 20), at + Vector2(60 * side, 10), at + Vector2(90 * side, 110)], Color("b9c6cc"))
-	poly([at + Vector2(-44 * side, 24), at + Vector2(-30 * side, -26), at + Vector2(56 * side, -30), at + Vector2(60 * side, 14)], SKIN)
+	var lit: Color = SKIN.lightened(0.1)
+	var shadow: Color = SKIN.darkened(0.3)
+	# Manche et dos de la main : éclairés par l'écran (en haut), sombres en bas.
+	shade_poly([at + Vector2(-70 * side, 110), at + Vector2(-40 * side, 20), at + Vector2(60 * side, 10), at + Vector2(90 * side, 110)],
+			Color("c9d4d9"), Color("6f7b82"))
+	shade_poly([at + Vector2(-44 * side, 24), at + Vector2(-30 * side, -26), at + Vector2(56 * side, -30), at + Vector2(60 * side, 14)], lit, shadow)
 	for f in 4:
 		var bob: float = typing * maxf(0.0, sin(time * 11.0 + f * 1.9 + side)) * 10.0
 		var x: float = (-24.0 + f * 22.0) * side
-		poly([at + Vector2(x, -26 - bob), at + Vector2(x + 14 * side, -26 - bob), at + Vector2(x + 16 * side, -64 - bob),
-				at + Vector2(x + 2 * side, -64 - bob)], SKIN)
+		shade_poly([at + Vector2(x, -26 - bob), at + Vector2(x + 14 * side, -26 - bob), at + Vector2(x + 16 * side, -64 - bob),
+				at + Vector2(x + 2 * side, -64 - bob)], shadow, lit)
+		draw_circle(at + Vector2(x + 8 * side, -64 - bob), 7.5, lit)
+		draw_rect(Rect2(at + Vector2(x + (4 if side > 0 else -12), -70 - bob), Vector2(8, 9)), Color("efd2c0"))  # ongle
+		draw_line(at + Vector2(x + 2 * side, -44 - bob), at + Vector2(x + 14 * side, -44 - bob), Color(shadow, 0.6), 1.5)  # pli
