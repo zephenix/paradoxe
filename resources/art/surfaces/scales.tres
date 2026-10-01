@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SurfaceStyle" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/surface_style.gd" id="1_style"]
+[ext_resource type="Texture2D" path="res://assets/textures/generated/scales.png" id="2_diffuse"]
+[ext_resource type="Texture2D" path="res://assets/textures/generated/scales_n.png" id="3_normal"]
+
+[resource]
+script = ExtResource("1_style")
+diffuse = ExtResource("2_diffuse")
+normal = ExtResource("3_normal")
+texel_size = 0.5

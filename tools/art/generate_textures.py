@@ -213,6 +213,29 @@ def fabric(size: int = 64) -> None:
     save("fabric", color, height, 0.9)
 
 
+def scales(size: int = 128) -> None:
+    """Écailles (peau du Traqueur) : des cellules irrégulières (« diagramme de
+    Voronoï » : chaque pixel appartient à la graine la plus proche), bombées au
+    centre, avec un sillon sombre entre elles. Les distances se mesurent en
+    « enroulant » l'image (les 9 copies voisines) : sans raccord."""
+    rng = np.random.default_rng(13)
+    seeds = rng.uniform(0, size, (70, 2))
+    y, x = np.mgrid[0:size, 0:size].astype(float)
+    first = np.full((size, size), 1e9)
+    second = np.full((size, size), 1e9)
+    for sx, sy in seeds:
+        for ox in (-size, 0, size):
+            for oy in (-size, 0, size):
+                d = np.sqrt((x - sx - ox) ** 2 + (y - sy - oy) ** 2)
+                second = np.where(d < first, first, np.minimum(second, d))
+                first = np.minimum(first, d)
+    edge = np.clip((second - first) / 6.0, 0.0, 1.0)  # 0 au sillon, 1 au centre
+    grain = periodic_noise(size, 0.8, 14)
+    color = 0.62 + 0.3 * edge + 0.06 * (grain - 0.5)
+    height = np.sqrt(edge) + 0.15 * grain
+    save("scales", color, height, 2.4)
+
+
 def main() -> None:
     print("Textures ->", os.path.normpath(OUT_DIR))
     concrete()
@@ -220,6 +243,7 @@ def main() -> None:
     metal()
     planks()
     fabric()
+    scales()
 
 
 if __name__ == "__main__":
