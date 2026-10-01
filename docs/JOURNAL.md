@@ -1470,6 +1470,12 @@ l'essayer d'abord sur un seul écran : les ruines, de nuit (écran 6).
   le juger sans lancer le niveau (`tools/godot/creature_sheet.gd`), et un test fait tourner
   ses animations pour s'assurer qu'aucune forme n'est impossible à dessiner (contrôlé par
   mutation : des épines dessinées « en nœud papillon » le font échouer).
+- **Le rendu étendu à tout le prototype** (écrans 2 à 8) : chaque bloc reçoit une matière
+  (béton, tôle, et une nouvelle texture de sol de jungle : terre, cailloux, plaques de
+  mousse), chaque façade en ruine des briques ou du béton, et chaque écran une ambiance :
+  soleil couchant orangé et pollen pour la jungle (écrans 2 et 3), lumière verte et
+  lucioles pour la clairière (4), lumière froide du plafond pour les cellules (5), jour
+  blafard et poussière pour le hall (7), clair de lune pour la poursuite (8).
 - *Le bruit et le compteur des pierres* : reportés en J9 (le compteur ira dans
   l'hologramme du bracelet), comme tu l'as choisi.
 

@@ -110,7 +110,8 @@ func test_key_light_follows_the_room() -> void:
 	var player: Player = level.player
 	player.input.from_devices = false
 	await wait_physics(3)
-	assert_almost_eq(level.key_light.energy, 0.0, 0.001, "écran 2 : pas de lumière principale")
+	var jungle: RoomAtmosphere = (level.get_node("Room2") as Room).atmosphere
+	assert_almost_eq(level.key_light.energy, jungle.key_energy, 0.001, "écran 2 : le soleil couchant")
 	player.global_position = (level.get_node("Room6/Entry") as Node2D).global_position
 	await wait_physics_seconds(Level.AMBIENT_FADE + 0.5)
 	assert_almost_eq(level.key_light.energy, RUINS_NIGHT.key_energy, 0.01, "écran 6 : le clair de lune")
@@ -118,7 +119,9 @@ func test_key_light_follows_the_room() -> void:
 	assert_almost_eq(float(grade.get_shader_parameter(&"vignette")), RUINS_NIGHT.vignette, 0.01, "bords assombris")
 	player.global_position = (level.get_node("Room4/Spawn") as Node2D).global_position
 	await wait_physics_seconds(Level.AMBIENT_FADE + 0.5)
-	assert_almost_eq(level.key_light.energy, 0.0, 0.01, "de retour à l'écran 4 : plus de lune")
+	var clearing: RoomAtmosphere = (level.get_node("Room4") as Room).atmosphere
+	assert_almost_eq(level.key_light.energy, clearing.key_energy, 0.01, "écran 4 : la lumière de la clairière")
+	assert_almost_eq(level.key_light.color.g, clearing.key_color.g, 0.01, "et sa couleur")
 
 
 func test_lamp_halo_goes_out_with_the_lamp() -> void:
