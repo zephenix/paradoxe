@@ -99,7 +99,12 @@ const POSES: Dictionary = {
 	"lying": {"rig_rot": -88, "rig_y": 17, "hips_y": 0, "torso": 4, "head": -10,
 		"arm_f": 30, "fore_f": 20, "arm_b": -20, "fore_b": 10, "thigh_f": 12, "shin_f": -15,
 		"thigh_b": -5, "shin_b": -5, "coat": 10},
-	"squeeze": {"rig_sx": 0.12},
+	# Demi-tour : le corps pivote. À mi-chemin, il est vu de trois quarts (encore
+	# 55 % de sa largeur, pas une « feuille de papier »), les bras écartés de
+	# part et d'autre du buste et les jambes un peu ouvertes : on lit un corps
+	# qui tourne, pas une image qu'on retourne.
+	"squeeze": {"rig_sx": 0.55, "torso": 0, "head": 0, "arm_f": 14, "fore_f": 10, "arm_b": -14, "fore_b": 10,
+		"thigh_f": 8, "shin_f": -4, "thigh_b": -8, "shin_b": -4, "coat": 0},
 	# Combat (J3). Bras avant à 90° : tendu à l'horizontale, pistolet au bout.
 	"aim": {"torso": 0, "head": -2, "hips_y": 1, "arm_f": 90, "fore_f": 0, "arm_b": 40, "fore_b": 70,
 		"thigh_f": 14, "shin_f": -6, "thigh_b": -12, "shin_b": -4, "coat": 2},

@@ -37,6 +37,8 @@ const DEPTH: float = 1400.0
 func _draw() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
+	if detailed:
+		_draw_back_row(rng)
 	var x: float = -200.0
 	while x < width:
 		var w: float = rng.randf_range(60.0, 170.0)
@@ -65,6 +67,20 @@ func _draw() -> void:
 				PackedColorArray([clear, clear, haze_color, haze_color]))
 		draw_polygon(PackedVector2Array([Vector2(-200, base_y), Vector2(width, base_y), Vector2(width, base_y + 260), Vector2(-200, base_y + 260)]),
 				PackedColorArray([haze_color, haze_color, clear, clear]))
+
+
+## Rangée du fond (version détaillée) : des immeubles plus lointains, collés les
+## uns aux autres et noyés dans la brume. On les voit entre les immeubles de
+## devant : sans eux, ces espaces formaient des bandes noires verticales.
+func _draw_back_row(rng: RandomNumberGenerator) -> void:
+	var back: Color = color.lerp(Color(haze_color, 1.0), 0.35)
+	var x: float = -200.0
+	while x < width:
+		var w: float = rng.randf_range(50.0, 120.0)
+		var top: float = base_y - rng.randf_range(min_height * 0.6, max_height * 0.8)
+		draw_colored_polygon(PackedVector2Array([Vector2(x, base_y + DEPTH), Vector2(x, top), Vector2(x + w, top), Vector2(x + w, base_y + DEPTH)]),
+				back.darkened(rng.randf_range(0.0, 0.12)))
+		x += w
 
 
 ## Un immeuble détaillé : sommet parfois effondré, arête gauche éclairée par la
