@@ -9,7 +9,8 @@ const FRAME := Rect2(-190.0, -135.0, 380.0, 270.0)  # autour du centre de la pho
 func _draw() -> void:
 	fill(Color("12100f"))
 	# Bureau : dégradé, un bord éclairé par la lampe.
-	vertical_gradient(200.0, H, Color("2a2420"), Color("15110f"))
+	tex_poly([Vector2(0, 200), Vector2(W, 200), Vector2(W, H), Vector2(0, H)], Color("5a4334"), PLANKS)
+	shade_poly([Vector2(0, 200), Vector2(W, 200), Vector2(W, H), Vector2(0, H)], Color(0, 0, 0, 0.35), Color(0, 0, 0, 0.75))
 	draw_circle(Vector2(1040.0, 260.0), 260.0, Color(1.0, 0.85, 0.6, 0.05))
 	# Tasse et tablette (pour situer le bureau).
 	draw_rect(Rect2(930, 420, 70, 90), Color("3d4148"))

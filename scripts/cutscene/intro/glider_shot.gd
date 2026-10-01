@@ -8,7 +8,7 @@ const GROUND_Y: float = 540.0
 func _draw() -> void:
 	vertical_gradient(0.0, GROUND_Y, Color("080c13"), Color("141c27"))
 	# Façade de l'entrée à droite, porte éclairée, auvent.
-	poly([Vector2(820, GROUND_Y), Vector2(820, 250), Vector2(W, 230), Vector2(W, GROUND_Y)], Color("121821"))
+	tex_poly([Vector2(820, GROUND_Y), Vector2(820, 250), Vector2(W, 230), Vector2(W, GROUND_Y)], Color("222a35"), CONCRETE)
 	draw_rect(Rect2(930, 420, 90, GROUND_Y - 420), Color("d9e8e0"))
 	draw_rect(Rect2(900, 400, 150, GROUND_Y - 400), Color(0.85, 0.95, 0.9, 0.1))
 	poly([Vector2(890, 405), Vector2(1060, 405), Vector2(1080, 390), Vector2(870, 390)], Color("2b3440"))
@@ -30,7 +30,8 @@ func _draw() -> void:
 	draw_colored_polygon(PackedVector2Array([tip, tip + beam_dir * 520.0 + side, tip + beam_dir * 520.0 - side]),
 			Color(1.0, 0.97, 0.85, 0.13 * lights_on))
 	draw_set_transform(pos, tilt)
-	poly([Vector2(-110, 8), Vector2(-90, -14), Vector2(-20, -24), Vector2(60, -22), Vector2(108, -6), Vector2(104, 10), Vector2(-100, 16)], Color("303946"))
+	shade_poly([Vector2(-110, 8), Vector2(-90, -14), Vector2(-20, -24), Vector2(60, -22), Vector2(108, -6), Vector2(104, 10), Vector2(-100, 16)],
+			Color("56677a"), Color("1c232c"))  # coque, éclairée par le haut
 	poly([Vector2(-30, -22), Vector2(10, -38), Vector2(56, -34), Vector2(70, -20)], Color("5c7488"))  # verrière
 	draw_line(Vector2(-100, 17), Vector2(100, 11), Color(GLOW, 0.8), 3.0)  # lueur sous la coque
 	draw_circle(Vector2(102, -2), 5.0, Color(1.0, 0.97, 0.85, lights_on))

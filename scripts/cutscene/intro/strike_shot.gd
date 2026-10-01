@@ -13,7 +13,7 @@ func _draw() -> void:
 	var strike: float = phase(0.08, 0.14)  # l'instant de l'impact
 	var light: float = maxf(flash, 0.0)
 	vertical_gradient(0.0, H, Color("070b12").lerp(Color("c9d6e6"), light * 0.8), Color("141c27").lerp(Color("e6eef7"), light))
-	poly([Vector2(0, 520), Vector2(W, 500), Vector2(W, H), Vector2(0, H)], Color("06090e").lerp(Color("4a5666"), light * 0.7))
+	tex_poly([Vector2(0, 520), Vector2(W, 500), Vector2(W, H), Vector2(0, H)], Color("0c1118").lerp(Color("4a5666"), light * 0.7), CONCRETE)
 	# Le bâtiment, plus grand (on est plus près) ; fenêtres vertes après l'impact.
 	var windows: Color = Color("e8d9a6").lerp(GLOW, clampf(progress * 3.0 - 0.3, 0.0, 1.0))
 	draw_lab(Vector2(330.0, 520.0), 1.6, windows, light)

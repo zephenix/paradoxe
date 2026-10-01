@@ -39,7 +39,25 @@ func _ready() -> void:
 	cutscenes.bar_height = BAR_HEIGHT
 	cutscenes.input_from_devices = input_from_devices
 	add_child(cutscenes)
+	_add_film_grade()
 	_play.call_deferred()
+
+
+## Finition « pellicule » (comme en jeu) : bords de l'image assombris, léger grain.
+func _add_film_grade() -> void:
+	var layer := CanvasLayer.new()
+	layer.name = "FilmGrade"
+	layer.layer = 2
+	add_child(layer)
+	var grade := ColorRect.new()
+	grade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	grade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var material := ShaderMaterial.new()
+	material.shader = preload("res://assets/shaders/screen_grade.gdshader")
+	material.set_shader_parameter(&"vignette", 0.5)
+	material.set_shader_parameter(&"grain", 0.05)
+	grade.material = material
+	layer.add_child(grade)
 
 
 func _play() -> void:

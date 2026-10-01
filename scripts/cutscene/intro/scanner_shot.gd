@@ -10,6 +10,7 @@ const SLEEVE: Color = Color("b9c6cc")
 
 func _draw() -> void:
 	fill(Color("1e242c"))
+	tex_poly([Vector2(0, 0), Vector2(W, 0), Vector2(W, H), Vector2(0, H)], Color("2a323c"), METAL)
 	# Panneaux du mur, joints.
 	for i in 6:
 		draw_line(Vector2(i * 240.0, 0), Vector2(i * 240.0 - 40.0, H), Color("141920"), 3.0)
@@ -44,15 +45,39 @@ func _draw() -> void:
 		draw_rect(Rect2(READER.position.x, y - 14.0, READER.size.x, 14.0), Color(GLOW, 0.12))
 
 
-## Main ouverte, paume contre le lecteur (vue de dos) : paume, quatre doigts, pouce, manche.
+## Main ouverte, paume contre le lecteur (vue de dos) : manche, dos de la main,
+## quatre doigts, pouce. Chaque partie est modelée (côté gauche éclairé, droit
+## dans l'ombre) ; ongles, phalanges et tendons donnent le détail.
 func _draw_hand(center: Vector2) -> void:
-	poly([center + Vector2(-60, 60), center + Vector2(-70, 260), center + Vector2(70, 260), center + Vector2(64, 50)], SLEEVE)
+	var lit: Color = SKIN.lightened(0.12)
+	var shadow: Color = SKIN.darkened(0.25)
+	# Manche de la blouse, avec ses plis.
+	shade_poly([center + Vector2(-60, 60), center + Vector2(-70, 260), center + Vector2(70, 260), center + Vector2(64, 50)],
+			SLEEVE.lightened(0.1), SLEEVE.darkened(0.25), Vector2.RIGHT)
 	draw_line(center + Vector2(-66, 150), center + Vector2(68, 150), Color("8a99a1"), 3.0)
-	poly([center + Vector2(-62, -60), center + Vector2(62, -60), center + Vector2(66, 60), center + Vector2(-58, 66)], SKIN)
+	for k in 3:
+		draw_line(center + Vector2(-40 + k * 30, 70), center + Vector2(-48 + k * 34, 140), Color(SLEEVE.darkened(0.3), 0.5), 2.0)
+	# Dos de la main.
+	shade_poly([center + Vector2(-62, -60), center + Vector2(62, -60), center + Vector2(66, 60), center + Vector2(-58, 66)], lit, shadow, Vector2.RIGHT)
+	for k in 4:  # tendons, vers chaque doigt
+		var x: float = -38.0 + k * 34.0
+		draw_line(center + Vector2(x * 0.6, 40), center + Vector2(x, -52), Color(shadow, 0.35), 3.0)
+	# Doigts : modelés, un pli à chaque phalange, l'ongle au bout.
 	for i in 4:
 		var x: float = -52.0 + i * 34.0
 		var length: float = [118.0, 136.0, 128.0, 100.0][i]
-		poly([center + Vector2(x, -54), center + Vector2(x + 2, -54 - length), center + Vector2(x + 26, -56 - length),
-				center + Vector2(x + 28, -56)], SKIN)
-		draw_line(center + Vector2(x + 14, -60 - length * 0.55), center + Vector2(x + 14, -64 - length * 0.35), Color("b98a70"), 2.0)
-	poly([center + Vector2(-58, 20), center + Vector2(-120, -40), center + Vector2(-104, -60), center + Vector2(-50, -10)], SKIN)
+		var finger: Array = [center + Vector2(x, -54), center + Vector2(x + 2, -54 - length), center + Vector2(x + 26, -56 - length),
+				center + Vector2(x + 28, -56)]
+		shade_poly(finger, lit, shadow, Vector2.RIGHT)
+		draw_circle(center + Vector2(x + 14, -55 - length), 13.0, lit.lerp(shadow, 0.4))  # bout arrondi
+		draw_circle(center + Vector2(x + 14, -60), 12.0, Color(shadow, 0.35))  # jointure
+		for joint: float in [0.38, 0.68]:
+			var y: float = -56.0 - length * joint
+			draw_arc(center + Vector2(x + 14, y), 9.0, PI * 0.15, PI * 0.85, 6, Color(shadow.darkened(0.2), 0.6), 1.5)
+		draw_rect(Rect2(center + Vector2(x + 6, -54 - length), Vector2(16, 22)), Color("e9c3ae"))  # ongle
+		draw_rect(Rect2(center + Vector2(x + 6, -54 - length), Vector2(16, 5)), Color("f3dccd"))
+		if i < 3:  # creux entre deux doigts
+			draw_line(center + Vector2(x + 28, -56), center + Vector2(x + 30, -56 - length * 0.6), Color(shadow.darkened(0.3), 0.7), 2.0)
+	# Pouce.
+	shade_poly([center + Vector2(-58, 20), center + Vector2(-120, -40), center + Vector2(-104, -60), center + Vector2(-50, -10)], lit, shadow, Vector2.DOWN)
+	draw_circle(center + Vector2(-112, -50), 12.0, lit.lerp(shadow, 0.3))
