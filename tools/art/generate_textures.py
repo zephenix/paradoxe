@@ -236,6 +236,21 @@ def scales(size: int = 128) -> None:
     save("scales", color, height, 2.4)
 
 
+def earth(size: int = 256) -> None:
+    """Sol de jungle : terre sombre, cailloux, et plaques de mousse (en couleur :
+    verte) qui la recouvrent par endroits."""
+    clods = periodic_noise(size, 1.2, 15)
+    moss_mask = np.clip((periodic_noise(size, 3.0, 16) - 0.45) * 4.0, 0.0, 1.0)
+    pebbles = (periodic_noise(size, 0.3, 17) > 0.86).astype(float)
+    fuzz = periodic_noise(size, 0.5, 18)
+    soil = 0.62 + 0.18 * (clods - 0.5) + 0.25 * pebbles
+    rgb = np.stack([soil * 1.0, soil * 0.92, soil * 0.82], axis=-1)
+    moss = np.stack([0.55 + 0.2 * fuzz, 0.85 + 0.15 * fuzz, 0.5 + 0.15 * fuzz], axis=-1)
+    rgb = rgb * (1 - moss_mask[..., None]) + moss * moss_mask[..., None]
+    height = 0.6 * clods + 1.2 * pebbles + 0.5 * moss_mask * fuzz
+    save("earth", rgb, height, 1.6)
+
+
 def main() -> None:
     print("Textures ->", os.path.normpath(OUT_DIR))
     concrete()
@@ -244,6 +259,7 @@ def main() -> None:
     planks()
     fabric()
     scales()
+    earth()
 
 
 if __name__ == "__main__":

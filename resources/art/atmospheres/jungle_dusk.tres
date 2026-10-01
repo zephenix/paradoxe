@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="RoomAtmosphere" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/room_atmosphere.gd" id="1_atmo"]
+
+[resource]
+script = ExtResource("1_atmo")
+key_energy = 0.35
+key_color = Color(1, 0.74, 0.52, 1)
+key_angle = -50.0
+key_height = 0.3
+fog_color = Color(0.62, 0.85, 0.7, 0.22)
+fog_height = 140.0
+dust_amount = 50
+dust_color = Color(0.95, 1, 0.7, 0.5)
+vignette = 0.4
+grain = 0.04

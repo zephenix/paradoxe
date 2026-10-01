@@ -43,6 +43,12 @@
 
 [ext_resource type="Resource" path="res://resources/art/atmospheres/ruins_night.tres" id="44_ruins_night"]
 
+[ext_resource type="Resource" path="res://resources/art/surfaces/earth.tres" id="45_earth"]
+[ext_resource type="Resource" path="res://resources/art/atmospheres/jungle_dusk.tres" id="46_jungle"]
+[ext_resource type="Resource" path="res://resources/art/atmospheres/clearing.tres" id="47_clearing"]
+[ext_resource type="Resource" path="res://resources/art/atmospheres/lab.tres" id="48_lab"]
+[ext_resource type="Resource" path="res://resources/art/atmospheres/hall.tres" id="49_hall"]
+
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
 colors = PackedColorArray(0.03, 0.06, 0.07, 1, 0.08, 0.17, 0.15, 1)
@@ -87,6 +93,7 @@ camera_zoom = 0.75
 title = "2 - Arrivée"
 acoustic_zone = &"arrival"
 ambient_light = 0.8
+atmosphere = ExtResource("46_jungle")
 
 [node name="Ruin1" type="Node2D" parent="Room2"]
 position = Vector2(20.0, 1032.0)
@@ -95,7 +102,8 @@ z_index = -1
 width = 360.0
 height = 560.0
 seed_value = 3
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.2, 0.23, 0.25, 1.0)
+style = ExtResource("41_brick")
 
 [node name="Ruin2" type="Node2D" parent="Room2"]
 position = Vector2(480.0, 1032.0)
@@ -104,7 +112,8 @@ z_index = -1
 width = 260.0
 height = 400.0
 seed_value = 5
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.2, 0.23, 0.25, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ruin3" type="Node2D" parent="Room2"]
 position = Vector2(1000.0, 1032.0)
@@ -113,7 +122,8 @@ z_index = -1
 width = 420.0
 height = 640.0
 seed_value = 7
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.2, 0.23, 0.25, 1.0)
+style = ExtResource("41_brick")
 
 [node name="Ruin4" type="Node2D" parent="Room2"]
 position = Vector2(1500.0, 1032.0)
@@ -122,7 +132,8 @@ z_index = -1
 width = 300.0
 height = 460.0
 seed_value = 9
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.2, 0.23, 0.25, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ruin5" type="Node2D" parent="Room2"]
 position = Vector2(1920.0, 936.0)
@@ -131,12 +142,14 @@ z_index = -1
 width = 380.0
 height = 600.0
 seed_value = 11
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.2, 0.23, 0.25, 1.0)
+style = ExtResource("41_brick")
 
 [node name="LeftWall" type="StaticBody2D" parent="Room2"]
 position = Vector2(-48.0, 0.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(1.0, 23.0)
+style = ExtResource("40_concrete")
 
 [node name="Ground" type="StaticBody2D" parent="Room2"]
 position = Vector2(0.0, 1032.0)
@@ -144,6 +157,7 @@ script = ExtResource("3_block")
 size_blocks = Vector2(38.0, 2.0)
 color = Color(0.18, 0.24, 0.22, 1.0)
 surface = &"plant"
+style = ExtResource("45_earth")
 
 [node name="FallenBeam" type="StaticBody2D" parent="Room2"]
 position = Vector2(1280.0, 1008.0)
@@ -151,12 +165,14 @@ script = ExtResource("3_block")
 size_blocks = Vector2(2.0, 0.5)
 color = Color(0.3, 0.33, 0.37, 1.0)
 surface = &"metal"
+style = ExtResource("42_metal")
 
 [node name="Ledge" type="StaticBody2D" parent="Room2"]
 position = Vector2(1824.0, 936.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(15.3333, 3.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Plants1" type="Node2D" parent="Room2"]
 position = Vector2(0.0, 1032.0)
@@ -230,6 +246,7 @@ camera_zoom = 1.0
 title = "3 - Canopée"
 acoustic_zone = &"canopy"
 ambient_light = 0.7
+atmosphere = ExtResource("46_jungle")
 
 [node name="Ruin1" type="Node2D" parent="Room3"]
 position = Vector2(1060.0, 1224.0)
@@ -238,7 +255,8 @@ z_index = -1
 width = 170.0
 height = 260.0
 seed_value = 21
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.2, 0.23, 0.25, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ruin2" type="Node2D" parent="Room3"]
 position = Vector2(1570.0, 1224.0)
@@ -247,7 +265,8 @@ z_index = -1
 width = 280.0
 height = 170.0
 seed_value = 22
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.2, 0.23, 0.25, 1.0)
+style = ExtResource("41_brick")
 
 [node name="Ruin3" type="Node2D" parent="Room3"]
 position = Vector2(460.0, 840.0)
@@ -256,31 +275,36 @@ z_index = -1
 width = 250.0
 height = 380.0
 seed_value = 23
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.2, 0.23, 0.25, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="RoofA" type="StaticBody2D" parent="Room3"]
 position = Vector2(0.0, 936.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(7.5, 7.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="RoofB" type="StaticBody2D" parent="Room3"]
 position = Vector2(360.0, 840.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(7.5, 9.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="RoofC" type="StaticBody2D" parent="Room3"]
 position = Vector2(720.0, 744.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(7.5, 11.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="PitFloor1" type="StaticBody2D" parent="Room3"]
 position = Vector2(1080.0, 1224.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(3.0, 1.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Beam" type="StaticBody2D" parent="Room3"]
 position = Vector2(1224.0, 744.0)
@@ -288,12 +312,14 @@ script = ExtResource("3_block")
 size_blocks = Vector2(7.0, 0.5)
 color = Color(0.3, 0.33, 0.37, 1.0)
 surface = &"metal"
+style = ExtResource("42_metal")
 
 [node name="PitFloor2" type="StaticBody2D" parent="Room3"]
 position = Vector2(1224.0, 1224.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(7.0, 1.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Overhang" type="StaticBody2D" parent="Room3"]
 position = Vector2(1320.0, 640.0)
@@ -301,6 +327,7 @@ script = ExtResource("3_block")
 size_blocks = Vector2(3.0, 0.8333)
 color = Color(0.3, 0.33, 0.37, 1.0)
 surface = &"metal"
+style = ExtResource("42_metal")
 
 [node name="Balcony" type="StaticBody2D" parent="Room3"]
 position = Vector2(1560.0, 840.0)
@@ -308,24 +335,28 @@ script = ExtResource("3_block")
 size_blocks = Vector2(6.25, 0.5)
 color = Color(0.3, 0.33, 0.37, 1.0)
 surface = &"metal"
+style = ExtResource("42_metal")
 
 [node name="PitFloor3" type="StaticBody2D" parent="Room3"]
 position = Vector2(1560.0, 1224.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(6.25, 1.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="PitFloor4" type="StaticBody2D" parent="Room3"]
 position = Vector2(1860.0, 1224.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(3.75, 1.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="RoofF" type="StaticBody2D" parent="Room3"]
 position = Vector2(2040.0, 840.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(5.625, 9.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ground" type="StaticBody2D" parent="Room3"]
 position = Vector2(2310.0, 1032.0)
@@ -333,6 +364,7 @@ script = ExtResource("3_block")
 size_blocks = Vector2(5.2083, 5.0)
 color = Color(0.18, 0.24, 0.22, 1.0)
 surface = &"plant"
+style = ExtResource("45_earth")
 
 [node name="Plants1" type="Node2D" parent="Room3"]
 position = Vector2(0.0, 936.0)
@@ -397,6 +429,7 @@ camera_zoom = 1.0
 title = "4 - Clairière"
 acoustic_zone = &"clearing"
 ambient_light = 0.6
+atmosphere = ExtResource("47_clearing")
 
 [node name="Plants1" type="Node2D" parent="Room4"]
 position = Vector2(0, 672)
@@ -425,11 +458,13 @@ script = ExtResource("3_block")
 size_blocks = Vector2(40, 2)
 color = Color(0.18, 0.24, 0.22, 1)
 surface = &"plant"
+style = ExtResource("45_earth")
 
 [node name="RightWall" type="StaticBody2D" parent="Room4"]
 position = Vector2(1920, 0)
 script = ExtResource("3_block")
 size_blocks = Vector2(1, 15)
+style = ExtResource("40_concrete")
 
 [node name="Checkpoint" parent="Room4" instance=ExtResource("7_checkpoint")]
 position = Vector2(96, 672)
@@ -479,6 +514,7 @@ camera_zoom = 1.0
 title = "5 - Cellules"
 acoustic_zone = &"cells"
 ambient_light = 0.55
+atmosphere = ExtResource("48_lab")
 
 [node name="Backdrop" type="Polygon2D" parent="Room5"]
 z_index = -1
@@ -490,46 +526,55 @@ position = Vector2(0, 0)
 script = ExtResource("3_block")
 size_blocks = Vector2(40, 1)
 color = Color(0.2, 0.22, 0.25, 1)
+style = ExtResource("40_concrete")
 
 [node name="LeftWall" type="StaticBody2D" parent="Room5"]
 position = Vector2(0, 48)
 script = ExtResource("3_block")
 size_blocks = Vector2(1, 13)
+style = ExtResource("40_concrete")
 
 [node name="RightWall" type="StaticBody2D" parent="Room5"]
 position = Vector2(1872, 48)
 script = ExtResource("3_block")
 size_blocks = Vector2(1, 13)
+style = ExtResource("40_concrete")
 
 [node name="FloorA" type="StaticBody2D" parent="Room5"]
 position = Vector2(0, 672)
 script = ExtResource("3_block")
 size_blocks = Vector2(33, 2)
+style = ExtResource("40_concrete")
 
 [node name="FloorB" type="StaticBody2D" parent="Room5"]
 position = Vector2(1776, 672)
 script = ExtResource("3_block")
 size_blocks = Vector2(2, 2)
+style = ExtResource("40_concrete")
 
 [node name="PitBottom" type="StaticBody2D" parent="Room5"]
 position = Vector2(1584, 696)
 script = ExtResource("3_block")
 size_blocks = Vector2(4, 1.5)
+style = ExtResource("40_concrete")
 
 [node name="WallAboveA" type="StaticBody2D" parent="Room5"]
 position = Vector2(432, 48)
 script = ExtResource("3_block")
 size_blocks = Vector2(0.5, 10)
+style = ExtResource("40_concrete")
 
 [node name="WallAboveB" type="StaticBody2D" parent="Room5"]
 position = Vector2(816, 48)
 script = ExtResource("3_block")
 size_blocks = Vector2(0.5, 10)
+style = ExtResource("40_concrete")
 
 [node name="WallAboveC" type="StaticBody2D" parent="Room5"]
 position = Vector2(1056, 48)
 script = ExtResource("3_block")
 size_blocks = Vector2(0.5, 10)
+style = ExtResource("40_concrete")
 
 [node name="Landing" type="StaticBody2D" parent="Room5"]
 position = Vector2(1200, 240)
@@ -537,6 +582,7 @@ script = ExtResource("3_block")
 size_blocks = Vector2(8, 0.5)
 color = Color(0.3, 0.33, 0.37, 1)
 surface = &"metal"
+style = ExtResource("42_metal")
 
 [node name="CellSpawn" type="Marker2D" parent="Room5"]
 position = Vector2(200, 672)
@@ -772,42 +818,49 @@ camera_zoom = 1.0
 title = "7 - Hall"
 acoustic_zone = &"hall"
 ambient_light = 0.85
+atmosphere = ExtResource("49_hall")
 
 [node name="Ceiling" type="StaticBody2D" parent="Room7"]
 position = Vector2(0.0, 0.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(40.0, 1.0)
 color = Color(0.2, 0.23, 0.27, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ground" type="StaticBody2D" parent="Room7"]
 position = Vector2(0.0, 672.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(34.6667, 2.0)
 color = Color(0.2, 0.23, 0.27, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="UnderElevator" type="StaticBody2D" parent="Room7"]
 position = Vector2(1664.0, 696.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(4.0, 1.5)
 color = Color(0.1, 0.13, 0.15, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="ExitLedge" type="StaticBody2D" parent="Room7"]
 position = Vector2(1856.0, 480.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(1.3333, 4.0)
 color = Color(0.2, 0.23, 0.27, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Cover1" type="StaticBody2D" parent="Room7"]
 position = Vector2(440.0, 600.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(1.0, 1.5)
 color = Color(0.33, 0.37, 0.42, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Cover2" type="StaticBody2D" parent="Room7"]
 position = Vector2(960.0, 600.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(1.0, 1.5)
 color = Color(0.33, 0.37, 0.42, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Sentinel1" parent="Room7" instance=ExtResource("26_sentinel")]
 position = Vector2(740.0, 672.0)
@@ -850,6 +903,7 @@ camera_zoom = 1.0
 title = "8 - Poursuite"
 acoustic_zone = &"ruins"
 ambient_light = 0.45
+atmosphere = ExtResource("44_ruins_night")
 
 [node name="Ruin1" type="Node2D" parent="Room8"]
 position = Vector2(220.0, 480.0)
@@ -858,7 +912,8 @@ z_index = -1
 width = 420.0
 height = 360.0
 seed_value = 51
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.27, 0.29, 0.31, 1.0)
+style = ExtResource("41_brick")
 
 [node name="Ruin2" type="Node2D" parent="Room8"]
 position = Vector2(920.0, 480.0)
@@ -867,7 +922,8 @@ z_index = -1
 width = 360.0
 height = 300.0
 seed_value = 52
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.27, 0.29, 0.31, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ruin3" type="Node2D" parent="Room8"]
 position = Vector2(1520.0, 480.0)
@@ -876,7 +932,8 @@ z_index = -1
 width = 500.0
 height = 420.0
 seed_value = 53
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.27, 0.29, 0.31, 1.0)
+style = ExtResource("41_brick")
 
 [node name="Ruin4" type="Node2D" parent="Room8"]
 position = Vector2(2220.0, 480.0)
@@ -885,13 +942,15 @@ z_index = -1
 width = 300.0
 height = 320.0
 seed_value = 54
-color = Color(0.1, 0.13, 0.15, 1.0)
+color = Color(0.27, 0.29, 0.31, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ground1" type="StaticBody2D" parent="Room8"]
 position = Vector2(0.0, 480.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(23.0, 5.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Barrier" type="StaticBody2D" parent="Room8"]
 position = Vector2(720.0, 456.0)
@@ -899,18 +958,21 @@ script = ExtResource("3_block")
 size_blocks = Vector2(1.0, 0.5)
 color = Color(0.3, 0.33, 0.37, 1.0)
 surface = &"metal"
+style = ExtResource("42_metal")
 
 [node name="PitFloor1" type="StaticBody2D" parent="Room8"]
 position = Vector2(1104.0, 576.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(3.0, 3.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ground2" type="StaticBody2D" parent="Room8"]
 position = Vector2(1248.0, 480.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(14.0, 5.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Overhang" type="StaticBody2D" parent="Room8"]
 position = Vector2(1470.0, 356.0)
@@ -918,23 +980,27 @@ script = ExtResource("3_block")
 size_blocks = Vector2(2.5, 1.0)
 color = Color(0.3, 0.33, 0.37, 1.0)
 surface = &"metal"
+style = ExtResource("42_metal")
 
 [node name="PitFloor2" type="StaticBody2D" parent="Room8"]
 position = Vector2(1920.0, 576.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(3.0, 3.0)
 color = Color(0.1, 0.13, 0.15, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="Ground3" type="StaticBody2D" parent="Room8"]
 position = Vector2(2064.0, 480.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(23.6667, 5.0)
 color = Color(0.16, 0.19, 0.2, 1.0)
+style = ExtResource("40_concrete")
 
 [node name="RightWall" type="StaticBody2D" parent="Room8"]
 position = Vector2(3152.0, 0.0)
 script = ExtResource("3_block")
 size_blocks = Vector2(1.0, 10.0)
+style = ExtResource("40_concrete")
 
 [node name="Door" type="StaticBody2D" parent="Room8"]
 position = Vector2(2520.0, 336.0)

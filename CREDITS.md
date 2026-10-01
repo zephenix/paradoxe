@@ -24,7 +24,7 @@ extérieure doit y être ajoutée avant d'être versionnée : source, auteur, li
 | Anneau du portail (écran titre) | Original, dessiné par code (`scripts/fx/portal_ring.gd`). |
 | Silhouette d'Élias et ses animations | Original, polygones et poses définis par code (`scripts/player/visual/`). |
 | Décors de la salle de test, silhouettes de ville | Originaux, générés par code (`scripts/world/solid_block.gd`, `scripts/fx/skyline.gd`). |
-| Textures du décor et des vêtements (`assets/textures/generated/` : béton, briques, tôle, planches, tissu, écailles, et leurs cartes de relief) | Originales, calculées par `tools/art/generate_textures.py` (bruit et motifs, numpy). Aucune image extérieure. |
+| Textures du décor et des vêtements (`assets/textures/generated/` : béton, briques, tôle, planches, tissu, écailles, sol de jungle, et leurs cartes de relief) | Originales, calculées par `tools/art/generate_textures.py` (bruit et motifs, numpy). Aucune image extérieure. |
 
 ## Sons
 
