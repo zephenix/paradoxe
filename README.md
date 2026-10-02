@@ -73,8 +73,9 @@ chmod +x Paradoxe.x86_64   # seulement si le fichier n'est pas exécutable
 
 ### Contrôles
 
-Les touches ci-dessous sont celles par défaut. Elles pourront être modifiées dans les
-options (jalon J9). Pour les lettres, c'est la **position** de la touche qui compte : les
+Les touches ci-dessous sont celles par défaut. Elles se modifient dans **Options >
+Commandes** (clavier et manette), et les textes du jeu affichent toujours les touches
+réglées. Pour les lettres, c'est la **position** de la touche qui compte : les
 touches notées « WASD » (clavier QWERTY) correspondent à **ZQSD** sur un clavier AZERTY.
 
 | Action | Clavier | Manette (disposition Xbox) | Disponible |
@@ -93,8 +94,9 @@ touches notées « WASD » (clavier QWERTY) correspondent à **ZQSD** sur un cla
 | Pause | Échap ou P | Start / Menu | J9 |
 | Passer une cinématique (maintenir) | Échap ou Espace | Start ou A | J7 |
 
-Dans la version actuelle (J8), n'importe quelle touche ou un clic active le son. On choisit
-ensuite « Nouvelle partie », « Salle de test » ou « Banc d'écoute » au clavier (flèches, Entrée), à la souris ou à la manette. Dans la
+Au lancement, n'importe quelle touche ou un clic active le son. On choisit ensuite
+« Nouvelle partie », « Options »… au clavier (flèches, Entrée), à la souris ou à la manette ;
+les outils de test (salle de test, banc d'écoute) sont rangés dans l'« Atelier ». Dans la
 salle de test, **Haut** (ou Espace à l'arrêt) sert aussi à sauter sur place et à se hisser,
 et **Échap** ramène à l'écran titre.
 
@@ -119,14 +121,20 @@ pression. **Maintenir Échap ou Espace** pendant une seconde passe une cinémati
 **Infiltration (salle G, de nuit)** : dans le noir, les Sentinelles voient mal ; sous une
 lampe, elles voient tout. Accroupi (**Bas**), Élias est moins visible et ses pas sont muets ;
 en marchant ou en courant, on l'entend (plus loin sur le métal). Un tir brise une lampe, mais
-le verre fait du bruit. **F** lance une pierre (ramassées sur le tas de gravats) : elle
-attire les Sentinelles là où elle retombe. En hauteur, sur une passerelle, Élias est hors de
-leur vue. L'interrupteur **Voir les sons** de l'écran titre montre jusqu'où porte chaque bruit.
+le verre fait du bruit. **E** devant un tas de gravats : Élias s'accroupit et ramasse des
+pierres, une à une. **F** en lance une : elle attire les Sentinelles là où elle retombe. En
+hauteur, sur une passerelle, Élias est hors de leur vue. L'option **Voir les sons**
+(Options > Image) montre jusqu'où porte chaque bruit.
+
+**Bracelet (J9)** : pas d'interface permanente. **Tab** (Back à la manette) projette un
+hologramme au-dessus du poignet d'Élias : énergie, arme et pierres, rembobinages restants,
+et l'objectif de l'écran avec une flèche. Il s'affiche aussi brièvement quand l'énergie
+change ou qu'on ramasse ou lance une pierre.
 
 **Mort et rembobinage** : à la mort, le temps ralentit puis se fige. **Maintenir R** fait
 remonter le temps (jusqu'à 5 s) ; en relâchant, on reprend à cet instant. Il y a 3
 rembobinages par checkpoint. **Entrée** ou **Espace** : reprendre au checkpoint. En **mode
-classique** (interrupteur de l'écran titre), pas de rembobinage : retour direct au
+classique** (Options > Aides), pas de rembobinage : retour direct au
 checkpoint, et aucune des aides du parkour.
 
 ---

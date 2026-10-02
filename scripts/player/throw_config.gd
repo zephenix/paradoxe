@@ -20,6 +20,16 @@ extends Resource
 ## Durée pendant laquelle une pierre reste visible au sol avant de disparaître.
 @export var linger_time: float = 4.0
 
+## Ramassage (J9) : sur un tas de gravats, « Interagir » fait s'accroupir Élias,
+## qui prend les pierres une à une (un son par pierre), puis se relève. Geste
+## engagé : il dure pickup_reach + (pierres à prendre) × pickup_interval + pickup_rise.
+## Temps pour se baisser jusqu'aux gravats (secondes).
+@export var pickup_reach: float = 0.22
+## Temps pour prendre UNE pierre et la mettre en poche (secondes).
+@export var pickup_interval: float = 0.16
+## Temps pour se relever (secondes).
+@export var pickup_rise: float = 0.25
+
 
 ## Vitesse de départ d'une pierre lancée vers « facing » (-1 ou 1).
 func launch_velocity(facing: int) -> Vector2:

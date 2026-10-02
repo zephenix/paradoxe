@@ -59,6 +59,7 @@ python3 tools/audio/generate_sounds.py       # régénère les sons + catalog.js
 python3 tools/art/generate_textures.py       # régénère les textures (couleur + relief), puis réimport Godot
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 -s res://tools/godot/creature_sheet.gd -- build/shots/creature.png   # planche du Traqueur (repos, course, rugissement)
 xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/room_shots.gd -- build/shots/x a:400:3072   # captures rapides d'un endroit (nom:x:y)
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --fixed-fps 60 -s res://tools/godot/bracelet_shots.gd -- build/shots/bracelet   # hologramme du bracelet et ramassage (J9)
 godot --headless --path . --import           # réimporte les sons
 godot --headless --path . -s res://tools/godot/build_sound_library.gd   # ajoute les nouveaux sons à la bibliothèque
 python3 tools/audio/measure_levels.py        # vérifie l'équilibre des niveaux (familles de sons ; lancé par la CI)
@@ -109,6 +110,13 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   pour l'accélérer. Poursuivants : `Pursuer` (`mode`, `Pursuer.Mode.CHASE`…). Musique :
   `AudioManager.music` (`theme_id`, `layer_gain(i)`, `theme_started`) ; appeler
   `AudioManager.music.silence()` dans `after_each()`.
+- Bracelet (J9) : `player.bracelet` (un `BraceletHologram`) : `open()`, `close()`,
+  `flash(&"energy"|&"pockets")`, `hide_now()`, `is_open`, `visible_rows()`,
+  `objective_direction()`. Touche : `input.press(&"bracelet")`. Une salle donne son objectif
+  par `Room.objective` et `Room.objective_target`. Pierres : un `RubblePile` est un
+  `Interactable` (`gesture = &"PickUp"`) : `input.press(&"interact")` devant lui, puis
+  attendre la fin du geste (environ 1 s pour trois pierres). L'état `PickUp` démarre au pas
+  de physique suivant l'appui : vérifier un état « Idle » juste après l'appui ne prouve rien.
 - Mort d'Élias (J4) : en mode moderne, avec assez d'historique, la séquence de mort
   (`level.death`, un `DeathController`) ralentit, **met le jeu en pause** et attend un choix.
   Dans un test : `level.death.input_from_devices = false`, puis `rewind_held = true/false`

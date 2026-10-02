@@ -1530,3 +1530,26 @@ sur lui-même ; et chaque motif (briques, plaques, planches) doit tomber juste d
 - **Crédits**, avec la licence de Godot (obligatoire).
 - **Manette** : elle était déjà reconnue (disposition Xbox) ; elle se remappe maintenant
   comme le clavier.
+
+**Le bracelet et les pierres (partie B)**
+
+- **Hologramme du bracelet** (touche Tab, ou Back à la manette) : un petit écran de lumière
+  s'élève du poignet gauche d'Élias, relié par un faisceau. Quatre lignes : l'énergie (une
+  barre par unité), les poches (l'arme, les objets, les pierres portées), les rembobinages
+  restants (absents en mode classique, « infini » avec l'aide) et l'objectif de l'écran,
+  avec une flèche qui pointe vers lui. Il reste 4 s ; un second appui le referme.
+- **Le jeu continue** : à l'arrêt, Élias lève le poignet et le regarde (nouvel état
+  `WristCheck`) ; la moindre commande l'en fait sortir. En marche ou en course, il ne
+  s'arrête pas.
+- **Affichages brefs** : une seule ligne, 1,6 s. L'énergie quand elle change (tir,
+  bouclier, recharge) : elle remplace la petite jauge provisoire de J3, supprimée. Les
+  pierres quand on en ramasse ou en lance.
+- **Ramasser des pierres** (retour de jeu de la v0.8) : plus en passant sur le tas, mais avec
+  « Interagir » devant lui, debout ou accroupi. Élias s'accroupit, prend les pierres **une
+  à une** (nouvel état `PickUp`, nouvelles poses), chacune avec un son bien audible
+  (`stone_take`), et l'hologramme les compte. Poches pleines : il tâte sa poche, les
+  pierres cliquettent.
+- **Objectifs** : chaque écran du prototype a une phrase et une cible (`Room.objective`,
+  `Room.objective_target`) : « Traverser la canopée », « Prendre l'ascenseur au fond du
+  hall »…
+- Textes des salles : le bracelet est présenté à l'écran 2, le ramassage à l'écran 6.

@@ -295,7 +295,23 @@ le bruit et une Sentinelle divise le rayon par deux** (deux murs : par quatre). 
 | `lamp_break` | Verre qui éclate, grésillement qui meurt | Lampe brisée (tir ou pierre) | SFX | 450 px |
 | `stone_impact` (3 variantes) | Pierre qui retombe, deux rebonds | Pierre lancée qui touche le décor (diversion) | SFX | 520 px |
 | `stone_throw` | Bras qui fouette l'air | Lancer une pierre | SFX | 60 px |
-| `stone_pickup` | Cailloux qui s'entrechoquent | Ramasser des pierres | SFX | 60 px |
+| `stone_pickup` | Cailloux qui s'entrechoquent | Poches déjà pleines : Élias tâte sa poche (J9) | SFX | 60 px |
+| `stone_take` (3 variantes) | La main racle les gravats, la pierre claque contre les autres | Une pierre ramassée (J9) : une fois par pierre | SFX | 90 px |
+
+*J9 (retour de jeu de la v0.8 : « il manque un bruit quand il ramasse »)* : `stone_pickup`
+était réglé comme un petit geste (-35 dB effectifs) et passait inaperçu. `stone_take` est
+réglé comme un objet ramassé (famille « Objets ramassés », -27,5 dB), et il sonne une fois
+par pierre : on entend le compte.
+
+### Bracelet (J9)
+
+| Son | Rôle | Déclencheur | Bus | Rayon |
+|---|---|---|---|---|
+| `bracelet_open` | Scintillement montant (glissando doux, quinte, vibrato rapide) | L'hologramme s'ouvre (touche « Bracelet ») | SFX | — |
+| `bracelet_close` | Glissement descendant | L'hologramme se referme | SFX | — |
+
+Pas de rayon de bruit : regarder son bracelet ne doit pas trahir Élias. Les affichages
+brefs (une pierre ramassée, un tir) sont muets : leur propre son suffit.
 
 ### Compagnon, mécanismes, cellules (J7)
 

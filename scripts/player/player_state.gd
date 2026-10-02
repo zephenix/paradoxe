@@ -61,7 +61,9 @@ func handle_combat_actions() -> bool:
 
 
 ## Interagir (J7) : si un objet interactif est à portée de main devant Élias,
-## il fait le geste (état Interact). Renvoie vrai si une transition a eu lieu.
+## il fait le geste (état Interact, ou PickUp sur un tas de gravats). Renvoie
+## vrai si une transition a eu lieu. Accroupi, il ne peut que ramasser des
+## pierres (se relever pour un levier pourrait le coincer sous un plafond bas).
 func handle_interact_action() -> bool:
 	var p: Player = player
 	if not p.is_on_floor() or not p.wants(&"interact"):
@@ -69,7 +71,9 @@ func handle_interact_action() -> bool:
 	var target: Interactable = Interactable.find_for(p, p.facing, p.config.interact_reach)
 	if target == null:
 		return false
-	machine.transition_to(&"Interact", {"target": target})
+	if p.is_crouched and target.gesture != &"PickUp":
+		return false
+	machine.transition_to(target.gesture, {"target": target})  # tendre la main, ou ramasser
 	return true
 
 

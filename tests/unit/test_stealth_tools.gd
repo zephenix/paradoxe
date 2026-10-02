@@ -73,16 +73,32 @@ func stones_in_flight() -> Array[ThrownStone]:
 
 # --- Pierres ---------------------------------------------------------------------
 
+## J9 : on ne ramasse plus en passant, mais avec « Interagir » : Élias
+## s'accroupit, prend les pierres une à une (un son chacune), puis se relève.
 func test_rubble_pile_gives_stones() -> void:
 	var pile := RubblePile.new()
 	pile.position = Vector2(300, FLOOR_Y)
 	arena.add_child(pile)
 	await spawn_player(100.0)
-	assert_eq(player.stones, 0)
 	player.input.move = 1
-	await wait_physics_seconds(2.0)
+	await wait_physics_seconds(1.5)
 	player.input.move = 0
+	assert_eq(player.stones, 0, "passer sur le tas ne suffit plus")
+	var played: Array[StringName] = []
+	var on_played := func(id: StringName) -> void: played.append(id)
+	AudioManager.sfx_played.connect(on_played)
+	player.input.press(&"interact")
+	await wait_physics(2)
+	assert_eq(player.machine.current_name, &"PickUp", "il s'accroupit pour ramasser")
+	assert_eq(player.stones, 0, "la première pierre n'arrive qu'une fois la main au sol")
+	await wait_physics_seconds(player.throw_config.pickup_reach + 0.05)
+	assert_eq(player.stones, 1, "puis les pierres arrivent une à une")
+	await wait_physics_seconds(1.2)
+	AudioManager.sfx_played.disconnect(on_played)
 	assert_eq(player.stones, player.throw_config.max_stones, "on ramasse de quoi remplir ses poches")
+	assert_eq(played.count(&"stone_take"), player.throw_config.max_stones, "un son par pierre")
+	assert_eq(player.machine.current_name, &"Idle", "puis il se relève")
+	assert_true(player.bracelet.visible_rows().has(&"pockets"), "l'hologramme montre le compteur")
 
 
 func test_throw_needs_a_stone() -> void:

@@ -233,7 +233,7 @@ setup.sh, export_presets.cfg, project.godot, README.md, CLAUDE.md, CREDITS.md
 | `rooms/room.tscn` | Gabarit de salle (limites, cadrage, acoustique, lumière ambiante) |
 | `fx/*.tscn` | Pluie, brouillard, éclairs, particules de spores, impacts |
 | `cutscenes/cutscene_player.tscn` | Lecteur de cinématiques : bandes noires, enchaînement des plans, passer la cinématique (voir §5.12) |
-| `ui/bracelet.tscn` | Interface holographique au poignet |
+| `ui/bracelet.tscn` | Interface holographique au poignet (J9 : pas de scène, un `BraceletHologram` créé par le Player) |
 | `ui/ghost.tscn` | Fantôme du mode chrono |
 
 ### 4.2 Scènes d'écran (menus et outils)
@@ -334,8 +334,9 @@ humanoïdes, appelés **Sentinelles** dans le code ; le prédateur, **Traqueur**
     accroupi (58 px) ; un tir « à genou » part à 40 px. Un muret de 1,5 bloc (72 px) arrête
     les tirs bas : accroupi derrière, Élias est à l'abri ;
   - portée d'un tir : 1000 px (environ un écran) ;
-  - en attendant l'hologramme du bracelet (J9), la lueur du bracelet suit l'énergie et une
-    petite jauge **provisoire** apparaît au-dessus d'Élias quand l'énergie change.
+  - la lueur du bracelet suit l'énergie ; quand l'énergie change, la ligne « énergie » de
+    l'hologramme du bracelet s'affiche brièvement (J9 ; jusqu'en J8, une petite jauge
+    provisoire jouait ce rôle).
 
 ### 5.3 Ennemis : IA à états (J3, perception en J6)
 
@@ -406,7 +407,7 @@ stateDiagram-v2
     le décor. Un tir ou une pierre les brise (bruit de verre, 450 px) ; elles suivent le
     rembobinage et sont réparées à la réapparition (sauf si brisées avant le checkpoint).
     La lumière ambiante est un réglage de chaque salle (`Room.ambient_light`) ;
-  - **pierres** : on en ramasse (3 au plus) sur les tas de gravats ; lancer en cloche
+  - **pierres** : on en ramasse (3 au plus) sur les tas de gravats (J9 : avec « Interagir ») ; lancer en cloche
     (≈ 7 blocs) ; l'impact fait du bruit (520 px) : les Sentinelles vont voir ;
   - **niveau d'alerte global** : le plus inquiet des ennemis (`Level.alert_level`, signal
     `Events.alert_level_changed`), pour la musique de J8 ;
@@ -503,6 +504,22 @@ d'options de J9) ; il coupe le rembobinage, et les six aides du parkour de J2.
   rembobinages restants. Ramasser une pierre : un son bien audible et un petit geste
   (retour de jeu après la v0.8).
   Le jeu continue pendant ce temps, comme pour un vrai geste.
+- *Précisions de J9* (réglages dans `resources/player/bracelet.tres`) :
+  - un appui ouvre tout l'hologramme 4 s (un second appui le referme) ; à l'arrêt, Élias
+    lève le poignet pour le regarder (état `WristCheck`, quitté à la moindre commande) ;
+    en marche ou en course, il ne s'arrête pas ;
+  - affichages brefs (1,6 s), une seule ligne : l'énergie quand elle change, les pierres
+    quand on en ramasse ou en lance ;
+  - l'objectif vient de la salle (`Room.objective`, une phrase, et `Room.objective_target`,
+    vers quoi pointe la flèche ; un cercle quand on y est) ;
+  - pas de ligne « rembobinages » en mode classique ; « infini » avec l'aide
+    correspondante. Le choix de la séquence de mort reste à l'écran (le jeu y est figé) ;
+  - l'hologramme est une lumière : dessiné dans un calque (CanvasLayer) qui suit la
+    caméra, il ne s'assombrit pas dans la pénombre ;
+  - **pierres** : on les ramasse avec « Interagir » devant un tas de gravats (debout ou
+    accroupi), plus en passant dessus. Élias s'accroupit et les prend une à une, un son
+    par pierre (`stone_take`), et l'hologramme compte ; poches pleines : il tâte sa poche
+    (`stone_pickup`). Geste engagé d'environ 1 s pour trois pierres (`throw.tres`).
 - Seuls les menus (pause, options) sont des écrans classiques.
 
 ### 5.11 Accessibilité et options (J9)

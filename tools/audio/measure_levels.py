@@ -73,7 +73,12 @@ FAMILIES: dict[str, tuple[float, float, list[str]]] = {
         "companion_ok", "companion_follow", "companion_wait", "companion_no", "companion_surprise"]),
     "Mécanismes (J7)": (-27.0, 2.0, [
         "lever_pull", "plate_click", "door_slide", "bars_clank", "elevator_stop", "elevator_loop",
-        "terminal_beep", "item_pickup"]),
+        "terminal_beep"]),
+    # Objets ramassés (J9) : une pierre, un objet. Bien audibles (retour de jeu de
+    # la v0.8) : au niveau des mécanismes, au-dessus des petits gestes.
+    "Objets ramassés": (-27.5, 2.0, ["item_pickup", "stone_take"]),
+    # Hologramme du bracelet (J9) : un signal discret, sous les mécanismes.
+    "Bracelet": (-30.0, 2.0, ["bracelet_open", "bracelet_close"]),
     "Couches d'ambiance": (-32.0, 2.5, [
         "amb_city_loop", "amb_electric_loop", "amb_hall_loop", "amb_lab_loop",
         "amb_shaft_loop", "amb_wind_loop", "amb_jungle_loop"]),

@@ -37,6 +37,12 @@ func set_energy(_ratio: float) -> void:
 	pass
 
 
+## Où est le bracelet, dans le monde (J9 : l'hologramme s'élève de là). Par
+## défaut, à mi-hauteur du personnage.
+func bracelet_position() -> Vector2:
+	return global_position + Vector2(0.0, -50.0)
+
+
 ## Pose actuelle (animation et instant), pour le rembobinage (J4).
 func capture_pose() -> Dictionary:
 	return {}

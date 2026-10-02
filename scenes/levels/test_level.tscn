@@ -416,7 +416,7 @@ position = Vector2(1872, 48)
 script = ExtResource("3_block")
 size_blocks = Vector2(1, 13)
 
-[node name="Rubble" type="Area2D" parent="RoomG"]
+[node name="Rubble" type="Node2D" parent="RoomG"]
 position = Vector2(240, 672)
 script = ExtResource("10_rubble")
 
@@ -489,7 +489,7 @@ theme_override_font_sizes/font_size = 17
 text = "SALLE G : INFILTRATION (nuit)
 Dans le noir, les Sentinelles voient mal. Accroupi ({move_down}), Élias est moins visible et ses pas sont muets.
 Sous une lampe, elles le voient. Un tir brise une lampe... mais le verre fait du bruit.
-{throw} : lancer une pierre (ramassées sur le tas de gravats) pour attirer une Sentinelle ailleurs.
+{interact} sur le tas de gravats : ramasser des pierres. {throw} : en lancer une pour attirer une Sentinelle ailleurs.
 En hauteur, sur les passerelles, elles ne voient pas Élias. Objectif : la sortie, en haut à droite"
 
 [node name="Elias" parent="." instance=ExtResource("5_elias")]

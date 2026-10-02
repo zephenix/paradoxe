@@ -1,46 +1,38 @@
 @tool
 class_name RubblePile
-extends Area2D
-## Un tas de gravats (J6) : en passant dessus, Élias ramasse des pierres
-## (jusqu'au maximum qu'il peut porter, resources/player/throw.tres). Le tas
-## ne s'épuise pas. L'origine du nœud est au sol, au centre du tas.
+extends Interactable
+## Un tas de gravats (J6) : Élias y ramasse des pierres, jusqu'au maximum qu'il
+## peut porter (resources/player/throw.tres). Le tas ne s'épuise pas. L'origine
+## du nœud est au sol, au centre du tas.
+##
+## J9 (retour de jeu de la v0.8) : on ne ramasse plus en passant dessus, mais
+## avec « Interagir », comme les autres objets. Élias s'accroupit et prend les
+## pierres une à une (état PickUp) : chaque pierre fait un bruit bien audible et
+## l'hologramme du bracelet montre le compteur. Il peut aussi ramasser en restant
+## accroupi, pour rester discret.
 
 ## Largeur du tas (pixels).
 @export var width: float = 72.0:
 	set(value):
 		width = value
+		reach_margin = width * 0.5
 		queue_redraw()
 
-## Délai minimal entre deux ramassages (secondes) : un seul bruit par passage.
-const PICKUP_COOLDOWN: float = 1.0
 
-var _cooldown: float = 0.0
-
-
-func _ready() -> void:
-	collision_layer = PhysicsLayers.TRIGGERS
-	collision_mask = PhysicsLayers.PLAYER
-	monitorable = false
-	var shape := CollisionShape2D.new()
-	var rect := RectangleShape2D.new()
-	rect.size = Vector2(width, 40.0)
-	shape.shape = rect
-	shape.position = Vector2(0.0, -20.0)
-	add_child(shape)
+func _init() -> void:
+	gesture = &"PickUp"  # l'état d'Élias : s'accroupir et ramasser
+	reach_margin = width * 0.5  # on l'atteint aussi debout sur le tas
 
 
-func _physics_process(delta: float) -> void:
-	if Engine.is_editor_hint():
-		return
-	_cooldown = maxf(_cooldown - delta, 0.0)
-	if _cooldown > 0.0:
-		return
-	for body in get_overlapping_bodies():
-		var player: Player = body as Player
-		if player and not player.is_dead and player.stones < player.throw_config.max_stones:
-			player.stones = player.throw_config.max_stones
-			AudioManager.play_sfx(&"stone_pickup", global_position, player)
-			_cooldown = PICKUP_COOLDOWN
+## Une pierre de plus dans la poche de « by » (appelé par l'état PickUp, une fois
+## par pierre). Renvoie faux si ses poches sont déjà pleines.
+func _on_interact(by: Node) -> bool:
+	var player: Player = by as Player
+	if player == null or player.is_dead or player.stones >= player.throw_config.max_stones:
+		return false
+	player.stones += 1
+	AudioManager.play_sfx(&"stone_take", global_position, player)
+	return true
 
 
 func _draw() -> void:

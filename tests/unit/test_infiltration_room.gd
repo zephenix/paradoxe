@@ -99,6 +99,10 @@ func test_room_g_can_be_crossed_unseen() -> void:
 	assert_eq(room.ambient_light, 0.15, "salle dans la pénombre")
 	# 1) Le tas de gravats.
 	assert_true(await go_to(250.0, false), "au tas de gravats")
+	player.input.press(&"interact")  # J9 : on ramasse avec « Interagir »
+	await wait_physics(2)
+	assert_eq(player.machine.current_name, &"PickUp", "il s'accroupit pour ramasser")
+	assert_true(await wait_for(func() -> bool: return player.machine.current_name == &"Idle", 120), "il se relève")
 	assert_eq(player.stones, player.throw_config.max_stones, "des pierres ramassées")
 	# 2) Au pied de la passerelle basse ; on attend que la Sentinelle 1 s'éloigne.
 	assert_true(await go_to(419.0, false), "au pied de la passerelle basse")

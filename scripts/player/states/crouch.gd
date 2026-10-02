@@ -20,6 +20,8 @@ func physics_update(delta: float) -> void:
 		return
 	if handle_throw_action():
 		return
+	if handle_interact_action():  # ramasser des pierres sans se relever (J9)
+		return
 	if p.wants(&"roll"):
 		machine.transition_to(&"Roll", {"landing": false})
 		return
