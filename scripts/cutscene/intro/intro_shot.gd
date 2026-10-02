@@ -31,7 +31,7 @@ const EARTH: SurfaceStyle = preload("res://resources/art/surfaces/earth.tres")
 ## Éclair : 0 = rien, 1 = plein éclat (animé par la table de montage).
 @export_range(0.0, 1.0) var flash: float = 0.0:
 	set(value):
-		flash = value
+		flash = value * Settings.flash_factor()  # option « moins de flashs » (J9)
 		queue_redraw()
 
 ## Secondes écoulées depuis que le plan est visible.

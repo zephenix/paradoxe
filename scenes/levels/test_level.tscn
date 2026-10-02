@@ -105,10 +105,10 @@ offset_bottom = 197.6
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "SALLE A : LES BASES
-Flèches ou ZQSD : marcher     Maj (maintenue) : courir
-Haut : se hisser sur la marche et sur le mur
-Bas : s'accroupir, puis avancer accroupi dans le tunnel
-C : roulade     J : tirer     K : bouclier (combat : salle F)     Échap : retour au titre"
+{move} : marcher     {run} (maintenue) : courir
+{move_up} : se hisser sur la marche et sur le mur
+{move_down} : s'accroupir, puis avancer accroupi dans le tunnel
+{roll} : roulade     {fire} : tirer     {shield} : bouclier (combat : salle F)     {pause} : pause"
 
 [node name="RoomB" type="Node2D" parent="."]
 position = Vector2(1280, 0)
@@ -162,10 +162,10 @@ offset_bottom = 197.6
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "SALLE B : SAUTS
-Espace en marchant : saut sans élan (2 blocs ; le premier trou en fait 1,5)
-Espace en courant, avec de l'élan : saut avec élan (4 blocs ; le grand trou en fait 3,5)
-Espace ou Haut à l'arrêt : saut sur place (s'accroche aux rebords)
-En courant, Bas : glissade sous l'obstacle"
+{jump} en marchant : saut sans élan (2 blocs ; le premier trou en fait 1,5)
+{jump} en courant, avec de l'élan : saut avec élan (4 blocs ; le grand trou en fait 3,5)
+{jump} ou {move_up} à l'arrêt : saut sur place (s'accroche aux rebords)
+En courant, {move_down} : glissade sous l'obstacle"
 
 [node name="RoomC" type="Node2D" parent="."]
 position = Vector2(2560, 0)
@@ -220,8 +220,8 @@ offset_bottom = 197.6
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "SALLE C : REBORDS ET CHUTES
-Contre un mur haut : Haut ou Espace pour sauter et s'accrocher, Haut pour se hisser
-Suspendu : Bas pour lâcher     Au bord d'un vide : Bas pour descendre et s'accrocher
+Contre un mur haut : {move_up} ou {jump} pour sauter et s'accrocher, {move_up} pour se hisser
+Suspendu : {move_down} pour lâcher     Au bord d'un vide : {move_down} pour descendre et s'accrocher
 Chute de 3 blocs : sans danger ; 4 à 5 blocs : roulade ; au-delà : mortelle
 Depuis la tour : se laisser tomber (roulade). Un saut avec élan porte trop loin : mortel
 Attention : le puits à droite est mortel"
@@ -379,10 +379,10 @@ offset_bottom = 276
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "SALLE F : COMBAT
-J ou X : tirer (1 unité d'énergie). Maintenir après un tir : tir chargé, qui brise un bouclier
-K ou W (Z en QWERTY) : bouclier, tant que la touche est maintenue (il consomme de l'énergie)
-Bas : s'accroupir derrière un muret. Les tirs debout passent au-dessus, pas les tirs à genou
-C : roulade d'esquive. Un seul tir tue, Élias comme les Sentinelles
+{fire} : tirer (1 unité d'énergie). Maintenir après un tir : tir chargé, qui brise un bouclier
+{shield} : bouclier, tant que la touche est maintenue (il consomme de l'énergie)
+{move_down} : s'accroupir derrière un muret. Les tirs debout passent au-dessus, pas les tirs à genou
+{roll} : roulade d'esquive. Un seul tir tue, Élias comme les Sentinelles
 Salle suivante (à droite) : infiltration, de nuit"
 
 [node name="RoomG" type="Node2D" parent="."]
@@ -487,9 +487,9 @@ offset_bottom = 244
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "SALLE G : INFILTRATION (nuit)
-Dans le noir, les Sentinelles voient mal. Accroupi (Bas), Élias est moins visible et ses pas sont muets.
+Dans le noir, les Sentinelles voient mal. Accroupi ({move_down}), Élias est moins visible et ses pas sont muets.
 Sous une lampe, elles le voient. Un tir brise une lampe... mais le verre fait du bruit.
-F : lancer une pierre (ramassées sur le tas de gravats) pour attirer une Sentinelle ailleurs.
+{throw} : lancer une pierre (ramassées sur le tas de gravats) pour attirer une Sentinelle ailleurs.
 En hauteur, sur les passerelles, elles ne voient pas Élias. Objectif : la sortie, en haut à droite"
 
 [node name="Elias" parent="." instance=ExtResource("5_elias")]

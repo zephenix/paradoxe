@@ -65,9 +65,9 @@ func play() -> StringName:
 	# 1) Ralenti, mesuré en temps réel (le dernier « true » : le minuteur ignore
 	#    le ralenti qu'il est chargé de mesurer).
 	phase = &"slowmo"
-	Engine.time_scale = cfg.slowmo_scale
+	Engine.time_scale = cfg.slowmo_scale * Settings.game_speed()
 	await get_tree().create_timer(cfg.slowmo_duration, true, false, true).timeout
-	Engine.time_scale = 1.0
+	Engine.time_scale = Settings.game_speed()
 	if not is_inside_tree():
 		return &"checkpoint"
 	# 2) Temps figé et choix.
@@ -116,7 +116,7 @@ func _process(delta: float) -> void:
 
 
 func _restore_time() -> void:
-	Engine.time_scale = 1.0
+	Engine.time_scale = Settings.game_speed()  # la vitesse choisie (aide « jeu ralenti »)
 	if _paused_by_me and is_inside_tree():
 		get_tree().paused = false
 	_paused_by_me = false
@@ -174,7 +174,9 @@ func _update_prompt() -> void:
 			text += "  (pas plus loin)"
 		elif not rewind_held and RewindManager.rewound() < cfg.min_rewind:
 			text += "  (remonter un peu plus)"
-		_prompt.text = text + "\nRelâcher R : reprendre ici     Entrée : checkpoint"
+		_prompt.text = text + InputPrompt.fill("\nRelâcher {rewind} : reprendre ici     {interact} : checkpoint", Settings.using_gamepad)
 	else:
-		_prompt.text = "Maintenir R : remonter le temps (%d restant%s)\nEntrée ou Espace : reprendre au checkpoint" % [
+		var left: String = "illimités" if Settings.infinite_rewinds else "%d restant%s" % [
 			GameState.rewinds_left, "s" if GameState.rewinds_left > 1 else ""]
+		_prompt.text = InputPrompt.fill("Maintenir {rewind} : remonter le temps (%s)\n{interact} ou {jump} : reprendre au checkpoint" % left,
+				Settings.using_gamepad)

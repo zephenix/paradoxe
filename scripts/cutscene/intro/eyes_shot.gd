@@ -16,7 +16,7 @@ const EYE_Y: float = 370.0
 
 
 func _draw() -> void:
-	var shake := Vector2(sin(time * 31.0), cos(time * 27.0)) * 1.5  # léger tremblement
+	var shake := Vector2(sin(time * 31.0), cos(time * 27.0)) * 1.5 * Settings.shake_factor()  # léger tremblement
 	draw_set_transform(shake)
 	var look: float = ease_in_out(phase(0.1, 0.6))  # le regard monte
 	var glow: float = ease_in_out(phase(0.3, 1.0))

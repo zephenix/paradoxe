@@ -96,8 +96,9 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="Items" type="VBoxContainer" parent="TestPanel"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 5
+theme_override_constants/separation = 8
 
 [node name="Heading" type="Label" parent="TestPanel/Items"]
 layout_mode = 2
@@ -109,7 +110,7 @@ text = "PARADOXE - prototype"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Nouvelle partie (intro, puis le prototype)"
+text = "Nouvelle partie"
 
 [node name="IntroButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
@@ -117,74 +118,29 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Revoir l'intro"
 
-[node name="LevelButton" type="Button" parent="TestPanel/Items"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Salle de test (mouvement, combat, infiltration)"
-
 [node name="PrototypeButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Prototype sans l'intro"
+text = "Jouer sans l'intro"
 
-[node name="SoundBoardButton" type="Button" parent="TestPanel/Items"]
+[node name="OptionsButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Banc d'écoute : tous les sons (J5)"
+text = "Options"
 
-[node name="ClassicToggle" type="CheckButton" parent="TestPanel/Items"]
+[node name="CreditsButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Comme les jeux d'origine : pas de rembobinage, pas de glissade, pas de rattrapage automatique des rebords, pas d'aides."
-text = "Mode classique (sans rembobinage ni aides)"
+theme_override_font_sizes/font_size = 16
+text = "Crédits"
 
-[node name="ShowSoundsToggle" type="CheckButton" parent="TestPanel/Items"]
+[node name="WorkshopButton" type="Button" parent="TestPanel/Items"]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Accessibilité : un cercle montre jusqu'où porte chaque bruit d'Élias (la distance à laquelle les ennemis l'entendent)."
-text = "Voir les sons (cercles de bruit)"
-
-[node name="Separator" type="HSeparator" parent="TestPanel/Items"]
-layout_mode = 2
-
-[node name="ImpactButton" type="Button" parent="TestPanel/Items"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Choc métallique  (SFX > Monde)"
-
-[node name="HumToggle" type="CheckButton" parent="TestPanel/Items"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Bourdonnement du portail  (Ambiance)"
-
-[node name="ReverbToggle" type="CheckButton" parent="TestPanel/Items"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Réverbération « grand hall »  (Monde)"
-
-[node name="MuffleToggle" type="CheckButton" parent="TestPanel/Items"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Étouffement  (Master, filtre)"
-
-[node name="SilenceButton" type="Button" parent="TestPanel/Items"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Coupure brutale au silence"
-
-[node name="VolumeLabel" type="Label" parent="TestPanel/Items"]
-layout_mode = 2
-text = "Volume général"
-
-[node name="VolumeSlider" type="HSlider" parent="TestPanel/Items"]
-unique_name_in_owner = true
-layout_mode = 2
-max_value = 1.0
-step = 0.01
-value = 0.8
+theme_override_font_sizes/font_size = 16
+text = "Atelier (outils de test)"
 
 [node name="Spacer" type="Control" parent="TestPanel/Items"]
 layout_mode = 2
@@ -199,6 +155,79 @@ text = "Plein écran"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Quitter"
+
+[node name="Workshop" type="VBoxContainer" parent="TestPanel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="WorkshopHeading" type="Label" parent="TestPanel/Workshop"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.43, 1, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "Atelier : outils de test"
+
+[node name="LevelButton" type="Button" parent="TestPanel/Workshop"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Salle de test (mouvement, combat, infiltration)"
+
+[node name="SoundBoardButton" type="Button" parent="TestPanel/Workshop"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Banc d'écoute : tous les sons"
+
+[node name="Separator" type="HSeparator" parent="TestPanel/Workshop"]
+layout_mode = 2
+
+[node name="ImpactButton" type="Button" parent="TestPanel/Workshop"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Choc métallique  (SFX > Monde)"
+
+[node name="HumToggle" type="CheckButton" parent="TestPanel/Workshop"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Bourdonnement du portail  (Ambiance)"
+
+[node name="ReverbToggle" type="CheckButton" parent="TestPanel/Workshop"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Réverbération « grand hall »  (Monde)"
+
+[node name="MuffleToggle" type="CheckButton" parent="TestPanel/Workshop"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Étouffement  (Master, filtre)"
+
+[node name="SilenceButton" type="Button" parent="TestPanel/Workshop"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Coupure brutale au silence"
+
+[node name="VolumeLabel" type="Label" parent="TestPanel/Workshop"]
+layout_mode = 2
+text = "Volume général"
+
+[node name="VolumeSlider" type="HSlider" parent="TestPanel/Workshop"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="WorkshopSpacer" type="Control" parent="TestPanel/Workshop"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="WorkshopBackButton" type="Button" parent="TestPanel/Workshop"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Retour"
 
 [node name="Diagnostics" type="Label" parent="."]
 unique_name_in_owner = true

@@ -149,3 +149,96 @@ static func all_actions() -> Array[StringName]:
 	for action: StringName in DEFAULTS:
 		names.append(action)
 	return names
+
+
+# --------------------------------------------------------------------------
+# Remappage (J9) : changer une touche, sauvegarder, recharger
+# --------------------------------------------------------------------------
+
+## Remplace la touche PRINCIPALE d'une commande par « event » : la première touche
+## clavier si c'est une touche, le premier bouton (ou axe) de manette sinon. Les
+## autres touches de la commande restent (au clavier : les flèches ET ZQSD).
+static func rebind(action: StringName, event: InputEvent) -> void:
+	if not InputMap.has_action(action):
+		return
+	var pad: bool = InputPrompt.is_pad(event)
+	var events: Array[InputEvent] = InputMap.action_get_events(action)
+	var replaced: bool = false
+	InputMap.action_erase_events(action)
+	for old in events:
+		if not replaced and InputPrompt.is_pad(old) == pad:
+			InputMap.action_add_event(action, _clean(event))
+			replaced = true
+		else:
+			InputMap.action_add_event(action, old)
+	if not replaced:
+		InputMap.action_add_event(action, _clean(event))
+
+
+## Copie « propre » d'un évènement capturé (sans l'état « enfoncé », et valable
+## pour toutes les manettes).
+static func _clean(event: InputEvent) -> InputEvent:
+	if event is InputEventKey:
+		var key := InputEventKey.new()
+		key.physical_keycode = (event as InputEventKey).physical_keycode
+		if key.physical_keycode == KEY_NONE:
+			key.physical_keycode = (event as InputEventKey).keycode
+		return key
+	if event is InputEventJoypadButton:
+		var button := InputEventJoypadButton.new()
+		button.button_index = (event as InputEventJoypadButton).button_index
+		button.device = -1
+		return button
+	if event is InputEventJoypadMotion:
+		var motion := InputEventJoypadMotion.new()
+		motion.axis = (event as InputEventJoypadMotion).axis
+		motion.axis_value = signf((event as InputEventJoypadMotion).axis_value)
+		motion.device = -1
+		return motion
+	return event
+
+
+## Écrit les touches de toutes les commandes dans la section [input] d'un
+## fichier de réglages. Chaque touche devient un petit tableau lisible :
+## ["key", code], ["button", numéro], ["axis", axe, sens].
+static func save_to(config: ConfigFile) -> void:
+	for action: StringName in DEFAULTS:
+		var list: Array = []
+		for event in InputMap.action_get_events(action):
+			if event is InputEventKey:
+				list.append(["key", int((event as InputEventKey).physical_keycode)])
+			elif event is InputEventJoypadButton:
+				list.append(["button", int((event as InputEventJoypadButton).button_index)])
+			elif event is InputEventJoypadMotion:
+				list.append(["axis", int((event as InputEventJoypadMotion).axis), (event as InputEventJoypadMotion).axis_value])
+		config.set_value("input", String(action), list)
+
+
+## Relit les touches sauvegardées (une commande absente du fichier garde ses
+## touches par défaut).
+static func load_from(config: ConfigFile) -> void:
+	for action: StringName in DEFAULTS:
+		if not config.has_section_key("input", String(action)):
+			continue
+		var list: Array = config.get_value("input", String(action), [])
+		InputMap.action_erase_events(action)
+		for item: Array in list:
+			var event: InputEvent = null
+			match String(item[0]):
+				"key":
+					var key := InputEventKey.new()
+					key.physical_keycode = int(item[1]) as Key
+					event = key
+				"button":
+					var button := InputEventJoypadButton.new()
+					button.button_index = int(item[1]) as JoyButton
+					button.device = -1
+					event = button
+				"axis":
+					var motion := InputEventJoypadMotion.new()
+					motion.axis = int(item[1]) as JoyAxis
+					motion.axis_value = float(item[2])
+					motion.device = -1
+					event = motion
+			if event:
+				InputMap.action_add_event(action, event)

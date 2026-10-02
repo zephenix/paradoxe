@@ -38,11 +38,71 @@ var fullscreen: bool = false
 ## bruit d'Élias (le rayon exact que perçoivent les ennemis).
 var show_sounds: bool = false
 
+# --- Assistances et accessibilité (J9, PLAN §5.11) ---
+## Jeu ralenti (vitesse : resources/settings/assists.tres).
+var slow_game: bool = false
+## Rembobinages illimités (en mode moderne).
+var infinite_rewinds: bool = false
+## Rebords plus faciles à attraper.
+var ledge_assist: bool = false
+## Accroupi et bouclier : un appui pour activer, un autre pour arrêter (au lieu
+## de maintenir la touche).
+var toggle_crouch: bool = false
+var toggle_shield: bool = false
+## Moins de flashs (éclairs, éclats) et moins de secousses de l'image.
+var reduce_flashes: bool = false
+var reduce_shake: bool = false
+
+## Ce que les aides changent (vitesse, tolérance…).
+var assists: AssistConfig = preload("res://resources/settings/assists.tres")
+
+## Vrai quand le joueur utilise la manette (les textes affichent alors les
+## boutons de manette). Détecté à chaque appui.
+var using_gamepad: bool = false
+
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS  # détecte la manette même en pause
 	InputActions.install_defaults()
 	load_settings()
 	apply_all()
+
+
+## Le dernier appareil utilisé décide des noms de touches affichés.
+func _input(event: InputEvent) -> void:
+	var pad: bool
+	if event is InputEventJoypadButton:
+		pad = true
+	elif event is InputEventJoypadMotion:
+		if absf((event as InputEventJoypadMotion).axis_value) < 0.5:
+			return  # petits mouvements d'un stick au repos : on les ignore
+		pad = true
+	elif event is InputEventKey or event is InputEventMouseButton:
+		pad = false
+	else:
+		return
+	if pad != using_gamepad:
+		using_gamepad = pad
+		Events.input_device_changed.emit(pad)
+
+
+## Vitesse du jeu (1 = normale ; moins avec l'aide « jeu ralenti »).
+func game_speed() -> float:
+	return assists.slow_speed if slow_game else 1.0
+
+
+## Facteur des rebords (1 = normal ; plus avec l'aide « rebords tolérants »).
+func ledge_factor() -> float:
+	return assists.ledge_factor if ledge_assist else 1.0
+
+
+## Intensité des flashs et des secousses (1 = normale).
+func flash_factor() -> float:
+	return assists.flash_factor if reduce_flashes else 1.0
+
+
+func shake_factor() -> float:
+	return assists.shake_factor if reduce_shake else 1.0
 
 
 ## Règle le volume d'un bus (0.0 à 1.0) et l'applique immédiatement.
@@ -84,6 +144,14 @@ func load_settings() -> void:
 	classic_mode = bool(config.get_value("gameplay", "classic_mode", false))
 	fullscreen = bool(config.get_value("display", "fullscreen", false))
 	show_sounds = bool(config.get_value("accessibility", "show_sounds", false))
+	slow_game = bool(config.get_value("assists", "slow_game", false))
+	infinite_rewinds = bool(config.get_value("assists", "infinite_rewinds", false))
+	ledge_assist = bool(config.get_value("assists", "ledge_assist", false))
+	toggle_crouch = bool(config.get_value("accessibility", "toggle_crouch", false))
+	toggle_shield = bool(config.get_value("accessibility", "toggle_shield", false))
+	reduce_flashes = bool(config.get_value("accessibility", "reduce_flashes", false))
+	reduce_shake = bool(config.get_value("accessibility", "reduce_shake", false))
+	InputActions.load_from(config)
 
 
 ## Écrit les réglages sur le disque. Renvoie OK (0) si tout s'est bien passé.
@@ -94,6 +162,14 @@ func save_settings() -> Error:
 	config.set_value("gameplay", "classic_mode", classic_mode)
 	config.set_value("display", "fullscreen", fullscreen)
 	config.set_value("accessibility", "show_sounds", show_sounds)
+	config.set_value("assists", "slow_game", slow_game)
+	config.set_value("assists", "infinite_rewinds", infinite_rewinds)
+	config.set_value("assists", "ledge_assist", ledge_assist)
+	config.set_value("accessibility", "toggle_crouch", toggle_crouch)
+	config.set_value("accessibility", "toggle_shield", toggle_shield)
+	config.set_value("accessibility", "reduce_flashes", reduce_flashes)
+	config.set_value("accessibility", "reduce_shake", reduce_shake)
+	InputActions.save_to(config)
 	return config.save(file_path)
 
 
@@ -103,6 +179,14 @@ func reset_to_defaults() -> void:
 	classic_mode = false
 	fullscreen = false
 	show_sounds = false
+	slow_game = false
+	infinite_rewinds = false
+	ledge_assist = false
+	toggle_crouch = false
+	toggle_shield = false
+	reduce_flashes = false
+	reduce_shake = false
+	InputActions.install_defaults()
 	apply_all()
 	Events.settings_changed.emit()
 
