@@ -487,6 +487,16 @@ stateDiagram-v2
 - Chrono de l'écran 2 à la fin (les cinématiques sont passées automatiquement).
 - Le meilleur passage est enregistré (position + animation, 20 fois par seconde) dans
   `user://ghost_best.res` et rejoué sous forme de silhouette translucide.
+- *Précisions de J9* (réglages dans `resources/time_trial.tres`) :
+  - « Contre la montre » sur l'écran titre (avec le record) ; `GameState.time_trial` ; le
+    Level crée alors un `TimeTrial` (chrono, enregistrement, fantôme, écran d'arrivée) ;
+  - le chrono compte le temps du jeu : arrêté en pause et pendant le choix de la séquence
+    de mort ; il s'arrête quand la cinématique de fin commence ;
+  - le passage (`GhostRun`) : position, sens du regard, animation (nom, instant, vitesse) ;
+    il n'est sauvegardé que s'il bat le record ; le fantôme (`GhostRunner`) n'a ni corps,
+    ni son ;
+  - écran d'arrivée : temps, record ou écart, « Recommencer » / « Retour au titre » ; le
+    menu pause propose aussi « Recommencer la course ».
 
 ### 5.9 Mode classique (J4, complété en J6)
 Un interrupteur unique, `Settings.classic_mode` (réglage du joueur, lu via

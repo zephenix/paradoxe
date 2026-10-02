@@ -157,3 +157,11 @@ func test_room_hints_show_the_players_keys() -> void:
 	Settings.using_gamepad = true
 	Events.input_device_changed.emit(true)
 	assert_true(hint.text.contains("A : sauter"), "bouton de manette")
+
+
+func test_every_command_can_be_remapped_in_the_options() -> void:
+	var listed: Array[StringName] = []
+	for entry: Array in OptionsMenu.ACTION_NAMES:
+		listed.append(entry[0])
+	for action: StringName in InputActions.DEFAULTS:
+		assert_true(listed.has(action), "« %s » figure dans Options > Commandes" % action)

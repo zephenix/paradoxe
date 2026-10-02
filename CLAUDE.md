@@ -117,6 +117,12 @@ godot --headless --path . -s res://tools/godot/generate_bus_layout.gd   # régé
   `Interactable` (`gesture = &"PickUp"`) : `input.press(&"interact")` devant lui, puis
   attendre la fin du geste (environ 1 s pour trois pierres). L'état `PickUp` démarre au pas
   de physique suivant l'appui : vérifier un état « Idle » juste après l'appui ne prouve rien.
+- Chrono (J9) : `GameState.time_trial = true` avant `add_node(level)` crée `level.time_trial`
+  (un `TimeTrial` : `elapsed`, `finish()`, `ghost`, `best`, `results`). Le meilleur
+  passage s'écrit dans `config.best_path` (`resources/time_trial.tres`, ressource partagée) :
+  un test le redirige vers un fichier de test et le remet dans `after_each()`, avec
+  `GameState.time_trial = false`. Pour finir une course : `level.cutscenes.play(
+  level.get_node("Story/Finale"))`.
 - Mort d'Élias (J4) : en mode moderne, avec assez d'historique, la séquence de mort
   (`level.death`, un `DeathController`) ralentit, **met le jeu en pause** et attend un choix.
   Dans un test : `level.death.input_from_devices = false`, puis `rewind_held = true/false`

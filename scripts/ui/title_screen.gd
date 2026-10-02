@@ -41,12 +41,14 @@ const SHIFT_WHEN_PANEL_OPEN: float = -210.0
 @onready var _volume_slider: HSlider = %VolumeSlider
 @onready var _fullscreen_button: Button = %FullscreenButton
 @onready var _quit_button: Button = %QuitButton
+@onready var _time_trial_button: Button = %TimeTrialButton
 
 var _diagnostic_timer: float = 0.0
 
 
 func _ready() -> void:
 	_panel.hide()
+	GameState.time_trial = false  # (retour d'une course contre la montre)
 	_quit_button.visible = not OS.has_feature("web")  # on ne « quitte » pas une page Web
 
 	# Clignotement doux de l'invitation (boucle infinie).
@@ -57,6 +59,10 @@ func _ready() -> void:
 	_level_button.pressed.connect(_on_level_pressed)
 	_sound_board_button.pressed.connect(_on_sound_board_pressed)
 	_prototype_button.pressed.connect(_on_prototype_pressed)
+	_time_trial_button.pressed.connect(_on_time_trial_pressed)
+	var best: float = TimeTrial.best_time()
+	if best < INF:
+		_time_trial_button.text = "Contre la montre (record %s)" % TimeTrial.format_time(best)
 	_new_game_button.pressed.connect(_on_new_game_pressed)
 	_intro_button.pressed.connect(_on_intro_pressed)
 	_options_button.pressed.connect(open_options)
@@ -173,6 +179,17 @@ func _on_new_game_pressed() -> void:
 	GameState.new_game()
 	IntroScene.return_to_title = false
 	SceneTransition.change_scene(INTRO, 1.0)
+
+
+## Contre la montre (J9) : de l'écran 2 à la fin, cinématiques passées, avec
+## le fantôme du meilleur passage.
+func _on_time_trial_pressed() -> void:
+	_time_trial_button.disabled = true
+	AudioManager.play_sfx(&"ui_confirm")
+	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
+	GameState.new_game()
+	GameState.time_trial = true
+	SceneTransition.change_scene(PROTOTYPE)
 
 
 ## Revoir l'intro : on revient ici à la fin.

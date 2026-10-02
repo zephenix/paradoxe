@@ -9,6 +9,7 @@ extends CanvasLayer
 ##   - MAINTENIR « Passer » (Échap, Espace ; Start ou A) pendant une seconde la
 ##     passe : une petite jauge se remplit en bas à droite. La cinématique saute
 ##     alors directement à son état final (Cutscene.finish).
+##   - en mode chrono (J9), toutes les cinématiques sont passées d'office.
 ## Puis la main revient au joueur.
 ##
 ## Pour les tests : input_from_devices = false, puis skip_held = vrai / faux.
@@ -67,7 +68,7 @@ func play(cutscene: Cutscene) -> void:
 	var current: Cutscene = cutscene
 	while current != null:
 		current.played = true
-		skipping = false
+		skipping = GameState.time_trial  # mode chrono (J9) : toutes passées d'office
 		skip_time = 0.0
 		started.emit(current)
 		await current.run(self)
