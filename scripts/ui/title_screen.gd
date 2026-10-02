@@ -1,19 +1,18 @@
 extends Control
-## Écran titre (provisoire) : accès à la salle de test, au banc d'écoute (J5)
-## et à un petit banc de test des bus audio.
+## Écran titre et menu principal (J9).
 ##
 ## 1. Attend un clic ou une touche (obligatoire sur le Web pour avoir du son).
 ## 2. Débloque l'audio, joue un son de validation, lance le bourdonnement du portail.
-## 3. Affiche un petit banc de test pour vérifier les bus et leurs effets
-##    (réverbération, étouffement, silence) sur chaque plateforme.
-##
-## Le vrai menu principal arrive en J9 ; cette scène restera l'écran titre.
+## 3. Affiche le menu : nouvelle partie, revoir l'intro, jouer sans l'intro,
+##    options, crédits, et l'« atelier » (outils de test : salle de test, banc
+##    d'écoute, essais des bus audio sur chaque plateforme).
 
 
 const TEST_LEVEL: String = "res://scenes/levels/test_level.tscn"
 const SOUND_BOARD: String = "res://scenes/ui/sound_board.tscn"
 const PROTOTYPE: String = "res://scenes/levels/prototype.tscn"
 const INTRO: String = "res://scenes/cutscenes/intro.tscn"
+const CREDITS: String = "res://scenes/ui/credits.tscn"
 const HUM_LOOP_ID: StringName = &"title_portal_hum"
 ## Décalage vers la gauche du portail et du titre quand le banc de test s'ouvre.
 const SHIFT_WHEN_PANEL_OPEN: float = -210.0
@@ -28,8 +27,12 @@ const SHIFT_WHEN_PANEL_OPEN: float = -210.0
 @onready var _prototype_button: Button = %PrototypeButton
 @onready var _new_game_button: Button = %NewGameButton
 @onready var _intro_button: Button = %IntroButton
-@onready var _classic_toggle: CheckButton = %ClassicToggle
-@onready var _show_sounds_toggle: CheckButton = %ShowSoundsToggle
+@onready var _items: Control = %Items
+@onready var _workshop: Control = %Workshop
+@onready var _options_button: Button = %OptionsButton
+@onready var _credits_button: Button = %CreditsButton
+@onready var _workshop_button: Button = %WorkshopButton
+@onready var _workshop_back_button: Button = %WorkshopBackButton
 @onready var _impact_button: Button = %ImpactButton
 @onready var _hum_toggle: CheckButton = %HumToggle
 @onready var _reverb_toggle: CheckButton = %ReverbToggle
@@ -56,10 +59,10 @@ func _ready() -> void:
 	_prototype_button.pressed.connect(_on_prototype_pressed)
 	_new_game_button.pressed.connect(_on_new_game_pressed)
 	_intro_button.pressed.connect(_on_intro_pressed)
-	_classic_toggle.set_pressed_no_signal(Settings.classic_mode)
-	_classic_toggle.toggled.connect(_on_classic_toggled)
-	_show_sounds_toggle.set_pressed_no_signal(Settings.show_sounds)
-	_show_sounds_toggle.toggled.connect(_on_show_sounds_toggled)
+	_options_button.pressed.connect(open_options)
+	_credits_button.pressed.connect(_on_credits_pressed)
+	_workshop_button.pressed.connect(_show_workshop.bind(true))
+	_workshop_back_button.pressed.connect(_show_workshop.bind(false))
 	_impact_button.pressed.connect(_on_impact_pressed)
 	_hum_toggle.toggled.connect(_on_hum_toggled)
 	_reverb_toggle.toggled.connect(_on_reverb_toggled)
@@ -188,20 +191,28 @@ func _on_sound_board_pressed() -> void:
 	SceneTransition.change_scene(SOUND_BOARD)
 
 
-## Mode classique (PLAN §5.9) : réglage du joueur, sauvegardé. Le vrai menu
-## d'options arrive en J9 ; en attendant, l'interrupteur est ici.
-func _on_classic_toggled(enabled: bool) -> void:
-	Settings.classic_mode = enabled
-	Settings.save_settings()
-	Events.settings_changed.emit()
+## Options (J9) : le menu s'ouvre par-dessus l'écran titre.
+func open_options() -> OptionsMenu:
+	AudioManager.play_sfx(&"ui_confirm")
+	var menu := OptionsMenu.new()
+	menu.closed.connect(_options_button.grab_focus)
+	add_child(menu)
+	return menu
 
 
-## « Voir les sons » (J6) : option d'accessibilité, sauvegardée. Elle ira dans
-## le menu d'options en J9.
-func _on_show_sounds_toggled(enabled: bool) -> void:
-	Settings.show_sounds = enabled
-	Settings.save_settings()
-	Events.settings_changed.emit()
+func _on_credits_pressed() -> void:
+	_credits_button.disabled = true
+	AudioManager.play_sfx(&"ui_confirm")
+	AudioManager.stop_loop(HUM_LOOP_ID, 0.8)
+	SceneTransition.change_scene(CREDITS)
+
+
+## L'atelier remplace le menu principal dans le panneau (et inversement).
+func _show_workshop(shown: bool) -> void:
+	AudioManager.play_sfx(&"ui_confirm")
+	_workshop.visible = shown
+	_items.visible = not shown
+	(_level_button if shown else _workshop_button).grab_focus()
 
 
 func _on_impact_pressed() -> void:

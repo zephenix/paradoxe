@@ -95,7 +95,8 @@ func frame_count() -> int:
 ## Vrai si Élias peut rembobiner maintenant : mode moderne, utilisations
 ## restantes, et assez d'historique.
 func can_rewind() -> bool:
-	return is_available() and GameState.rewinds_left > 0 and history_length() >= config.min_rewind
+	return is_available() and (GameState.rewinds_left > 0 or Settings.infinite_rewinds) \
+			and history_length() >= config.min_rewind
 
 
 func _physics_process(delta: float) -> void:
@@ -180,7 +181,8 @@ func finish_rewind() -> bool:
 	_frames.resize(index + 1)
 	_clock = _frames[index]["time"]
 	_since_capture = 0.0
-	GameState.rewinds_left = maxi(GameState.rewinds_left - 1, 0)
+	if not Settings.infinite_rewinds:  # aide « rembobinages illimités » (J9)
+		GameState.rewinds_left = maxi(GameState.rewinds_left - 1, 0)
 	_end_effects()
 	AudioManager.play_sfx(&"rewind_release")
 	is_rewinding = false

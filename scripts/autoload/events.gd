@@ -39,4 +39,8 @@ signal room_entered(room: Node)
 ## Le niveau d'alerte global (0 = calme, 1 = combat) a changé. (J6)
 signal alert_level_changed(level: float)
 
+## Le joueur est passé du clavier à la manette (ou l'inverse) : les textes qui
+## citent des touches se mettent à jour (J9).
+signal input_device_changed(gamepad: bool)
+
 @warning_ignore_restore("unused_signal")

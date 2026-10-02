@@ -1504,3 +1504,29 @@ Pour couvrir un grand mur avec une petite image, on la répète comme un carrela
 droit ne continue pas le bord gauche, une couture se voit à chaque carreau. Le générateur
 part d'un bruit calculé par transformée de Fourier : par construction, ce bruit « boucle »
 sur lui-même ; et chaque motif (briques, plaques, planches) doit tomber juste dans l'image.
+
+## J9 — Les finitions (v0.9)
+
+### Ce qui a été fait
+
+**Menus, options, commandes (partie A)**
+
+- **Écran titre** devenu un vrai menu : Nouvelle partie, Revoir l'intro, Jouer sans l'intro,
+  Options, Crédits, et l'« Atelier » qui regroupe les outils de test (salle de test, banc
+  d'écoute, essais des bus audio).
+- **Menu pause** (Échap ou Start en jeu) : Reprendre, Recommencer au checkpoint, Options,
+  Retour au titre. Le jeu s'arrête derrière, la musique continue.
+- **Menu d'options**, quatre onglets, sauvegardés aussitôt :
+  - *Son* : un curseur par bus (général, musique, ambiance, effets, voix, interface) ;
+  - *Commandes* : chaque commande avec sa touche clavier et son bouton de manette ;
+    cliquer puis appuyer sur la nouvelle touche ; « Touches par défaut » ;
+  - *Aides* : mode classique, jeu ralenti (80 %), rembobinages illimités, rebords plus
+    faciles à attraper, accroupi et bouclier en « bascule » (un appui pour activer, un
+    autre pour arrêter) ;
+  - *Image* : plein écran, voir les sons, moins de flashs, moins de secousses.
+- **Les touches affichées sont celles du joueur** : les textes des salles disent « A » à un
+  joueur AZERTY pour l'ordre au compagnon (fini le « Q (A en AZERTY) »), le nom des boutons
+  à la manette, et ils changent dès qu'on passe du clavier à la manette.
+- **Crédits**, avec la licence de Godot (obligatoire).
+- **Manette** : elle était déjà reconnue (disposition Xbox) ; elle se remappe maintenant
+  comme le clavier.

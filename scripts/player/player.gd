@@ -247,8 +247,8 @@ func climb_or_jump_up() -> void:
 func try_grab() -> bool:
 	if grab_cooldown > 0.0 or (not modern() and not input.up):
 		return false
-	var ledge: Dictionary = find_ledge(config.hang_hand_height - config.grab_tolerance,
-			config.hang_hand_height + config.grab_tolerance)
+	var tolerance: float = config.grab_tolerance * Settings.ledge_factor()  # aide « rebords tolérants » (J9)
+	var ledge: Dictionary = find_ledge(config.hang_hand_height - tolerance, config.hang_hand_height + tolerance)
 	if ledge.is_empty():
 		return false
 	var point: Vector2 = ledge["point"]
@@ -292,7 +292,7 @@ func can_stand() -> bool:
 func find_ledge(min_height: float, max_height: float) -> Dictionary:
 	var feet: Vector2 = global_position
 	var half: float = config.body_width * 0.5
-	var probe_x: float = feet.x + facing * (half + config.grab_reach)
+	var probe_x: float = feet.x + facing * (half + config.grab_reach * Settings.ledge_factor())
 	# 1) Un rayon vertical, juste devant, cherche le dessus d'un bloc.
 	var top_hit: Dictionary = _ray(Vector2(probe_x, feet.y - max_height - 2.0), Vector2(probe_x, feet.y - min_height + 2.0))
 	if top_hit.is_empty() or top_hit["normal"].y > -0.7:

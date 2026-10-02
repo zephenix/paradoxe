@@ -27,6 +27,11 @@ var shield: bool = false
 ## Touche « Ordre » maintenue (compagnon, J7) : court = suivre/attendre, long = activer.
 var order: bool = false
 
+## Options « bascule » (J9) : un appui sur Bas (ou Bouclier) l'active, un autre
+## l'arrête, au lieu de maintenir la touche. Ces deux variables retiennent l'état.
+var _crouch_latched: bool = false
+var _shield_latched: bool = false
+
 ## Horloge interne (secondes) et date du dernier appui de chaque commande.
 var _clock: float = 0.0
 var _pressed_at: Dictionary = {}   # action -> date
@@ -45,9 +50,21 @@ func update(delta: float) -> void:
 	move = 0 if absf(axis) < 0.3 else int(signf(axis))
 	up = Input.is_action_pressed(&"move_up")
 	down = Input.is_action_pressed(&"move_down")
+	if Settings.toggle_crouch:
+		if Input.is_action_just_pressed(&"move_down"):
+			_crouch_latched = not _crouch_latched
+		if up or Input.is_action_just_pressed(&"jump"):
+			_crouch_latched = false  # se relever : Haut ou Saut
+		down = _crouch_latched
 	run = Input.is_action_pressed(&"run")
 	fire = Input.is_action_pressed(&"fire")
 	shield = Input.is_action_pressed(&"shield")
+	if Settings.toggle_shield:
+		if Input.is_action_just_pressed(&"shield"):
+			_shield_latched = not _shield_latched
+		if Input.is_action_just_pressed(&"fire"):
+			_shield_latched = false  # tirer baisse le bouclier
+		shield = _shield_latched
 	order = Input.is_action_pressed(&"order")
 	for action in BUFFERED:
 		if Input.is_action_just_pressed(action):
@@ -78,6 +95,8 @@ func consume(action: StringName, window: float) -> bool:
 func clear() -> void:
 	_pressed_at.clear()
 	_consumed.clear()
+	_crouch_latched = false
+	_shield_latched = false
 	move = 0
 	up = false
 	down = false

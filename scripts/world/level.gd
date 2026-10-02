@@ -48,6 +48,10 @@ var _sky_tint: CanvasModulate
 var _tint_tween: Tween
 ## « Voir les sons » (J6) : cercles des bruits d'Élias.
 var noise_rings: NoiseRings
+## Menu pause (J9).
+var pause_menu: PauseMenu
+## Textes des salles (aides, « SORTIE ») : leurs touches sont remplies au vol.
+var _labels: Array[Label] = []
 ## Niveau d'alerte global (J6) : 0 = calme, 1 = combat. C'est le plus inquiet
 ## des ennemis qui compte ; la musique de tension (J8) le suivra.
 var alert_level: float = 0.0
@@ -66,8 +70,14 @@ func _ready() -> void:
 	# Chaque salle a sa zone acoustique (J5) : en y entrant, l'ambiance et
 	# l'acoustique passent en fondu à celles de la zone.
 	camera.room_changed.connect(_on_room_changed)
+	Engine.time_scale = Settings.game_speed()  # aide « jeu ralenti » (J9)
+	Events.settings_changed.connect(_on_settings_changed)
 	_create_tints()
 	_create_noise_rings()
+	pause_menu = PauseMenu.new()
+	pause_menu.name = "PauseMenu"
+	pause_menu.restart_requested.connect(restart_from_checkpoint)
+	add_child(pause_menu)
 	_lift_labels()
 	player.died.connect(_on_player_died)
 	player.kill_y = _lowest_room_bottom() + respawn.kill_margin
@@ -90,6 +100,7 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	Engine.time_scale = 1.0  # les menus tournent à vitesse normale
 	RewindManager.recording = false
 	RewindManager.clear()
 	AudioManager.set_zone(&"", 1.0)
@@ -196,6 +207,27 @@ func _lift_labels() -> void:
 				room.remove_child(label)
 				layer.add_child(label)
 				label.position = world_position
+				# Le texte d'origine garde ses jetons ({jump}…) : on le remplit avec
+				# les touches du joueur, et on le refait s'il change d'appareil (J9).
+				# (Seulement les textes qui contiennent des jetons : d'autres, comme
+				# l'aide de la sortie, sont écrits par leur propre script.)
+				if label.text.contains("{"):
+					label.set_meta(&"template", label.text)
+					_labels.append(label)
+	_refresh_labels()
+	if not Events.input_device_changed.is_connected(_on_input_device_changed):
+		Events.input_device_changed.connect(_on_input_device_changed)
+
+
+func _on_input_device_changed(_gamepad: bool) -> void:
+	_refresh_labels()
+
+
+## Remplit les textes des salles avec les noms des touches (clavier ou manette).
+func _refresh_labels() -> void:
+	for label in _labels:
+		if is_instance_valid(label):
+			label.text = InputPrompt.fill(String(label.get_meta(&"template")), Settings.using_gamepad)
 
 
 ## Un CanvasModulate multiplie la couleur de tout ce qui est dessiné dans son
@@ -232,10 +264,26 @@ func _create_tints() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Pendant une cinématique, Échap sert à la passer (maintenue), pas à quitter.
-	if event.is_action_pressed(&"pause") and not (cutscenes and cutscenes.playing):
+	# Échap : le menu pause (J9). Pas pendant une cinématique (Échap sert alors à
+	# la passer), ni pendant la séquence de mort (elle a son propre choix).
+	if event.is_action_pressed(&"pause") and can_pause():
 		get_viewport().set_input_as_handled()
-		SceneTransition.change_scene("res://scenes/ui/title_screen.tscn")
+		pause_menu.open()
+
+
+## Vrai si le menu pause peut s'ouvrir maintenant.
+func can_pause() -> bool:
+	return not (cutscenes and cutscenes.playing) and not get_tree().paused and not player.is_dead \
+			and not SceneTransition.is_changing_scene
+
+
+## « Recommencer au checkpoint » (menu pause) : comme après une mort, sans la mort.
+func restart_from_checkpoint() -> void:
+	clear_projectiles()
+	var point: Array = respawn_point()
+	player.respawn(point[0], point[1])
+	camera.snap_to_target()
+	RewindManager.start_recording()
 
 
 func _play_opening() -> void:
@@ -290,3 +338,11 @@ func _lowest_room_bottom() -> float:
 	for node in get_tree().get_nodes_in_group(&"rooms"):
 		bottom = maxf(bottom, (node as Room).world_rect().end.y)
 	return bottom if bottom > -INF else 1000.0
+
+
+## Un réglage a changé (menu pause > options) : la vitesse du jeu suit, sauf
+## pendant le ralenti de la mort (le DeathController la remettra lui-même).
+func _on_settings_changed() -> void:
+	if death == null or death.phase == &"":
+		Engine.time_scale = Settings.game_speed()
+	_refresh_labels()

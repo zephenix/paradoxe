@@ -20,6 +20,7 @@ static func spawn(parent: Node, at: Vector2, flash_color: Color, factor: float =
 	var flash := ImpactFlash.new()
 	flash.color = flash_color
 	flash.size_factor = factor
+	flash.modulate.a = maxf(Settings.flash_factor(), 0.15)  # option « moins de flashs » (J9)
 	parent.add_child(flash)
 	flash.global_position = at
 	return flash
