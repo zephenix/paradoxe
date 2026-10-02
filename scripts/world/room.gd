@@ -29,6 +29,12 @@ enum Transition { SLIDE, CUT }
 ## Ambiance visuelle (essai graphique) : lumière principale, brume, poussières,
 ## grain. Vide : rien de tout cela. Sans effet sur le gameplay.
 @export var atmosphere: RoomAtmosphere
+## Objectif affiché par l'hologramme du bracelet (J9) : une phrase courte.
+## Vide : pas de ligne « objectif ».
+@export var objective: String = ""
+## Vers quoi pointe la flèche de l'objectif (une sortie, un mécanisme…). Vide :
+## pas de flèche, seulement la phrase.
+@export var objective_target: NodePath
 
 const FOG_SHADER: Shader = preload("res://assets/shaders/fog.gdshader")
 
@@ -38,6 +44,21 @@ func _ready() -> void:
 	if atmosphere and not Engine.is_editor_hint():
 		_create_fog()
 		_create_dust()
+
+
+## Position (dans le monde) de la cible de l'objectif ; Vector2.INF s'il n'y en a pas.
+func objective_point() -> Vector2:
+	var target: Node2D = get_node_or_null(objective_target) as Node2D if not objective_target.is_empty() else null
+	return target.global_position if target else Vector2.INF
+
+
+## La salle qui contient le point « at » (dans le monde), ou null.
+static func find_at(context: Node, at: Vector2) -> Room:
+	for node in context.get_tree().get_nodes_in_group(&"rooms"):
+		var room: Room = node as Room
+		if room and room.world_rect().has_point(at):
+			return room
+	return null
 
 
 ## Brume : un rectangle au bas de la salle, dessiné par un shader (volutes qui

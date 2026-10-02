@@ -94,6 +94,8 @@ title = "2 - Arrivée"
 acoustic_zone = &"arrival"
 ambient_light = 0.8
 atmosphere = ExtResource("46_jungle")
+objective = "Avancer à travers la jungle"
+objective_target = NodePath("Objective")
 
 [node name="Ruin1" type="Node2D" parent="Room2"]
 position = Vector2(20.0, 1032.0)
@@ -236,7 +238,7 @@ offset_right = 1140
 offset_bottom = 260
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
-text = "ÉCRAN 2 : ARRIVÉE\n{move} : marcher. {run} (maintenue) : courir. {jump} : sauter (plus loin en courant).\nAu pied d'un mur pas trop haut : {move_up} pour grimper."
+text = "ÉCRAN 2 : ARRIVÉE\n{move} : marcher. {run} (maintenue) : courir. {jump} : sauter (plus loin en courant).\nAu pied d'un mur pas trop haut : {move_up} pour grimper. {bracelet} : le bracelet (objectif, énergie, poches)."
 
 [node name="Room3" type="Node2D" parent="."]
 position = Vector2(-2560.0, -360.0)
@@ -247,6 +249,8 @@ title = "3 - Canopée"
 acoustic_zone = &"canopy"
 ambient_light = 0.7
 atmosphere = ExtResource("46_jungle")
+objective = "Traverser la canopée"
+objective_target = NodePath("Objective")
 
 [node name="Ruin1" type="Node2D" parent="Room3"]
 position = Vector2(1060.0, 1224.0)
@@ -430,6 +434,8 @@ title = "4 - Clairière"
 acoustic_zone = &"clearing"
 ambient_light = 0.6
 atmosphere = ExtResource("47_clearing")
+objective = "Explorer la clairière"
+objective_target = NodePath("CaptureTrigger")
 
 [node name="Plants1" type="Node2D" parent="Room4"]
 position = Vector2(0, 672)
@@ -515,6 +521,8 @@ title = "5 - Cellules"
 acoustic_zone = &"cells"
 ambient_light = 0.55
 atmosphere = ExtResource("48_lab")
+objective = "Reprendre votre arme et fuir avec Marek"
+objective_target = NodePath("Exit")
 
 [node name="Backdrop" type="Polygon2D" parent="Room5"]
 z_index = -1
@@ -686,7 +694,7 @@ offset_right = 1180
 offset_bottom = 204
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
-text = "ÉCRAN 5 : CELLULES. {interact} : interagir (levier, casier, terminal).\n{order} : ordre au compagnon. Appui bref : suis-moi / attends.\nMaintenir {order} jusqu'à remplir l'anneau : « Active ça » sur la spirale verte entourée.\nLes deux leviers des cellules doivent être tirés ensemble. Votre arme est dans un casier (E)."
+text = "ÉCRAN 5 : CELLULES. {interact} : interagir (levier, casier, terminal).\n{order} : ordre au compagnon. Appui bref : suis-moi / attends.\nMaintenir {order} jusqu'à remplir l'anneau : « Active ça » sur la spirale verte entourée.\nLes deux leviers des cellules doivent être tirés ensemble. Votre arme est dans un casier."
 
 [node name="Room6" type="Node2D" parent="."]
 position = Vector2(0.0, 2400.0)
@@ -697,6 +705,8 @@ title = "6 - Ruines"
 acoustic_zone = &"ruins"
 ambient_light = 0.22
 atmosphere = ExtResource("44_ruins_night")
+objective = "Traverser les ruines par les hauteurs"
+objective_target = NodePath("Objective")
 
 [node name="Ruin1" type="Node2D" parent="Room6"]
 position = Vector2(150.0, 672.0)
@@ -785,7 +795,7 @@ patrol_left_blocks = 4.0
 patrol_right_blocks = 4.0
 rng_seed = 5
 
-[node name="Rubble" type="Area2D" parent="Room6"]
+[node name="Rubble" type="Node2D" parent="Room6"]
 position = Vector2(1900.0, 672.0)
 script = ExtResource("28_rubble")
 
@@ -808,7 +818,7 @@ offset_right = 1140
 offset_bottom = 160
 theme_override_colors/font_color = Color(0.72, 0.88, 0.82, 0.9)
 theme_override_font_sizes/font_size = 17
-text = "ÉCRAN 6 : RUINES, DE NUIT\nMarek se glisse dans un conduit, trop étroit pour vous : il vous retrouvera plus loin.\nIl vous a montré un chemin par les hauteurs. Accroupi ({move_down}), vos pas sont muets.\nLes Sentinelles voient mal dans le noir et ne regardent pas en l'air. {throw} : lancer une pierre."
+text = "ÉCRAN 6 : RUINES, DE NUIT\nMarek se glisse dans un conduit, trop étroit pour vous : il vous retrouvera plus loin.\nIl vous a montré un chemin par les hauteurs. Accroupi ({move_down}), vos pas sont muets.\nLes Sentinelles voient mal dans le noir et ne regardent pas en l'air. {interact} sur un tas de gravats : ramasser des pierres ; {throw} : en lancer une."
 
 [node name="Room7" type="Node2D" parent="."]
 position = Vector2(2560.0, 2400.0)
@@ -819,6 +829,8 @@ title = "7 - Hall"
 acoustic_zone = &"hall"
 ambient_light = 0.85
 atmosphere = ExtResource("49_hall")
+objective = "Prendre l'ascenseur au fond du hall"
+objective_target = NodePath("Elevator")
 
 [node name="Ceiling" type="StaticBody2D" parent="Room7"]
 position = Vector2(0.0, 0.0)
@@ -904,6 +916,8 @@ title = "8 - Poursuite"
 acoustic_zone = &"ruins"
 ambient_light = 0.45
 atmosphere = ExtResource("44_ruins_night")
+objective = "Fuir ! Ouvrir la porte du fond"
+objective_target = NodePath("FinaleTrigger")
 
 [node name="Ruin1" type="Node2D" parent="Room8"]
 position = Vector2(220.0, 480.0)
@@ -1099,3 +1113,12 @@ layer = 20
 
 [node name="EndingShot" type="Node2D" parent="Story/EndingLayer"]
 script = ExtResource("35_ending")
+
+[node name="Objective" type="Marker2D" parent="Room2"]
+position = Vector2(2540.0, 936.0)
+
+[node name="Objective" type="Marker2D" parent="Room3"]
+position = Vector2(2540.0, 1032.0)
+
+[node name="Objective" type="Marker2D" parent="Room6"]
+position = Vector2(2540.0, 672.0)

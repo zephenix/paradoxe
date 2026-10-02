@@ -772,6 +772,58 @@ def stone_pickup(rng: np.random.Generator) -> np.ndarray:
     return dsp.fade(dsp.normalize(out, 0.5))
 
 
+def _register_stone_takes() -> None:
+    # J9 (retour de jeu de la v0.8 : « il manque un bruit quand il ramasse ») :
+    # UNE pierre ramassée, bien audible. La main racle les gravats (grain bref),
+    # puis la pierre claque contre celles déjà en poche (deux chocs secs, aigus,
+    # comme deux galets). Trois variantes : trois pierres à la suite ne sonnent
+    # pas pareil.
+    def take(rng: np.random.Generator, i: int) -> np.ndarray:
+        d = 0.42
+        out = np.zeros(dsp.n_samples(d))
+        scrape = dsp.bandpass(dsp.crackle(0.12, rng, 260.0), 1200, 7000, order=1) * dsp.ramp(0.12, 1.0, 0.0)
+        out[: len(scrape)] += 0.5 * dsp.normalize(scrape)
+        for k, (at, level) in enumerate(((0.13 + 0.01 * i, 1.0), (0.2 + 0.015 * i, 0.55))):
+            f = rng.uniform(1700, 2600) + 180.0 * i
+            clack = dsp.modal_body(0.18, [(f, 1.0, 0.025), (f * 1.47, 0.6, 0.018), (f * 2.3, 0.3, 0.01)])
+            body = dsp.sine(rng.uniform(380, 520), 0.18) * dsp.exp_decay(0.18, 0.02) * 0.6
+            start = dsp.n_samples(at)
+            hit = (clack + body) * level
+            out[start:start + len(hit)] += hit[: len(out) - start]
+        return dsp.fade(dsp.normalize(out, 0.9), 0.001, 0.05)
+
+    for i in range(1, 4):
+        def build(rng: np.random.Generator, i: int = i) -> np.ndarray:
+            return take(rng, i)
+        sound(f"stone_take_{i:02d}", "foley",
+              description=f"Une pierre ramassée : la main racle, la pierre claque en poche, variante {i} (J9).")(build)
+
+
+_register_stone_takes()
+
+
+@sound("bracelet_open", "sfx", description="Hologramme du bracelet qui s'ouvre : scintillement montant (J9).")
+def bracelet_open(rng: np.random.Generator) -> np.ndarray:
+    # Un glissando doux (420 -> 1260 Hz) doublé d'une quinte, avec un léger
+    # vibrato rapide (« scintillement ») et un souffle aigu : la lumière qui se déplie.
+    d = 0.32
+    t = dsp.time_axis(d)
+    glide = 420.0 * 3.0 ** np.clip(t / 0.2, 0.0, 1.0)
+    shimmer = 1.0 + 0.012 * np.sin(2 * np.pi * 34.0 * t)
+    tone = dsp.sine(glide * shimmer, d) + 0.4 * dsp.sine(glide * 1.5 * shimmer, d)
+    air = dsp.bandpass(dsp.white_noise(d, rng), 4000, 9000) * 0.15
+    return dsp.fade(dsp.normalize((tone + air) * dsp.adsr(d, 0.02, 0.1, 0.5, 0.18), 0.6))
+
+
+@sound("bracelet_close", "sfx", description="Hologramme du bracelet qui se replie : glissement descendant (J9).")
+def bracelet_close(rng: np.random.Generator) -> np.ndarray:
+    d = 0.22
+    t = dsp.time_axis(d)
+    glide = 1100.0 / 2.5 ** np.clip(t / 0.15, 0.0, 1.0)
+    tone = dsp.sine(glide, d) + 0.3 * dsp.sine(glide * 1.5, d)
+    return dsp.fade(dsp.normalize(tone * dsp.adsr(d, 0.01, 0.05, 0.5, 0.15), 0.5))
+
+
 def _register_stone_impacts() -> None:
     def impact(rng: np.random.Generator, i: int) -> np.ndarray:
         # La pierre frappe le sol, rebondit deux fois (de plus en plus faible), puis roule.

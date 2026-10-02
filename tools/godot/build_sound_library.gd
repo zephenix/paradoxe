@@ -99,6 +99,9 @@ const OVERRIDES: Dictionary = {
 	&"stone_impact": {"volume_db": 0.5, "noise_radius": 520.0},
 	&"stone_throw": {"volume_db": -12.0, "noise_radius": 60.0},
 	&"stone_pickup": {"volume_db": -12.0, "noise_radius": 60.0},
+	&"stone_take": {"volume_db": -1.5, "noise_radius": 90.0},  # J9 : bien audible, mais discret pour les ennemis
+	&"bracelet_open": {"volume_db": -15.0},
+	&"bracelet_close": {"volume_db": -13.5},
 	&"lever_pull": {"volume_db": -2.0, "noise_radius": 150.0},
 	&"plate_click": {"volume_db": -1.0},
 	&"door_slide": {"volume_db": -12.5, "noise_radius": 250.0},

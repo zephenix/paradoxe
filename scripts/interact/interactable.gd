@@ -35,6 +35,13 @@ const GROUP: StringName = &"interactables"
 ## Chaque type d'objet règle la sienne dans _init() ; l'indicateur d'ordre
 ## d'Élias (OrderIndicator) s'en sert pour allumer la spirale visée.
 var mark_offset: Vector2 = Vector2(0.0, -92.0)
+## Le geste d'Élias pour l'actionner : le nom de l'état du joueur (J9). Par
+## défaut, il tend la main (« Interact ») ; sur un tas de gravats, il s'accroupit
+## pour ramasser (« PickUp »).
+var gesture: StringName = &"Interact"
+## Marge de portée (pixels) : un objet large (tas de gravats) s'atteint aussi
+## quand Élias se tient dessus ou juste à côté.
+var reach_margin: float = 0.0
 
 
 func _ready() -> void:
@@ -71,7 +78,7 @@ static func find_for(who: Node2D, facing: int, reach: float) -> Interactable:
 		if absf(offset.y) > 48.0:
 			continue  # pas au même niveau
 		var ahead: float = offset.x * facing
-		if ahead < -16.0 or ahead > reach:
+		if ahead < -16.0 - item.reach_margin or ahead > reach + item.reach_margin:
 			continue  # derrière lui, ou trop loin
 		if absf(offset.x) < best_distance:
 			best_distance = absf(offset.x)

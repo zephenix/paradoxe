@@ -69,7 +69,7 @@ var _shape := RectangleShape2D.new()
 const RESUME_AS: Dictionary = {
 	&"Idle": &"Idle", &"Walk": &"Walk", &"Run": &"Run", &"Crouch": &"Crouch",
 	&"CrouchWalk": &"CrouchWalk", &"Fall": &"Fall", &"Jump": &"Fall", &"Aim": &"Aim",
-	&"LedgeHang": &"LedgeHang",
+	&"LedgeHang": &"LedgeHang", &"WristCheck": &"Idle",
 }
 
 
@@ -80,10 +80,9 @@ func _ready() -> void:
 	collision_mask = PhysicsLayers.WORLD
 	weapon.energy = energy
 	weapon.team = Projectile.TEAM_PLAYER
-	energy.changed.connect(func(value: float, capacity: float) -> void: visual.set_energy(value / capacity))
-	var gauge: EnergyGauge = get_node_or_null(^"EnergyGauge") as EnergyGauge
-	if gauge:
-		gauge.watch(energy)
+	energy.changed.connect(func(value: float, capacity: float) -> void:
+		visual.set_energy(value / capacity)
+		bracelet.flash(&"energy"))
 	floor_snap_length = 6.0
 	_shape_node.shape = _shape
 	set_crouched(false)
@@ -94,6 +93,10 @@ func _ready() -> void:
 	order_indicator = OrderIndicator.new()
 	order_indicator.position = Vector2(0.0, -config.stand_height - 26.0)
 	add_child(order_indicator)
+	# Hologramme du bracelet (J9) : énergie, poches, rembobinages, objectif.
+	bracelet = BraceletHologram.new(self)
+	bracelet.name = "Bracelet"
+	add_child(bracelet)
 	machine.setup(self)
 
 
@@ -106,10 +109,35 @@ func _physics_process(delta: float) -> void:
 	else:
 		time_since_grounded += delta
 		air_top_y = minf(air_top_y, global_position.y)
+	_update_bracelet()
 	machine.physics_update(delta)
 	_update_orders(delta)
 	if not is_dead and global_position.y > kill_y:
 		kill(&"fall")
+
+
+# --------------------------------------------------------------------------
+# Bracelet (J9)
+# --------------------------------------------------------------------------
+
+## Hologramme du bracelet (créé dans _ready).
+var bracelet: BraceletHologram
+
+
+## Touche « Bracelet » : l'hologramme s'ouvre (ou se referme). Si Élias est à
+## l'arrêt, il lève le poignet pour le regarder (état WristCheck) ; sinon,
+## l'hologramme s'affiche sans qu'il s'arrête.
+func _update_bracelet() -> void:
+	if is_dead or not wants(&"bracelet"):
+		return
+	bracelet.toggle()
+	if bracelet.is_open and machine.current_name == &"Idle":
+		machine.transition_to(&"WristCheck")
+
+
+## Montre le compteur de pierres sur l'hologramme (ramassage, lancer).
+func show_stones() -> void:
+	bracelet.flash(&"pockets")
 
 
 # --------------------------------------------------------------------------
@@ -388,6 +416,7 @@ func kill(cause: StringName) -> void:
 		return
 	is_dead = true
 	weapon.reset()
+	bracelet.hide_now()
 	machine.transition_to(&"Dead", {"cause": cause})
 	died.emit(cause)
 	Events.player_died.emit(cause)
@@ -408,6 +437,7 @@ func throw_stone(crouched: bool) -> ThrownStone:
 	var hand_height: float = config.crouch_height if crouched else config.stand_height
 	stone.global_position = global_position + Vector2(facing * 14.0, -hand_height * 0.95)
 	AudioManager.play_sfx(&"stone_throw", global_position, self)
+	show_stones()
 	return stone
 
 
@@ -473,6 +503,7 @@ func respawn(at: Vector2, new_facing: int = 1) -> void:
 	set_crouched(false)
 	weapon.reset()
 	energy.refill()
+	bracelet.hide_now()  # (la recharge l'aurait fait apparaître)
 	facing = new_facing
 	machine.transition_to(&"Idle")
 	Events.player_respawned.emit()

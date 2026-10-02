@@ -249,6 +249,11 @@ func _build_gun(fore: Node2D) -> void:
 	_gun.visible = false
 
 
+## Le milieu du bracelet, dans le monde (J9).
+func bracelet_position() -> Vector2:
+	return _bracelet.to_global(Vector2(0.0, 8.75)) if _bracelet else super.bracelet_position()
+
+
 ## Détails propres au personnage. Élias : le bracelet au poignet gauche, dont
 ## la lueur suit l'énergie. De profil vers la droite, on voit le côté gauche
 ## d'Élias : son bras gauche est le bras « avant », celui qui tient l'arme ; le

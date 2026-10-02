@@ -17,6 +17,8 @@ func physics_update(delta: float) -> void:
 		return
 	if handle_throw_action():
 		return
+	if handle_interact_action():  # ramasser des pierres sans se relever (J9)
+		return
 	if not p.input.down and p.can_stand():
 		machine.transition_to(&"Walk" if p.input.move != 0 else &"Idle")
 		return

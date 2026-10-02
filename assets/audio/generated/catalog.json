@@ -109,6 +109,16 @@
   "description": "Porte de cellule : barreaux qui coulissent et claquent (J7).",
   "loop": false
  },
+ "bracelet_close": {
+  "category": "sfx",
+  "description": "Hologramme du bracelet qui se replie : glissement descendant (J9).",
+  "loop": false
+ },
+ "bracelet_open": {
+  "category": "sfx",
+  "description": "Hologramme du bracelet qui s'ouvre : scintillement montant (J9).",
+  "loop": false
+ },
  "breath_calm_01": {
   "category": "voice",
   "description": "Respiration calme, variante 1 (J5).",
@@ -562,6 +572,21 @@
  "stone_pickup": {
   "category": "foley",
   "description": "Ramasser des pierres : cailloux qui s'entrechoquent (J6).",
+  "loop": false
+ },
+ "stone_take_01": {
+  "category": "foley",
+  "description": "Une pierre ramassée : la main racle, la pierre claque en poche, variante 1 (J9).",
+  "loop": false
+ },
+ "stone_take_02": {
+  "category": "foley",
+  "description": "Une pierre ramassée : la main racle, la pierre claque en poche, variante 2 (J9).",
+  "loop": false
+ },
+ "stone_take_03": {
+  "category": "foley",
+  "description": "Une pierre ramassée : la main racle, la pierre claque en poche, variante 3 (J9).",
   "loop": false
  },
  "stone_throw": {

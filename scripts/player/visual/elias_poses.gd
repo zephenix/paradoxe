@@ -131,6 +131,17 @@ const POSES: Dictionary = {
 	"touch_chest": {"torso": 8, "head": 14, "arm_f": 45, "fore_f": 125, "arm_b": 4, "fore_b": 10},
 	"cower": {"hips_y": 20, "thigh_f": 70, "shin_f": -115, "thigh_b": 55, "shin_b": -110,
 		"torso": 30, "head": -10, "arm_f": 150, "fore_f": 70, "arm_b": 140, "fore_b": 75, "coat": -35},
+	# Ramasser une pierre (J9) : accroupi, buste penché, la main au sol (« pick »),
+	# puis la main remonte vers la poche de la blouse (« pick_pocket »).
+	# (Le bras suit le buste : buste penché de 62°, un bras à 88° descend 26° en
+	# avant de la verticale, vers le sol.)
+	"pick": {"hips_y": 26, "thigh_f": 80, "shin_f": -128, "thigh_b": 62, "shin_b": -122,
+		"torso": 62, "head": 10, "arm_f": 88, "fore_f": 6, "arm_b": 50, "fore_b": 30, "coat": -45},
+	"pick_pocket": {"hips_y": 24, "thigh_f": 75, "shin_f": -125, "thigh_b": 60, "shin_b": -120,
+		"torso": 40, "head": 12, "arm_f": 35, "fore_f": 70, "arm_b": 35, "fore_b": 30, "coat": -40},
+	# Regarder le bracelet (J9) : l'avant-bras gauche levé devant la poitrine, la
+	# tête penchée vers le poignet (l'hologramme s'en élève).
+	"wrist": {"torso": 5, "head": 24, "arm_f": 22, "fore_f": 82, "arm_b": 6, "fore_b": 10},
 	# À genou (tir bas des Sentinelles) : jambes de l'accroupi, buste droit.
 	"kneel_aim": {"hips_y": 24, "thigh_f": 75, "shin_f": -125, "thigh_b": 60, "shin_b": -120,
 		"torso": 8, "head": -4, "arm_f": 82, "fore_f": 0, "arm_b": 40, "fore_b": 70, "coat": -40},
@@ -182,6 +193,15 @@ const ANIMATIONS: Dictionary = {
 		"keys": [[0.0, "crouch"], [0.12, "crouch_throw_back"], [0.2, "crouch_throw_release"], [0.4, "crouch"]]},
 	# Interactions et gestes (J7).
 	"interact": {"length": 0.35, "keys": [[0.0, "stand"], [0.15, "reach"], [0.35, "stand"]]},
+	# Ramassage (J9) : se baisser, prendre (une boucle par pierre), se relever
+	# (debout, ou accroupi s'il ramassait accroupi). L'état PickUp en règle les durées.
+	"pick_down": {"length": 0.22, "keys": [[0.0, "stand"], [0.22, "pick"]]},
+	"pick_take": {"length": 0.32, "loop": true, "keys": [[0.0, "pick"], [0.16, "pick_pocket"], [0.32, "pick"]]},
+	"pick_rise": {"length": 0.25, "keys": [[0.0, "pick"], [0.25, "stand"]]},
+	"pick_rise_crouch": {"length": 0.25, "keys": [[0.0, "pick"], [0.25, "crouch"]]},
+	# Le bracelet (J9) : il lève le poignet, puis respire doucement en le regardant.
+	"wrist": {"length": 3.0, "keys": [[0.0, "stand"], [0.2, "wrist"], [1.6, "wrist", false, {"torso": 6, "hips_y": 1, "head": 23}],
+		[3.0, "wrist"]]},
 	"beckon": {"length": 0.8, "keys": [[0.0, "stand"], [0.2, "beckon"], [0.4, "beckon", false, {"fore_f": 55}],
 		[0.6, "beckon"], [0.8, "stand"]]},
 	"halt": {"length": 0.8, "keys": [[0.0, "stand"], [0.2, "halt"], [0.6, "halt"], [0.8, "stand"]]},

@@ -28,7 +28,8 @@
 [ext_resource type="Script" path="res://scripts/player/states/interact.gd" id="s21_interact"]
 [ext_resource type="Script" path="res://scripts/combat/energy_pool.gd" id="5_energy"]
 [ext_resource type="Script" path="res://scripts/combat/weapon.gd" id="6_weapon"]
-[ext_resource type="Script" path="res://scripts/player/energy_gauge.gd" id="7_gauge"]
+[ext_resource type="Script" path="res://scripts/player/states/pick_up.gd" id="s22_pick_up"]
+[ext_resource type="Script" path="res://scripts/player/states/wrist_check.gd" id="s23_wrist_check"]
 
 [node name="Elias" type="CharacterBody2D"]
 script = ExtResource("1_player")
@@ -46,9 +47,6 @@ script = ExtResource("5_energy")
 
 [node name="Weapon" type="Node2D" parent="."]
 script = ExtResource("6_weapon")
-
-[node name="EnergyGauge" type="Node2D" parent="."]
-script = ExtResource("7_gauge")
 
 [node name="StateMachine" type="Node" parent="."]
 script = ExtResource("3_machine")
@@ -118,3 +116,9 @@ script = ExtResource("s20_throw")
 
 [node name="Interact" type="Node" parent="StateMachine"]
 script = ExtResource("s21_interact")
+
+[node name="PickUp" type="Node" parent="StateMachine"]
+script = ExtResource("s22_pick_up")
+
+[node name="WristCheck" type="Node" parent="StateMachine"]
+script = ExtResource("s23_wrist_check")
