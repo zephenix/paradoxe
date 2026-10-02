@@ -5,6 +5,7 @@ extends CanvasLayer
 ## continuent, comme ce menu et la musique).
 ##   - Reprendre ;
 ##   - Recommencer au checkpoint ;
+##   - Recommencer la course (mode chrono seulement) ;
 ##   - Options (le même menu qu'à l'écran titre) ;
 ##   - Retour au titre.
 ## Créé par le Level ; il ne s'ouvre ni pendant une cinématique, ni pendant la
@@ -46,6 +47,10 @@ func _ready() -> void:
 	_button(box, "Recommencer au checkpoint", func() -> void:
 		close()
 		restart_requested.emit())
+	if GameState.time_trial:  # mode chrono (J9) : repartir de zéro
+		_button(box, "Recommencer la course", func() -> void:
+			close()
+			SceneTransition.change_scene(TimeTrial.LEVEL_SCENE))
 	_button(box, "Options", open_options)
 	_button(box, "Retour au titre", func() -> void:
 		close()

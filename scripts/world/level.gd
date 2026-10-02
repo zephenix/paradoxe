@@ -15,7 +15,8 @@ extends Node2D
 ## Son (J5) : en changeant de salle, l'ambiance passe à la zone acoustique de la
 ## salle (Room.acoustic_zone) ; en quittant le niveau, elle s'éteint.
 ##
-## « Pause » ramène à l'écran titre (le menu pause arrive en J9).
+## « Pause » ouvre le menu pause (J9). En mode chrono (GameState.time_trial),
+## un TimeTrial chronomètre la course et fait courir le fantôme du record.
 
 ## Durée du fondu de la lumière ambiante en changeant de salle (secondes).
 const AMBIENT_FADE: float = 0.8
@@ -50,6 +51,8 @@ var _tint_tween: Tween
 var noise_rings: NoiseRings
 ## Menu pause (J9).
 var pause_menu: PauseMenu
+## Mode chrono (J9) : chrono, enregistrement du passage, fantôme. Null hors chrono.
+var time_trial: TimeTrial
 ## Textes des salles (aides, « SORTIE ») : leurs touches sont remplies au vol.
 var _labels: Array[Label] = []
 ## Niveau d'alerte global (J6) : 0 = calme, 1 = combat. C'est le plus inquiet
@@ -91,6 +94,10 @@ func _ready() -> void:
 	cutscenes = CutscenePlayer.new()
 	cutscenes.name = "Cutscenes"
 	add_child(cutscenes)
+	if GameState.time_trial:
+		time_trial = TimeTrial.new(self)
+		time_trial.name = "TimeTrial"
+		add_child(time_trial)
 	if play_opening and not opening_cutscene.is_empty():
 		_play_opening.call_deferred()
 	# Pendant le défilement arrière, le jeu est en pause : la caméra ne suit plus
@@ -113,6 +120,9 @@ func _on_room_changed(room: Room) -> void:
 	AudioManager.set_zone(room.acoustic_zone)
 	set_ambient(room.ambient_light, AMBIENT_FADE)
 	set_atmosphere(room.atmosphere, AMBIENT_FADE)
+	# En entrant dans un écran, le bracelet rappelle brièvement son objectif (J9).
+	if room.objective != "" and not (cutscenes and cutscenes.playing) and not player.is_dead:
+		player.bracelet.flash(&"objective")
 
 
 ## Applique l'ambiance visuelle d'une salle (null = aucune) en « duration »
@@ -274,7 +284,7 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Vrai si le menu pause peut s'ouvrir maintenant.
 func can_pause() -> bool:
 	return not (cutscenes and cutscenes.playing) and not get_tree().paused and not player.is_dead \
-			and not SceneTransition.is_changing_scene
+			and not SceneTransition.is_changing_scene and not (time_trial and time_trial.is_finished)
 
 
 ## « Recommencer au checkpoint » (menu pause) : comme après une mort, sans la mort.

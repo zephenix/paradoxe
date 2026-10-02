@@ -1553,3 +1553,114 @@ sur lui-même ; et chaque motif (briques, plaques, planches) doit tomber juste d
   `Room.objective_target`) : « Traverser la canopée », « Prendre l'ascenseur au fond du
   hall »…
 - Textes des salles : le bracelet est présenté à l'écran 2, le ramassage à l'écran 6.
+
+**Contre la montre et finitions (partie C)**
+
+- **Mode chrono** (« Contre la montre » sur l'écran titre, avec le record s'il y en a un) :
+  de l'écran 2 à la fin, les cinématiques passent d'office. Le chrono est en haut à droite,
+  le record juste dessous. À l'arrivée, un écran donne le temps, le record ou l'écart, et
+  propose de recommencer ou de revenir au titre. Le menu pause gagne « Recommencer la
+  course ».
+- **Le fantôme** : pendant la course, la trace d'Élias est enregistrée 20 fois par seconde
+  (position, sens du regard, animation). Un temps qui bat le record est sauvegardé
+  (`user://ghost_best.res`), et la course suivante, une silhouette translucide d'Élias
+  rejoue ce meilleur passage à côté du joueur.
+- **Objectif en entrant dans un écran** : le bracelet l'affiche brièvement tout seul.
+- Version **0.9.0**.
+
+### Comment tester
+
+1. Écran titre : « **Nouvelle partie** », puis jouer. Essayer aussi les menus.
+2. À essayer :
+
+| À essayer | Ce qui doit se passer |
+|---|---|
+| Échap en jeu | Le menu pause ; le jeu s'arrête derrière |
+| Options > Commandes : cliquer « Sauter », appuyer sur une autre touche | La touche change, et les textes des salles aussi |
+| Options > Aides : « Jeu ralenti » | Tout le jeu à 80 % de sa vitesse |
+| Brancher une manette, appuyer sur un bouton | Les textes des salles affichent les boutons de la manette |
+| Tab à l'arrêt | Élias regarde son poignet ; l'hologramme s'ouvre (énergie, poches, rembobinages, objectif) |
+| Tab en courant | L'hologramme s'ouvre sans qu'Élias s'arrête |
+| Écran 6 : E devant le tas de gravats | Élias s'accroupit, trois « clac » ; le compteur affiche trois pierres |
+| E une seconde fois | Il tâte sa poche : elle est pleine |
+| Entrer dans un nouvel écran | L'objectif s'affiche un instant au-dessus d'Élias |
+| « Contre la montre », aller au bout | Écran d'arrivée : « Premier record ! » |
+| « Contre la montre » une seconde fois | Le fantôme (Élias translucide) refait votre premier passage |
+
+### Ce qu'il faut écouter
+
+| Moment | Ce que tu dois entendre |
+|---|---|
+| Ramasser des pierres | Pour chaque pierre, un raclement puis un double « clac » de galets, nettement audible |
+| Poches pleines | Le petit cliquetis des pierres en poche |
+| Ouvrir le bracelet | Un scintillement qui monte |
+| Le refermer | Un glissement qui descend |
+| Menus | Le « bip » de validation à chaque réglage |
+
+### Décisions prises (et pourquoi)
+
+- **Ramasser avec « Interagir »** plutôt qu'en passant : c'est un vrai geste, on l'entend et
+  on le voit, et il a un prix (environ 1 s accroupi, à la merci d'une Sentinelle), dans
+  l'esprit des jeux d'origine.
+- **Un hologramme, pas d'interface permanente** (PLAN §5.10). Les affichages brefs
+  remplacent la jauge d'énergie provisoire. Le choix de la séquence de mort reste à l'écran :
+  le jeu y est figé, et c'est un choix de menu.
+- **Le chrono compte le temps du jeu** : il s'arrête en pause et pendant le choix de la
+  séquence de mort, mais pas pendant le temps rejoué après un rembobinage (une mort coûte du
+  temps). Avec « Jeu ralenti », le jeu va moins vite mais le chrono aussi : le temps reste
+  comparable.
+- **Un seul record**, celui de la machine (fichier `user://ghost_best.res`). Le fantôme ne
+  touche à rien : ni corps, ni son, ni Sentinelles.
+- **Les menus sont construits par le code** (options, pause) : la liste des commandes vient
+  d'un seul tableau (`InputActions.DEFAULTS`), et un test vérifie que chaque commande y est.
+- **Touches affichées « à la place » des touches** : on règle des touches physiques ;
+  `InputPrompt` demande au système quelle lettre est gravée à cet endroit. Un joueur AZERTY
+  lit « A » là où un joueur QWERTY lit « Q ».
+
+### Vérifications effectuées
+
+- `./tools/run_tests.sh` : 357 tests au vert (partie A : 8 + 2 ; partie B : 12 ; partie C :
+  11, dont une course arrêtée par la cinématique de fin, un premier record et un record
+  gardé). Un test vérifie aussi que chaque commande figure dans Options > Commandes (« Passer
+  une cinématique » y a été ajoutée).
+- Contrôles par mutation, chacun détecté par un test :
+  - partie A : sans la sauvegarde des touches ;
+  - partie B : un tas qui donne toutes les pierres d'un coup, ou pas de pose « poignet » ;
+  - partie C : des cinématiques non passées, ou un record remplacé par un temps plus lent.
+- `python3 tools/audio/measure_levels.py` : aucun écart. Nouvelles familles « Objets
+  ramassés » et « Bracelet ».
+- Captures vérifiées :
+  - menus et options ;
+  - hologramme dans les ruines de nuit et dans le hall ;
+  - poses « poignet » et « ramassage » ;
+  - chrono et fantôme à l'écran 2 ;
+  - écran d'arrivée.
+
+### Reste à faire / points d'attention
+
+- **À régler en jouant** :
+  - les durées de l'hologramme (`resources/player/bracelet.tres`) ;
+  - le rythme du ramassage (`resources/player/throw.tres`) ;
+  - la transparence du fantôme (`resources/time_trial.tres`).
+- Sur le Web, une manette n'est reconnue qu'après un premier appui sur un de ses boutons
+  (règle des navigateurs).
+- Suite possible : **v1.0** si tu valides cette version. Il resterait les retouches issues
+  de tes essais et l'audit complet du code.
+
+### Concepts Godot expliqués
+
+**1. Un calque qui « suit la caméra » (CanvasLayer + follow_viewport)**
+
+Un `CanvasLayer` est une feuille transparente posée sur l'écran. D'ordinaire, elle ne bouge
+pas avec la caméra (c'est le cas des menus). Avec `follow_viewport_enabled`, elle bouge comme
+le monde : on y place l'hologramme aux coordonnées d'Élias. Et comme ce n'est pas la même
+feuille que le décor, la teinte sombre de la salle (`CanvasModulate`) ne s'y applique pas :
+c'est ce qui fait « briller » l'hologramme dans le noir.
+
+**2. Une ressource pour sauvegarder des données (Resource + ResourceSaver)**
+
+Le passage du fantôme est une `Resource` (`GhostRun`) : un objet dont les variables
+marquées `@export` sont écrites dans un fichier par `ResourceSaver.save` et relues par
+`ResourceLoader.load`. Pas besoin d'écrire le format soi-même : c'est l'équivalent
+d'« Enregistrer sous » pour un objet. Les colonnes sont des tableaux « compacts »
+(`PackedVector2Array`…), beaucoup plus légers que des tableaux ordinaires.

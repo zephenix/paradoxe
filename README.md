@@ -12,15 +12,17 @@ plan. Le tout est modernisé avec du parkour, un rembobinage temporel limité, u
 de l'infiltration par la lumière et le son, et une interface intégrée au personnage.
 Tous les éléments du jeu (images, sons, musique) sont originaux ou générés par du code.
 
-> **État actuel : jalon J8 (v0.8), le prototype de bout en bout.** Depuis l'écran titre :
+> **État actuel : jalon J9 (v0.9), les finitions.** Depuis l'écran titre :
 > - **Nouvelle partie** : la cinématique d'ouverture (le laboratoire, l'orage, le portail),
 >   puis les 7 écrans jouables : l'arrivée et la fuite devant un prédateur, la canopée,
 >   la capture, l'évasion à deux avec un vieux prisonnier, les ruines de nuit, le combat du
 >   hall, la poursuite, et la fin ;
-> - **Revoir l'intro**, ou **Prototype sans l'intro** ;
-> - la **salle de test** (sept écrans) : mouvements, combat, rembobinage, infiltration ;
-> - le **banc d'écoute** de tous les sons et musiques (avec un curseur de tension) ;
-> - deux interrupteurs : **mode classique** et **Voir les sons**.
+> - **Revoir l'intro**, ou **Jouer sans l'intro** ;
+> - **Contre la montre** : le prototype chronométré, avec le fantôme de votre record ;
+> - **Options** : volumes, commandes (clavier et manette), aides (mode classique, jeu
+>   ralenti, rembobinages illimités…), image (Voir les sons, moins de flashs…) ;
+> - **Crédits** ;
+> - l'**Atelier** : la salle de test (sept écrans) et le banc d'écoute de tous les sons.
 >
 > Feuille de route : [`docs/PLAN.md`](docs/PLAN.md) ;
 > avancement : [`docs/JOURNAL.md`](docs/JOURNAL.md).
@@ -130,6 +132,10 @@ hauteur, sur une passerelle, Élias est hors de leur vue. L'option **Voir les so
 hologramme au-dessus du poignet d'Élias : énergie, arme et pierres, rembobinages restants,
 et l'objectif de l'écran avec une flèche. Il s'affiche aussi brièvement quand l'énergie
 change ou qu'on ramasse ou lance une pierre.
+
+**Contre la montre (J9)** : depuis l'écran titre, de l'écran 2 à la fin, cinématiques
+passées d'office. Le chrono est en haut à droite. Battre son record l'enregistre, et la
+course suivante, un fantôme (Élias translucide) rejoue ce meilleur passage.
 
 **Mort et rembobinage** : à la mort, le temps ralentit puis se fige. **Maintenir R** fait
 remonter le temps (jusqu'à 5 s) ; en relâchant, on reprend à cet instant. Il y a 3

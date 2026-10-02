@@ -21,7 +21,7 @@ const ACTION_NAMES: Array = [
 	[&"move_down", "Bas (s'accroupir)"], [&"jump", "Sauter"], [&"run", "Courir (maintenir)"], [&"roll", "Roulade"],
 	[&"fire", "Tirer"], [&"shield", "Bouclier"], [&"interact", "Interagir"], [&"throw", "Lancer une pierre"],
 	[&"order", "Ordre au compagnon"], [&"bracelet", "Bracelet"], [&"rewind", "Remonter le temps"],
-	[&"pause", "Pause"],
+	[&"pause", "Pause"], [&"skip", "Passer une cinématique (maintenir)"],
 ]
 const VOLUME_NAMES: Array = [
 	[AudioBuses.MASTER, "Volume général"], [AudioBuses.MUSIC, "Musique"], [AudioBuses.AMBIENCE, "Ambiance"],
